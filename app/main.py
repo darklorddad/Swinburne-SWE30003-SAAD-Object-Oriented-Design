@@ -63,3 +63,11 @@ async def park_detail_page(request: Request, park_id: UUID):
     return templates.TemplateResponse(
         "park_detail.html", {"request": request, "park_id": park_id}
     )
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard_page(request: Request):
+    """
+    Serves the admin dashboard page.
+    """
+    return templates.TemplateResponse("admin.html", {"request": request})

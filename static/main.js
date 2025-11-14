@@ -19,6 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadParks();
   }
 
+  if (window.location.pathname === "/admin") {
+    loadAdminDashboard();
+  }
+
   if (window.location.pathname.startsWith("/parks/")) {
     loadParkDetail();
   }
@@ -57,6 +61,9 @@ function updateNav() {
     navItems.innerHTML = `
             <li class="nav-item">
                 <a class="nav-link" href="/profile">Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin">Admin</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" id="logout-btn">Logout</a>
@@ -444,6 +451,78 @@ async function handleOrderSubmit(event) {
       window.location.href = "/profile";
     }, 2000);
   } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function loadAdminDashboard() {
+  const token = getToken();
+  if (!token) {
+    window.location.href = "/login";
+    return;
+  }
+
+  const statsContainer = document.getElementById("statistics-container");
+
+  try {
+    const response = await fetch("/api/admin/statistics/visitors/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 403) {
+      throw new Error("You do not have permission to view this page.");
+    }
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.detail || "Failed to fetch visitor statistics.");
+    }
+
+    const stats = await response.json();
+
+    if (stats.revenue_by_park.length === 0) {
+      statsContainer.innerHTML = `
+        <h5>Overall Summary</h5>
+        <p><strong>Total Revenue:</strong> RM 0.00</p>
+        <p><strong>Total Tickets Sold:</strong> 0</p>
+        <hr>
+        <p>No park data available to generate statistics.</p>
+      `;
+      return;
+    }
+
+    const parkStatsHtml = stats.revenue_by_park
+      .map(
+        (p) => `
+        <tr>
+            <td>${p.park_name}</td>
+            <td>${p.tickets_sold}</td>
+            <td>RM ${p.total_revenue.toFixed(2)}</td>
+        </tr>
+    `
+      )
+      .join("");
+
+    statsContainer.innerHTML = `
+        <h5>Overall Summary</h5>
+        <p><strong>Total Revenue:</strong> RM ${stats.total_revenue.toFixed(2)}</p>
+        <p><strong>Total Tickets Sold:</strong> ${stats.total_tickets_sold}</p>
+        <hr>
+        <h5>Revenue by Park</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Park</th>
+                    <th>Tickets Sold</th>
+                    <th>Total Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${parkStatsHtml}
+            </tbody>
+        </table>
+    `;
+  } catch (error) {
+    statsContainer.innerHTML = ""; // Clear the "Loading..." message
     showAlert(error.message, "danger");
   }
 }
