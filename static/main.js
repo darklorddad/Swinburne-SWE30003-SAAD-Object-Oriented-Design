@@ -203,47 +203,108 @@ async function loadAdminParks() {
 
   const container = document.getElementById("parks-management-container");
   try {
-    const response = await fetch("/api/admin/parks/", {
+    const parksResponse = await fetch("/api/admin/parks/", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) throw new Error("Failed to fetch parks.");
+    if (!parksResponse.ok) throw new Error("Failed to fetch parks.");
 
-    const parks = await response.json();
+    const parks = await parksResponse.json();
     if (parks.length === 0) {
       container.innerHTML = "<p>No parks have been created yet.</p>";
       return;
     }
 
-    const parksHtml = parks
-      .map(
-        (park) => `
-      <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-        <div>
-          <strong>${park.name}</strong>
-          <small class="d-block text-muted">${park.location || "No location"}</small>
+    // Fetch ticket types for all parks in parallel
+    const parksWithTicketTypesPromises = parks.map(async (park) => {
+      const ticketTypesResponse = await fetch(
+        `/api/admin/parks/${park.id}/ticket-types/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const ticketTypes = ticketTypesResponse.ok
+        ? await ticketTypesResponse.json()
+        : [];
+      return { ...park, ticketTypes };
+    });
+
+    const parksWithTicketTypes = await Promise.all(parksWithTicketTypesPromises);
+
+    const accordionId = "parks-accordion";
+    const parksHtml = parksWithTicketTypes
+      .map((park) => {
+        const ticketTypesHtml =
+          park.ticketTypes.length > 0
+            ? park.ticketTypes
+                .map(
+                  (tt) => `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>${tt.name} - RM ${tt.price.toFixed(2)}</span>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm">Edit</button>
+                        <button class="btn btn-outline-danger btn-sm">Delete</button>
+                    </div>
+                </li>
+            `
+                )
+                .join("")
+            : '<li class="list-group-item">No ticket types found for this park.</li>';
+
+        return `
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-${park.id}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
+                  park.id
+                }" aria-expanded="false" aria-controls="collapse-${park.id}">
+                    ${park.name}
+                </button>
+            </h2>
+            <div id="collapse-${
+              park.id
+            }" class="accordion-collapse collapse" aria-labelledby="heading-${
+          park.id
+        }" data-bs-parent="#${accordionId}">
+                <div class="accordion-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <strong>Location:</strong> ${
+                              park.location || "N/A"
+                            }<br>
+                            <strong>Description:</strong> ${
+                              park.description || "N/A"
+                            }
+                        </div>
+                        <div>
+                            <button
+                                class="btn btn-secondary btn-sm edit-park-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editParkModal"
+                                data-park-id="${park.id}"
+                                data-park-name="${park.name}"
+                                data-park-location="${park.location || ""}"
+                                data-park-description="${park.description || ""}"
+                            >
+                                Edit Park
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-park-btn" data-park-id="${
+                              park.id
+                            }">Delete Park</button>
+                        </div>
+                    </div>
+                    
+                    <h6>Ticket Types</h6>
+                    <ul class="list-group mb-3">
+                        ${ticketTypesHtml}
+                    </ul>
+                    <button class="btn btn-primary btn-sm">Add Ticket Type</button>
+                </div>
+            </div>
         </div>
-        <div>
-          <button
-            class="btn btn-secondary btn-sm edit-park-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#editParkModal"
-            data-park-id="${park.id}"
-            data-park-name="${park.name}"
-            data-park-location="${park.location || ""}"
-            data-park-description="${park.description || ""}"
-          >
-            Edit
-          </button>
-          <button class="btn btn-danger btn-sm delete-park-btn" data-park-id="${
-            park.id
-          }">Delete</button>
-        </div>
-      </div>
-    `
-      )
+      `;
+      })
       .join("");
 
-    container.innerHTML = parksHtml;
+    container.innerHTML = `<div class="accordion" id="${accordionId}">${parksHtml}</div>`;
   } catch (error) {
     container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
   }
