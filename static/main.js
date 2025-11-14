@@ -16,6 +16,38 @@ document.addEventListener("DOMContentLoaded", () => {
     createParkForm.addEventListener("submit", handleCreatePark);
   }
 
+  const saveParkBtn = document.getElementById("save-park-changes-btn");
+  if (saveParkBtn) {
+    saveParkBtn.addEventListener("click", handleUpdatePark);
+  }
+
+  const editParkModal = document.getElementById("editParkModal");
+  if (editParkModal) {
+    editParkModal.addEventListener("show.bs.modal", (event) => {
+      // Button that triggered the modal
+      const button = event.relatedTarget;
+      // Extract info from data-* attributes
+      const id = button.getAttribute("data-park-id");
+      const name = button.getAttribute("data-park-name");
+      const location = button.getAttribute("data-park-location");
+      const description = button.getAttribute("data-park-description");
+
+      // Update the modal's content.
+      const modalIdInput = editParkModal.querySelector("#edit-park-id");
+      const modalNameInput = editParkModal.querySelector("#edit-park-name");
+      const modalLocationInput =
+        editParkModal.querySelector("#edit-park-location");
+      const modalDescriptionInput = editParkModal.querySelector(
+        "#edit-park-description"
+      );
+
+      modalIdInput.value = id;
+      modalNameInput.value = name;
+      modalLocationInput.value = location;
+      modalDescriptionInput.value = description;
+    });
+  }
+
   const profileUpdateForm = document.getElementById("profile-update-form");
   if (profileUpdateForm) {
     profileUpdateForm.addEventListener("submit", handleProfileUpdate);
@@ -191,6 +223,17 @@ async function loadAdminParks() {
           <small class="d-block text-muted">${park.location || "No location"}</small>
         </div>
         <div>
+          <button
+            class="btn btn-secondary btn-sm edit-park-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#editParkModal"
+            data-park-id="${park.id}"
+            data-park-name="${park.name}"
+            data-park-location="${park.location || ""}"
+            data-park-description="${park.description || ""}"
+          >
+            Edit
+          </button>
           <button class="btn btn-danger btn-sm delete-park-btn" data-park-id="${
             park.id
           }">Delete</button>
@@ -226,6 +269,50 @@ async function handleDeletePark(parkId) {
 
     showAlert("Park deleted successfully.", "success");
     loadAdminParks(); // Refresh the list
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleUpdatePark() {
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  const parkId = document.getElementById("edit-park-id").value;
+  const parkName = document.getElementById("edit-park-name").value;
+  const parkLocation = document.getElementById("edit-park-location").value;
+  const parkDescription = document.getElementById("edit-park-description").value;
+
+  const parkData = {
+    name: parkName,
+    location: parkLocation,
+    description: parkDescription,
+  };
+
+  try {
+    const response = await fetch(`/api/admin/parks/${parkId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(parkData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to update park.");
+    }
+
+    showAlert("Park updated successfully.", "success");
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("editParkModal")
+    );
+    modal.hide();
+    loadAdminParks(); // Refresh the list of parks
   } catch (error) {
     showAlert(error.message, "danger");
   }

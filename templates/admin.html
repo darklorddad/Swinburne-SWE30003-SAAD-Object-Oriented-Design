@@ -55,4 +55,37 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for editing a park -->
+<div class="modal fade" id="editParkModal" tabindex="-1" aria-labelledby="editParkModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editParkModalLabel">Edit Park</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-park-form">
+          <input type="hidden" id="edit-park-id">
+          <div class="mb-3">
+            <label for="edit-park-name" class="form-label">Park Name</label>
+            <input type="text" class="form-control" id="edit-park-name" required>
+          </div>
+          <div class="mb-3">
+            <label for="edit-park-location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="edit-park-location">
+          </div>
+          <div class="mb-3">
+            <label for="edit-park-description" class="form-label">Description</label>
+            <textarea class="form-control" id="edit-park-description" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-park-changes-btn">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
