@@ -11,10 +11,20 @@ document.addEventListener("DOMContentLoaded", () => {
     registerForm.addEventListener("submit", handleRegister);
   }
 
-  // The logout button is dynamically added, so we need to use event delegation
-  document.body.addEventListener("click", (event) => {
+  if (window.location.pathname === "/profile") {
+    loadProfileData();
+  }
+
+  // Event delegation for dynamically added buttons
+  document.body.addEventListener("click", async (event) => {
     if (event.target.id === "logout-btn") {
       handleLogout();
+    }
+    if (event.target.classList.contains("cancel-order-btn")) {
+      const orderId = event.target.dataset.orderId;
+      if (confirm("Are you sure you want to cancel this order?")) {
+        await cancelOrder(orderId);
+      }
     }
   });
 });
@@ -136,4 +146,99 @@ function showAlert(message, type = "info") {
   // Clear previous alerts
   placeholder.innerHTML = "";
   placeholder.append(wrapper);
+}
+
+async function loadProfileData() {
+  const token = getToken();
+  if (!token) {
+    window.location.href = "/login";
+    return;
+  }
+
+  try {
+    // Fetch user info
+    const userResponse = await fetch("/api/users/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!userResponse.ok)
+      throw new Error("Failed to fetch user data. Please log in again.");
+    const userData = await userResponse.json();
+    document.getElementById("user-full-name").textContent =
+      userData.full_name || "N/A";
+    document.getElementById("user-email").textContent = userData.email;
+
+    // Fetch orders
+    const ordersResponse = await fetch("/api/orders/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!ordersResponse.ok) throw new Error("Failed to fetch orders.");
+    const ordersData = await ordersResponse.json();
+
+    const ordersContainer = document.getElementById("orders-container");
+    if (ordersData.length === 0) {
+      ordersContainer.innerHTML = "<p>You have no orders.</p>";
+      return;
+    }
+
+    const ordersHtml = ordersData
+      .map(
+        (order) => `
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span>Order ID: ${order.id}</span>
+                <span>Date: ${new Date(
+                  order.created_at
+                ).toLocaleDateString()}</span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Status: <span class="badge bg-${
+                  order.status === "cancelled" ? "danger" : "success"
+                }">${order.status}</span></h5>
+                <p class="card-text">Total: RM ${order.total_amount.toFixed(
+                  2
+                )}</p>
+                <h6>Items:</h6>
+                <ul>
+                    ${order.items
+                      .map(
+                        (item) =>
+                          `<li>${item.quantity} x Ticket (Visit: ${item.visit_date})</li>`
+                      )
+                      .join("")}
+                </ul>
+                ${
+                  order.status !== "cancelled"
+                    ? `<button class="btn btn-danger btn-sm cancel-order-btn" data-order-id="${order.id}">Cancel Order</button>`
+                    : ""
+                }
+            </div>
+        </div>
+    `
+      )
+      .join("");
+
+    ordersContainer.innerHTML = ordersHtml;
+  } catch (error) {
+    showAlert(error.message, "danger");
+    removeToken();
+    setTimeout(() => (window.location.href = "/login"), 2000);
+  }
+}
+
+async function cancelOrder(orderId) {
+  const token = getToken();
+  try {
+    const response = await fetch(`/api/orders/${orderId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to cancel order.");
+    }
+    showAlert("Order cancelled successfully.", "success");
+    loadProfileData(); // Reload profile data to show updated status
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
 }

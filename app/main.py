@@ -42,3 +42,11 @@ async def register_page(request: Request):
     Serves the registration page.
     """
     return templates.TemplateResponse("register.html", {"request": request})
+
+
+@app.get("/profile", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    """
+    Serves the user profile page.
+    """
+    return templates.TemplateResponse("profile.html", {"request": request})

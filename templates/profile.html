@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Profile</h2>
+<div id="alert-placeholder"></div>
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">User Information</h5>
+        <p><strong>Full Name:</strong> <span id="user-full-name"></span></p>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+    </div>
+</div>
+
+<h3>My Orders</h3>
+<div id="orders-container">
+    <p>Loading orders...</p>
+</div>
+{% endblock %}
