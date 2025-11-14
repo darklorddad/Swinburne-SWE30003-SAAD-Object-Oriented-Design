@@ -1,19 +1,28 @@
-from fastapi import FastAPI
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from app.api.endpoints import admin, auth, orders
 
 app = FastAPI(title="SWE30003 - Assignment 3")
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Setup templates
+templates = Jinja2Templates(directory="templates")
+
+
+# Include API routers
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(admin.router, prefix="/api", tags=["admin"])
 app.include_router(orders.router, prefix="/api", tags=["orders"])
 
 
-@app.get("/")
-async def root():
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
     """
-    Root endpoint for the API.
+    Serves the root HTML page.
     """
-    return {"message": "Welcome to the National Parks Online System API"}
+    return templates.TemplateResponse("index.html", {"request": request})
