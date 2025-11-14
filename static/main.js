@@ -97,6 +97,11 @@ document.addEventListener("DOMContentLoaded", () => {
     passwordRecoveryForm.addEventListener("submit", handlePasswordRecovery);
   }
 
+  const tokenSubmitForm = document.getElementById("token-submit-form");
+  if (tokenSubmitForm) {
+    tokenSubmitForm.addEventListener("submit", handleTokenSubmit);
+  }
+
   const resetPasswordForm = document.getElementById("reset-password-form");
   if (resetPasswordForm) {
     resetPasswordForm.addEventListener("submit", handleResetPassword);
@@ -232,8 +237,22 @@ async function handlePasswordRecovery(event) {
     }
 
     showAlert(data.msg, "info");
+    // Hide email form and show token form
+    document.getElementById("email-form-section").classList.add("d-none");
+    document.getElementById("token-form-section").classList.remove("d-none");
   } catch (error) {
     showAlert(error.message, "danger");
+  }
+}
+
+function handleTokenSubmit(event) {
+  event.preventDefault();
+  const form = event.target;
+  const token = form.querySelector("#recovery-token").value;
+  if (token) {
+    window.location.href = `/reset-password?token=${token}`;
+  } else {
+    showAlert("Please enter the recovery token.", "warning");
   }
 }
 
