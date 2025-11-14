@@ -11,7 +11,7 @@ from app.api import deps
 from app.models.park import Park, ParkCreate, ParkUpdate
 from app.models.report import VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
-from app.services import admin_service
+from app.services import admin_service, park_service
 
 router = APIRouter()
 
@@ -38,7 +38,7 @@ async def read_parks(db: Client = Depends(deps.get_db)):
     """
     Retrieve all parks. (Admin only)
     """
-    return await admin_service.get_parks(db)
+    return await park_service.get_parks(db)
 
 
 @router.put(
@@ -107,7 +107,13 @@ async def read_ticket_types_for_park(
     """
     Retrieve all ticket types for a specific park. (Admin only)
     """
-    return await admin_service.get_ticket_types_for_park(db, park_id)
+    # Check if park exists first
+    park = await park_service.get_park_by_id(db, park_id)
+    if not park:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
+        )
+    return await park_service.get_ticket_types_for_park(db, park_id)
 
 
 @router.put(

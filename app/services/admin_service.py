@@ -10,6 +10,7 @@ from supabase import Client
 from app.models.park import Park, ParkCreate, ParkUpdate
 from app.models.report import ParkStatistic, VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
+from app.services.park_service import get_park_by_id
 
 
 async def create_park(db: Client, park: ParkCreate) -> Park:
@@ -19,19 +20,6 @@ async def create_park(db: Client, park: ParkCreate) -> Park:
     return Park(**created_park_data)
 
 
-async def get_parks(db: Client) -> List[Park]:
-    """Fetches all parks from the database."""
-    response = db.table("parks").select("*").execute()
-    parks = [Park(**park_data) for park_data in response.data]
-    return parks
-
-
-async def get_park_by_id(db: Client, park_id: UUID) -> Optional[Park]:
-    """Fetches a single park by its ID."""
-    response = db.table("parks").select("*").eq("id", str(park_id)).single().execute()
-    if response.data:
-        return Park(**response.data)
-    return None
 
 
 async def update_park(
@@ -69,12 +57,6 @@ async def create_ticket_type(
     return TicketType(**response.data[0])
 
 
-async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketType]:
-    """Fetches all ticket types for a specific park."""
-    response = (
-        db.table("ticket_types").select("*").eq("park_id", str(park_id)).execute()
-    )
-    return [TicketType(**tt) for tt in response.data]
 
 
 async def update_ticket_type(

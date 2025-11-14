@@ -10,7 +10,7 @@ from supabase import Client
 from app.api import deps
 from app.models.park import Park
 from app.models.ticket import TicketType
-from app.services import admin_service
+from app.services import park_service
 
 router = APIRouter()
 
@@ -20,7 +20,7 @@ async def read_public_parks(db: Client = Depends(deps.get_db)):
     """
     Retrieve all parks for public viewing.
     """
-    return await admin_service.get_parks(db)
+    return await park_service.get_parks(db)
 
 
 @router.get("/parks/{park_id}", response_model=Park)
@@ -28,7 +28,7 @@ async def read_public_park(park_id: UUID, db: Client = Depends(deps.get_db)):
     """
     Retrieve a single park by its ID for public viewing.
     """
-    park = await admin_service.get_park_by_id(db, park_id)
+    park = await park_service.get_park_by_id(db, park_id)
     if not park:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
@@ -44,9 +44,9 @@ async def read_public_ticket_types_for_park(
     Retrieve all ticket types for a specific park for public viewing.
     """
     # Check if park exists first
-    park = await admin_service.get_park_by_id(db, park_id)
+    park = await park_service.get_park_by_id(db, park_id)
     if not park:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
         )
-    return await admin_service.get_ticket_types_for_park(db, park_id)
+    return await park_service.get_ticket_types_for_park(db, park_id)
