@@ -9,7 +9,7 @@ from supabase import Client
 
 from app.api import deps
 from app.core.config import get_settings
-from app.models.user import Token, User, UserCreate, UserUpdate
+from app.models.user import NewPassword, Token, User, UserCreate, UserUpdate
 from app.services import auth_service
 
 router = APIRouter()
@@ -79,3 +79,52 @@ async def update_user_me(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
     return user
+
+
+@router.post("/password-recovery/{email}", status_code=status.HTTP_200_OK)
+async def recover_password(email: str, db: Client = Depends(deps.get_db)):
+    """
+    Password Recovery.
+    """
+    user = await auth_service.get_user_by_email(db, email)
+    if not user:
+        # We don't want to reveal if a user exists or not for security reasons.
+        # We return a generic message in both cases.
+        print(f"Password recovery requested for non-existent user: {email}")
+        return {
+            "msg": "If an account with this email exists, a password recovery link has been sent."
+        }
+
+    password_reset_token = auth_service.create_password_reset_token(email=email)
+    # In a real app, you would email this token. For this demo, we print it.
+    # This is a simplification for the assignment.
+    # The user will have to manually copy this token from the console.
+    print(f"Password reset token for {email}: {password_reset_token}")
+    return {
+        "msg": "If an account with this email exists, a password recovery link has been sent."
+    }
+
+
+@router.post("/reset-password/", status_code=status.HTTP_200_OK)
+async def reset_password(
+    new_password_data: NewPassword, db: Client = Depends(deps.get_db)
+):
+    """
+    Reset password.
+    """
+    email = auth_service.get_email_from_password_reset_token(
+        token=new_password_data.token
+    )
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
+        )
+    user = await auth_service.get_user_by_email(db, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    await auth_service.reset_user_password(
+        db, user=user, new_password=new_password_data.new_password
+    )
+    return {"msg": "Password updated successfully"}

@@ -59,3 +59,10 @@ class TokenData(BaseModel):
     """Model for the data encoded within the JWT."""
 
     email: Optional[str] = None
+
+
+class NewPassword(BaseModel):
+    """Model for resetting a password."""
+
+    token: str
+    new_password: str

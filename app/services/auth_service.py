@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
-from jose import jwt
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from supabase import Client
 
@@ -39,6 +39,16 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
     to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
+    return encoded_jwt
+
+
+def create_password_reset_token(email: str) -> str:
+    """Creates a password reset token."""
+    delta = timedelta(hours=1)
+    to_encode = {"exp": datetime.utcnow() + delta, "sub": email}
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
@@ -112,3 +122,21 @@ async def update_user(
     if response.data:
         return User(**response.data[0])
     return None
+
+
+def get_email_from_password_reset_token(token: str) -> Optional[str]:
+    """Decodes a password reset token and returns the user's email."""
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        email: str = payload.get("sub")
+        return email
+    except JWTError:
+        return None
+
+
+async def reset_user_password(db: Client, user: UserInDB, new_password: str):
+    """Updates the user's password hash in the database."""
+    hashed_password = get_password_hash(new_password)
+    db.table("users").update({"password_hash": hashed_password}).eq(
+        "id", str(user.id)
+    ).execute()
