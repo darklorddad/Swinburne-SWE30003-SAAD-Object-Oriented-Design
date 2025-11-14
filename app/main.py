@@ -26,3 +26,19 @@ async def read_root(request: Request):
     Serves the root HTML page.
     """
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """
+    Serves the login page.
+    """
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    """
+    Serves the registration page.
+    """
+    return templates.TemplateResponse("register.html", {"request": request})
