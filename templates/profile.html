@@ -6,8 +6,17 @@
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title">User Information</h5>
-        <p><strong>Full Name:</strong> <span id="user-full-name"></span></p>
-        <p><strong>Email:</strong> <span id="user-email"></span></p>
+        <form id="profile-update-form">
+            <div class="mb-3">
+                <label for="profile-full-name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="profile-full-name">
+            </div>
+            <div class="mb-3">
+                <label for="profile-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="profile-email" disabled>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
     </div>
 </div>
 

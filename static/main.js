@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
     createParkForm.addEventListener("submit", handleCreatePark);
   }
 
+  const profileUpdateForm = document.getElementById("profile-update-form");
+  if (profileUpdateForm) {
+    profileUpdateForm.addEventListener("submit", handleProfileUpdate);
+  }
+
   if (window.location.pathname === "/profile") {
     loadProfileData();
   }
@@ -226,6 +231,42 @@ async function handleDeletePark(parkId) {
   }
 }
 
+async function handleProfileUpdate(event) {
+  event.preventDefault();
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  const fullName = document.getElementById("profile-full-name").value;
+  const updateData = {
+    full_name: fullName,
+  };
+
+  try {
+    const response = await fetch("/api/users/me", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to update profile.");
+    }
+
+    showAlert("Profile updated successfully.", "success");
+    // Optionally, re-set the value in case the backend modifies it
+    document.getElementById("profile-full-name").value = data.full_name || "";
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
 async function handleRegister(event) {
   event.preventDefault();
   const form = event.target;
@@ -299,9 +340,9 @@ async function loadProfileData() {
     if (!userResponse.ok)
       throw new Error("Failed to fetch user data. Please log in again.");
     const userData = await userResponse.json();
-    document.getElementById("user-full-name").textContent =
-      userData.full_name || "N/A";
-    document.getElementById("user-email").textContent = userData.email;
+    document.getElementById("profile-full-name").value =
+      userData.full_name || "";
+    document.getElementById("profile-email").value = userData.email;
 
     // Fetch orders
     const ordersResponse = await fetch("/api/orders/", {

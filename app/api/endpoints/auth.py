@@ -9,7 +9,7 @@ from supabase import Client
 
 from app.api import deps
 from app.core.config import get_settings
-from app.models.user import Token, User, UserCreate
+from app.models.user import Token, User, UserCreate, UserUpdate
 from app.services import auth_service
 
 router = APIRouter()
@@ -60,3 +60,22 @@ async def read_users_me(current_user: User = Depends(deps.get_current_active_use
     Fetch the current logged in user.
     """
     return current_user
+
+
+@router.put("/users/me", response_model=User)
+async def update_user_me(
+    user_update: UserUpdate,
+    db: Client = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    """
+    Update current user's information.
+    """
+    user = await auth_service.update_user(
+        db, user_id=current_user.id, user_update=user_update
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    return user

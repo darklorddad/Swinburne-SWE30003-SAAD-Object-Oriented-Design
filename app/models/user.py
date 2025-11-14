@@ -23,6 +23,12 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(BaseModel):
+    """Model for updating a user's information."""
+
+    full_name: Optional[str] = None
+
+
 class User(UserBase):
     """Model for representing a user read from the database."""
 

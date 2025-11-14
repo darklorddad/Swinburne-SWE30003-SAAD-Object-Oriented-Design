@@ -6,13 +6,14 @@ creating, fetching, and authenticating users.
 """
 from datetime import datetime, timedelta
 from typing import Optional
+from uuid import UUID
 
 from jose import jwt
 from passlib.context import CryptContext
 from supabase import Client
 
 from app.core.config import get_settings
-from app.models.user import User, UserCreate, UserInDB
+from app.models.user import User, UserCreate, UserInDB, UserUpdate
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 settings = get_settings()
@@ -86,3 +87,28 @@ async def create_user(db: Client, user: UserCreate) -> User:
     created_user_data = response.data[0]
 
     return User(**created_user_data)
+
+
+async def update_user(
+    db: Client, user_id: UUID, user_update: UserUpdate
+) -> Optional[User]:
+    """Updates a user's information in the database."""
+    update_data = user_update.dict(exclude_unset=True)
+    if not update_data:
+        # If nothing to update, just fetch and return the user
+        response = (
+            db.table("users").select("*").eq("id", str(user_id)).single().execute()
+        )
+        if response.data:
+            return User(**response.data)
+        return None
+
+    response = (
+        db.table("users")
+        .update(update_data)
+        .eq("id", str(user_id))
+        .execute()
+    )
+    if response.data:
+        return User(**response.data[0])
+    return None
