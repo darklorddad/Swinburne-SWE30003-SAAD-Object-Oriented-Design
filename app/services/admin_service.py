@@ -9,7 +9,7 @@ from supabase import Client
 
 from app.models.park import Park, ParkCreate, ParkUpdate
 from app.models.report import ParkStatistic, VisitorStatistics
-from app.models.ticket import TicketType, TicketTypeCreate
+from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
 
 
 async def create_park(db: Client, park: ParkCreate) -> Park:
@@ -75,6 +75,60 @@ async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketTyp
         db.table("ticket_types").select("*").eq("park_id", str(park_id)).execute()
     )
     return [TicketType(**tt) for tt in response.data]
+
+
+async def update_ticket_type(
+    db: Client,
+    park_id: UUID,
+    ticket_type_id: UUID,
+    ticket_type_update: TicketTypeUpdate,
+) -> Optional[TicketType]:
+    """Updates an existing ticket type, ensuring it belongs to the correct park."""
+    # First, verify the ticket type exists and belongs to the park.
+    verify_response = (
+        db.table("ticket_types")
+        .select("id")
+        .eq("id", str(ticket_type_id))
+        .eq("park_id", str(park_id))
+        .single()
+        .execute()
+    )
+    if not verify_response.data:
+        return None
+
+    update_data = ticket_type_update.dict(exclude_unset=True)
+    if not update_data:
+        # If nothing to update, fetch full data and return
+        get_response = (
+            db.table("ticket_types")
+            .select("*")
+            .eq("id", str(ticket_type_id))
+            .single()
+            .execute()
+        )
+        return TicketType(**get_response.data) if get_response.data else None
+
+    response = (
+        db.table("ticket_types")
+        .update(update_data)
+        .eq("id", str(ticket_type_id))
+        .execute()
+    )
+    if response.data:
+        return TicketType(**response.data[0])
+    return None
+
+
+async def delete_ticket_type(db: Client, park_id: UUID, ticket_type_id: UUID) -> bool:
+    """Deletes a ticket type, ensuring it belongs to the correct park."""
+    response = (
+        db.table("ticket_types")
+        .delete()
+        .eq("id", str(ticket_type_id))
+        .eq("park_id", str(park_id))
+        .execute()
+    )
+    return bool(response.data)
 
 
 async def get_visitor_statistics(db: Client) -> VisitorStatistics:

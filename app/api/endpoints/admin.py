@@ -10,7 +10,7 @@ from supabase import Client
 from app.api import deps
 from app.models.park import Park, ParkCreate, ParkUpdate
 from app.models.report import VisitorStatistics
-from app.models.ticket import TicketType, TicketTypeCreate
+from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
 from app.services import admin_service
 
 router = APIRouter()
@@ -108,6 +108,50 @@ async def read_ticket_types_for_park(
     Retrieve all ticket types for a specific park. (Admin only)
     """
     return await admin_service.get_ticket_types_for_park(db, park_id)
+
+
+@router.put(
+    "/admin/parks/{park_id}/ticket-types/{ticket_type_id}",
+    response_model=TicketType,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def update_ticket_type_for_park(
+    park_id: UUID,
+    ticket_type_id: UUID,
+    ticket_type_in: TicketTypeUpdate,
+    db: Client = Depends(deps.get_db),
+):
+    """
+    Update a ticket type for a specific park. (Admin only)
+    """
+    ticket_type = await admin_service.update_ticket_type(
+        db, park_id, ticket_type_id, ticket_type_in
+    )
+    if not ticket_type:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ticket type not found or does not belong to this park",
+        )
+    return ticket_type
+
+
+@router.delete(
+    "/admin/parks/{park_id}/ticket-types/{ticket_type_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def delete_ticket_type_for_park(
+    park_id: UUID, ticket_type_id: UUID, db: Client = Depends(deps.get_db)
+):
+    """
+    Delete a ticket type for a specific park. (Admin only)
+    """
+    success = await admin_service.delete_ticket_type(db, park_id, ticket_type_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ticket type not found or does not belong to this park",
+        )
 
 
 @router.get(
