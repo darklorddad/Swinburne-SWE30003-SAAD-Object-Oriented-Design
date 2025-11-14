@@ -6,7 +6,7 @@ from uuid import UUID
 
 from supabase import Client
 
-from app.models.order import Order, OrderCreate
+from app.models.order import Order, OrderCreate, OrderItem
 
 
 async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> Order:
