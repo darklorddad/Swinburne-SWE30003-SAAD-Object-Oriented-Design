@@ -20,8 +20,6 @@ async def create_park(db: Client, park: ParkCreate) -> Park:
     return Park(**created_park_data)
 
 
-
-
 async def update_park(
     db: Client, park_id: UUID, park_update: ParkUpdate
 ) -> Optional[Park]:
@@ -55,8 +53,6 @@ async def create_ticket_type(
     data["park_id"] = str(park_id)
     response = db.table("ticket_types").insert(data).execute()
     return TicketType(**response.data[0])
-
-
 
 
 async def update_ticket_type(

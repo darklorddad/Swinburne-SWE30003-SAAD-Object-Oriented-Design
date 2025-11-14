@@ -11,7 +11,12 @@
     </div>
 </div>
 
-<h2 class="mb-4">Our Parks</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Our Parks</h2>
+    <form class="d-flex" id="search-form" onsubmit="return false;">
+        <input class="form-control me-2" type="search" id="search-input" placeholder="Search parks..." aria-label="Search">
+    </form>
+</div>
 <div id="parks-container" class="row">
     <!-- Parks will be loaded here by JavaScript -->
     <p>Loading parks...</p>

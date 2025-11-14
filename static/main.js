@@ -1,3 +1,5 @@
+let allParks = []; // To store all parks for client-side searching
+
 document.addEventListener("DOMContentLoaded", () => {
   updateNav();
 
@@ -96,6 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (window.location.pathname === "/") {
     loadParks();
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+      searchInput.addEventListener("keyup", handleParkSearch);
+    }
   }
 
   if (window.location.pathname === "/admin") {
@@ -721,37 +727,51 @@ async function loadParks() {
     if (!response.ok) {
       throw new Error("Failed to fetch parks.");
     }
-    const parks = await response.json();
-
-    if (parks.length === 0) {
-      parksContainer.innerHTML = "<p>No parks are available at the moment.</p>";
-      return;
-    }
-
-    const parksHtml = parks
-      .map(
-        (park) => `
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">${park.name}</h5>
-                    <p class="card-text">${
-                      park.description || "No description available."
-                    }</p>
-                    <a href="/parks/${
-                      park.id
-                    }" class="btn btn-primary">View Details</a>
-                </div>
-            </div>
-        </div>
-    `
-      )
-      .join("");
-
-    parksContainer.innerHTML = parksHtml;
+    allParks = await response.json();
+    renderParks(allParks);
   } catch (error) {
     parksContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
   }
+}
+
+function renderParks(parks) {
+  const parksContainer = document.getElementById("parks-container");
+  if (parks.length === 0) {
+    parksContainer.innerHTML = "<p>No parks match your search.</p>";
+    return;
+  }
+
+  const parksHtml = parks
+    .map(
+      (park) => `
+      <div class="col-md-4 mb-4">
+          <div class="card">
+              <div class="card-body">
+                  <h5 class="card-title">${park.name}</h5>
+                  <p class="card-text">${
+                    park.description || "No description available."
+                  }</p>
+                  <a href="/parks/${
+                    park.id
+                  }" class="btn btn-primary">View Details</a>
+              </div>
+          </div>
+      </div>
+  `
+    )
+    .join("");
+
+  parksContainer.innerHTML = parksHtml;
+}
+
+function handleParkSearch(event) {
+  const searchTerm = event.target.value.toLowerCase();
+  const filteredParks = allParks.filter(
+    (park) =>
+      park.name.toLowerCase().includes(searchTerm) ||
+      (park.description && park.description.toLowerCase().includes(searchTerm))
+  );
+  renderParks(filteredParks);
 }
 
 async function loadParkDetail() {
