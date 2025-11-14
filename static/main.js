@@ -19,6 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadParks();
   }
 
+  if (window.location.pathname.startsWith("/parks/")) {
+    loadParkDetail();
+  }
+
   // Event delegation for dynamically added buttons
   document.body.addEventListener("click", async (event) => {
     if (event.target.id === "logout-btn") {
@@ -284,5 +288,162 @@ async function loadParks() {
     parksContainer.innerHTML = parksHtml;
   } catch (error) {
     parksContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+  }
+}
+
+async function loadParkDetail() {
+  const pathParts = window.location.pathname.split("/");
+  const parkId = pathParts[pathParts.length - 1];
+  const parkDetailContainer = document.getElementById("park-detail-container");
+  const orderFormContainer = document.getElementById("order-form-container");
+
+  try {
+    // Fetch park details and ticket types in parallel
+    const [parkResponse, ticketTypesResponse] = await Promise.all([
+      fetch(`/api/parks/${parkId}`),
+      fetch(`/api/parks/${parkId}/ticket-types/`),
+    ]);
+
+    if (!parkResponse.ok) throw new Error("Failed to fetch park details.");
+    const park = await parkResponse.json();
+
+    if (!ticketTypesResponse.ok) throw new Error("Failed to fetch ticket types.");
+    const ticketTypes = await ticketTypesResponse.json();
+
+    // Render park details
+    parkDetailContainer.innerHTML = `
+            <h2>${park.name}</h2>
+            <p><strong>Location:</strong> ${park.location || "N/A"}</p>
+            <p>${park.description || "No description available."}</p>
+        `;
+
+    // Render order form if logged in
+    const token = getToken();
+    if (token) {
+      if (ticketTypes.length === 0) {
+        orderFormContainer.innerHTML =
+          "<p>No tickets available for this park at the moment.</p>";
+      } else {
+        const today = new Date().toISOString().split("T")[0];
+        const ticketInputs = ticketTypes
+          .map(
+            (tt) => `
+                    <div class="mb-3 border p-3 rounded">
+                        <h5>${tt.name} (RM ${tt.price.toFixed(2)})</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="quantity-${
+                                  tt.id
+                                }" class="form-label">Quantity</label>
+                                <input type="number" id="quantity-${
+                                  tt.id
+                                }" class="form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
+              tt.id
+            }">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="visit-date-${
+                                  tt.id
+                                }" class="form-label">Visit Date</label>
+                                <input type="date" id="visit-date-${
+                                  tt.id
+                                }" class="form-control visit-date" min="${today}">
+                            </div>
+                        </div>
+                    </div>
+                `
+          )
+          .join("");
+
+        orderFormContainer.innerHTML = `
+                    <h3>Book Tickets</h3>
+                    <form id="order-form">
+                        ${ticketInputs}
+                        <button type="submit" class="btn btn-success mt-3">Place Order</button>
+                    </form>
+                `;
+        document
+          .getElementById("order-form")
+          .addEventListener("submit", handleOrderSubmit);
+      }
+    } else {
+      orderFormContainer.innerHTML =
+        '<p><a href="/login">Log in</a> to book tickets.</p>';
+    }
+  } catch (error) {
+    parkDetailContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+  }
+}
+
+async function handleOrderSubmit(event) {
+  event.preventDefault();
+  const token = getToken();
+  if (!token) {
+    showAlert("You must be logged in to place an order.", "warning");
+    return;
+  }
+
+  const items = [];
+  const quantityInputs = document.querySelectorAll(".ticket-quantity");
+  let validationFailed = false;
+
+  quantityInputs.forEach((input) => {
+    if (validationFailed) return;
+    const quantity = parseInt(input.value, 10);
+    if (quantity > 0) {
+      const ticketTypeId = input.dataset.ticketTypeId;
+      const visitDateInput = document.getElementById(
+        `visit-date-${ticketTypeId}`
+      );
+      const visitDate = visitDateInput.value;
+
+      if (!visitDate) {
+        const ticketName = input.closest(".border").querySelector("h5").textContent;
+        showAlert(`Please select a visit date for: ${ticketName}`, "warning");
+        validationFailed = true;
+        return;
+      }
+
+      items.push({
+        ticket_type_id: ticketTypeId,
+        quantity: quantity,
+        visit_date: visitDate,
+      });
+    }
+  });
+
+  if (validationFailed) return;
+
+  if (items.length === 0) {
+    showAlert("Please select at least one ticket.", "warning");
+    return;
+  }
+
+  const orderData = { items: items };
+
+  try {
+    const response = await fetch("/api/orders/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to place order.");
+    }
+
+    showAlert(
+      "Order placed successfully! You will be redirected to your profile.",
+      "success"
+    );
+    setTimeout(() => {
+      window.location.href = "/profile";
+    }, 2000);
+  } catch (error) {
+    showAlert(error.message, "danger");
   }
 }

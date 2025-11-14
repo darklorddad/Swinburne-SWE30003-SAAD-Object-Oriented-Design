@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -51,3 +53,13 @@ async def profile_page(request: Request):
     Serves the user profile page.
     """
     return templates.TemplateResponse("profile.html", {"request": request})
+
+
+@app.get("/parks/{park_id}", response_class=HTMLResponse)
+async def park_detail_page(request: Request, park_id: UUID):
+    """
+    Serves the park detail page.
+    """
+    return templates.TemplateResponse(
+        "park_detail.html", {"request": request, "park_id": park_id}
+    )
