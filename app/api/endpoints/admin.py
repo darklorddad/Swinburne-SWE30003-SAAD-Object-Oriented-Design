@@ -9,6 +9,7 @@ from supabase import Client
 
 from app.api import deps
 from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.ticket import TicketType, TicketTypeCreate
 from app.services import admin_service
 
 router = APIRouter()
@@ -72,3 +73,37 @@ async def delete_existing_park(park_id: UUID, db: Client = Depends(deps.get_db))
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
         )
+
+
+@router.post(
+    "/admin/parks/{park_id}/ticket-types/",
+    response_model=TicketType,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def create_new_ticket_type_for_park(
+    park_id: UUID,
+    ticket_type_in: TicketTypeCreate,
+    db: Client = Depends(deps.get_db),
+):
+    """
+    Create a new ticket type for a specific park. (Admin only)
+    """
+    try:
+        return await admin_service.create_ticket_type(db, ticket_type_in, park_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.get(
+    "/admin/parks/{park_id}/ticket-types/",
+    response_model=List[TicketType],
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def read_ticket_types_for_park(
+    park_id: UUID, db: Client = Depends(deps.get_db)
+):
+    """
+    Retrieve all ticket types for a specific park. (Admin only)
+    """
+    return await admin_service.get_ticket_types_for_park(db, park_id)

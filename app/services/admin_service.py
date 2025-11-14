@@ -7,6 +7,7 @@ from uuid import UUID
 from supabase import Client
 
 from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.ticket import TicketType, TicketTypeCreate
 
 
 async def create_park(db: Client, park: ParkCreate) -> Park:
@@ -50,3 +51,25 @@ async def delete_park(db: Client, park_id: UUID) -> bool:
     """Deletes a park from the database."""
     response = db.table("parks").delete().eq("id", str(park_id)).execute()
     return bool(response.data)
+
+
+async def create_ticket_type(
+    db: Client, ticket_type_in: TicketTypeCreate, park_id: UUID
+) -> TicketType:
+    """Creates a new ticket type for a park."""
+    park = await get_park_by_id(db, park_id)
+    if not park:
+        raise ValueError("Park not found")
+
+    data = ticket_type_in.dict()
+    data["park_id"] = str(park_id)
+    response = db.table("ticket_types").insert(data).execute()
+    return TicketType(**response.data[0])
+
+
+async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketType]:
+    """Fetches all ticket types for a specific park."""
+    response = (
+        db.table("ticket_types").select("*").eq("park_id", str(park_id)).execute()
+    )
+    return [TicketType(**tt) for tt in response.data]
