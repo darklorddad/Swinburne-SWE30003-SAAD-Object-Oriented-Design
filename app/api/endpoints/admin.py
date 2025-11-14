@@ -9,6 +9,7 @@ from supabase import Client
 
 from app.api import deps
 from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.report import VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate
 from app.services import admin_service
 
@@ -107,3 +108,15 @@ async def read_ticket_types_for_park(
     Retrieve all ticket types for a specific park. (Admin only)
     """
     return await admin_service.get_ticket_types_for_park(db, park_id)
+
+
+@router.get(
+    "/admin/statistics/visitors/",
+    response_model=VisitorStatistics,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def get_visitor_statistics_report(db: Client = Depends(deps.get_db)):
+    """
+    Retrieve a report on visitor statistics. (Admin only)
+    """
+    return await admin_service.get_visitor_statistics(db)

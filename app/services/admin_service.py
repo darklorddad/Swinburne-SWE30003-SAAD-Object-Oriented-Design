@@ -1,12 +1,14 @@
 """
 Service layer for administrator-specific logic.
 """
+from collections import defaultdict
 from typing import List, Optional
 from uuid import UUID
 
 from supabase import Client
 
 from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.report import ParkStatistic, VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate
 
 
@@ -73,3 +75,65 @@ async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketTyp
         db.table("ticket_types").select("*").eq("park_id", str(park_id)).execute()
     )
     return [TicketType(**tt) for tt in response.data]
+
+
+async def get_visitor_statistics(db: Client) -> VisitorStatistics:
+    """
+    Generates a report on visitor statistics, including revenue and ticket sales.
+
+    This report considers all non-cancelled orders as valid for statistics.
+    """
+    # Fetch all non-cancelled orders with their items and related park info
+    response = (
+        db.table("orders")
+        .select(
+            "status, order_items(quantity, price_at_purchase, ticket_types(park_id, parks(name)))"
+        )
+        .neq("status", "cancelled")
+        .execute()
+    )
+
+    if not response.data:
+        return VisitorStatistics(
+            total_revenue=0, total_tickets_sold=0, revenue_by_park=[]
+        )
+
+    total_revenue = 0.0
+    total_tickets_sold = 0
+    park_stats_raw = defaultdict(lambda: {"revenue": 0.0, "tickets": 0, "name": ""})
+
+    for order in response.data:
+        for item in order["order_items"]:
+            # Ensure nested data exists before processing
+            if item.get("ticket_types") and item["ticket_types"].get("parks"):
+                park_id = item["ticket_types"]["park_id"]
+                park_name = item["ticket_types"]["parks"]["name"]
+                quantity = item["quantity"]
+                price = item["price_at_purchase"]
+                revenue = quantity * price
+
+                total_revenue += revenue
+                total_tickets_sold += quantity
+
+                park_stats_raw[park_id]["revenue"] += revenue
+                park_stats_raw[park_id]["tickets"] += quantity
+                park_stats_raw[park_id]["name"] = park_name
+
+    revenue_by_park = [
+        ParkStatistic(
+            park_id=pid,
+            park_name=stats["name"],
+            total_revenue=stats["revenue"],
+            tickets_sold=stats["tickets"],
+        )
+        for pid, stats in park_stats_raw.items()
+    ]
+
+    # Sort the park statistics by park name for consistent ordering
+    revenue_by_park.sort(key=lambda p: p.park_name)
+
+    return VisitorStatistics(
+        total_revenue=total_revenue,
+        total_tickets_sold=total_tickets_sold,
+        revenue_by_park=revenue_by_park,
+    )
