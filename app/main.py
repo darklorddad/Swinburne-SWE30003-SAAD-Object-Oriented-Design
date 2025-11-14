@@ -71,3 +71,21 @@ async def admin_dashboard_page(request: Request):
     Serves the admin dashboard page.
     """
     return templates.TemplateResponse("admin.html", {"request": request})
+
+
+@app.get("/password-recovery", response_class=HTMLResponse)
+async def password_recovery_page(request: Request):
+    """
+    Serves the password recovery page.
+    """
+    return templates.TemplateResponse("password_recovery.html", {"request": request})
+
+
+@app.get("/reset-password", response_class=HTMLResponse)
+async def reset_password_page(request: Request, token: str):
+    """
+    Serves the password reset page, capturing the token from the URL.
+    """
+    return templates.TemplateResponse(
+        "reset_password.html", {"request": request, "token": token}
+    )

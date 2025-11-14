@@ -92,6 +92,16 @@ document.addEventListener("DOMContentLoaded", () => {
     profileUpdateForm.addEventListener("submit", handleProfileUpdate);
   }
 
+  const passwordRecoveryForm = document.getElementById("password-recovery-form");
+  if (passwordRecoveryForm) {
+    passwordRecoveryForm.addEventListener("submit", handlePasswordRecovery);
+  }
+
+  const resetPasswordForm = document.getElementById("reset-password-form");
+  if (resetPasswordForm) {
+    resetPasswordForm.addEventListener("submit", handleResetPassword);
+  }
+
   if (window.location.pathname === "/profile") {
     loadProfileData();
   }
@@ -201,6 +211,64 @@ async function handleLogin(event) {
 
     setToken(data.access_token);
     window.location.href = "/"; // Redirect to home page
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handlePasswordRecovery(event) {
+  event.preventDefault();
+  const form = event.target;
+  const email = form.querySelector("#email").value;
+
+  try {
+    const response = await fetch(`/api/password-recovery/${email}`, {
+      method: "POST",
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to request password recovery.");
+    }
+
+    showAlert(data.msg, "info");
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleResetPassword(event) {
+  event.preventDefault();
+  const form = event.target;
+  const token = form.querySelector("#reset-token").value;
+  const newPassword = form.querySelector("#new-password").value;
+
+  const resetData = {
+    token: token,
+    new_password: newPassword,
+  };
+
+  try {
+    const response = await fetch("/api/reset-password/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(resetData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to reset password.");
+    }
+
+    showAlert(
+      "Password has been reset successfully. You can now log in.",
+      "success"
+    );
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 3000);
   } catch (error) {
     showAlert(error.message, "danger");
   }
