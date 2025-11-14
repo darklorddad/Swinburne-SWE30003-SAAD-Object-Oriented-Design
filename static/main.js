@@ -15,6 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProfileData();
   }
 
+  if (window.location.pathname === "/") {
+    loadParks();
+  }
+
   // Event delegation for dynamically added buttons
   document.body.addEventListener("click", async (event) => {
     if (event.target.id === "logout-btn") {
@@ -240,5 +244,45 @@ async function cancelOrder(orderId) {
     loadProfileData(); // Reload profile data to show updated status
   } catch (error) {
     showAlert(error.message, "danger");
+  }
+}
+
+async function loadParks() {
+  const parksContainer = document.getElementById("parks-container");
+  try {
+    const response = await fetch("/api/parks/");
+    if (!response.ok) {
+      throw new Error("Failed to fetch parks.");
+    }
+    const parks = await response.json();
+
+    if (parks.length === 0) {
+      parksContainer.innerHTML = "<p>No parks are available at the moment.</p>";
+      return;
+    }
+
+    const parksHtml = parks
+      .map(
+        (park) => `
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${park.name}</h5>
+                    <p class="card-text">${
+                      park.description || "No description available."
+                    }</p>
+                    <a href="/parks/${
+                      park.id
+                    }" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    `
+      )
+      .join("");
+
+    parksContainer.innerHTML = parksHtml;
+  } catch (error) {
+    parksContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
   }
 }

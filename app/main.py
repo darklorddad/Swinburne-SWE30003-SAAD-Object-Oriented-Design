@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.api.endpoints import admin, auth, orders
+from app.api.endpoints import admin, auth, orders, parks
 
 app = FastAPI(title="SWE30003 - Assignment 3")
 
@@ -18,6 +18,7 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(admin.router, prefix="/api", tags=["admin"])
 app.include_router(orders.router, prefix="/api", tags=["orders"])
+app.include_router(parks.router, prefix="/api", tags=["parks"])
 
 
 @app.get("/", response_class=HTMLResponse)
