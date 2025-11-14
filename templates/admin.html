@@ -88,4 +88,34 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for adding/editing a ticket type -->
+<div class="modal fade" id="ticketTypeModal" tabindex="-1" aria-labelledby="ticketTypeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ticketTypeModalLabel">Add/Edit Ticket Type</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="ticket-type-form">
+          <input type="hidden" id="tt-park-id">
+          <input type="hidden" id="tt-id">
+          <div class="mb-3">
+            <label for="tt-name" class="form-label">Ticket Type Name</label>
+            <input type="text" class="form-control" id="tt-name" required>
+          </div>
+          <div class="mb-3">
+            <label for="tt-price" class="form-label">Price (RM)</label>
+            <input type="number" class="form-control" id="tt-price" step="0.01" min="0" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-tt-changes-btn">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

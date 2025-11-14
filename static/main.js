@@ -21,6 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     saveParkBtn.addEventListener("click", handleUpdatePark);
   }
 
+  const saveTicketTypeBtn = document.getElementById("save-tt-changes-btn");
+  if (saveTicketTypeBtn) {
+    saveTicketTypeBtn.addEventListener("click", handleSaveTicketType);
+  }
+
   const editParkModal = document.getElementById("editParkModal");
   if (editParkModal) {
     editParkModal.addEventListener("show.bs.modal", (event) => {
@@ -45,6 +50,38 @@ document.addEventListener("DOMContentLoaded", () => {
       modalNameInput.value = name;
       modalLocationInput.value = location;
       modalDescriptionInput.value = description;
+    });
+  }
+
+  const ticketTypeModal = document.getElementById("ticketTypeModal");
+  if (ticketTypeModal) {
+    ticketTypeModal.addEventListener("show.bs.modal", (event) => {
+      const button = event.relatedTarget;
+      const parkId = button.getAttribute("data-park-id");
+      const ttId = button.getAttribute("data-tt-id");
+      const ttName = button.getAttribute("data-tt-name");
+      const ttPrice = button.getAttribute("data-tt-price");
+
+      const modalTitle = ticketTypeModal.querySelector(".modal-title");
+      const modalParkIdInput = ticketTypeModal.querySelector("#tt-park-id");
+      const modalTtIdInput = ticketTypeModal.querySelector("#tt-id");
+      const modalTtNameInput = ticketTypeModal.querySelector("#tt-name");
+      const modalTtPriceInput = ticketTypeModal.querySelector("#tt-price");
+
+      modalParkIdInput.value = parkId;
+      if (ttId) {
+        // Editing existing ticket type
+        modalTitle.textContent = "Edit Ticket Type";
+        modalTtIdInput.value = ttId;
+        modalTtNameInput.value = ttName;
+        modalTtPriceInput.value = ttPrice;
+      } else {
+        // Adding new ticket type
+        modalTitle.textContent = "Add New Ticket Type";
+        modalTtIdInput.value = "";
+        modalTtNameInput.value = "";
+        modalTtPriceInput.value = "";
+      }
     });
   }
 
@@ -87,6 +124,13 @@ document.addEventListener("DOMContentLoaded", () => {
         confirm("Are you sure you want to delete this park? This is irreversible.")
       ) {
         await handleDeletePark(parkId);
+      }
+    }
+    if (event.target.classList.contains("delete-tt-btn")) {
+      const parkId = event.target.dataset.parkId;
+      const ttId = event.target.dataset.ttId;
+      if (confirm("Are you sure you want to delete this ticket type?")) {
+        await handleDeleteTicketType(parkId, ttId);
       }
     }
   });
@@ -241,8 +285,24 @@ async function loadAdminParks() {
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span>${tt.name} - RM ${tt.price.toFixed(2)}</span>
                     <div>
-                        <button class="btn btn-outline-secondary btn-sm">Edit</button>
-                        <button class="btn btn-outline-danger btn-sm">Delete</button>
+                        <button
+                            class="btn btn-outline-secondary btn-sm edit-tt-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#ticketTypeModal"
+                            data-park-id="${park.id}"
+                            data-tt-id="${tt.id}"
+                            data-tt-name="${tt.name}"
+                            data-tt-price="${tt.price}"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            class="btn btn-outline-danger btn-sm delete-tt-btn"
+                            data-park-id="${park.id}"
+                            data-tt-id="${tt.id}"
+                        >
+                            Delete
+                        </button>
                     </div>
                 </li>
             `
@@ -296,7 +356,14 @@ async function loadAdminParks() {
                     <ul class="list-group mb-3">
                         ${ticketTypesHtml}
                     </ul>
-                    <button class="btn btn-primary btn-sm">Add Ticket Type</button>
+                    <button
+                        class="btn btn-primary btn-sm add-tt-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#ticketTypeModal"
+                        data-park-id="${park.id}"
+                    >
+                        Add Ticket Type
+                    </button>
                 </div>
             </div>
         </div>
@@ -330,6 +397,85 @@ async function handleDeletePark(parkId) {
 
     showAlert("Park deleted successfully.", "success");
     loadAdminParks(); // Refresh the list
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleSaveTicketType() {
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  const parkId = document.getElementById("tt-park-id").value;
+  const ttId = document.getElementById("tt-id").value;
+  const ttName = document.getElementById("tt-name").value;
+  const ttPrice = parseFloat(document.getElementById("tt-price").value);
+
+  if (!ttName || !ttPrice) {
+    showAlert("Ticket type name and price are required.", "warning");
+    return;
+  }
+
+  const isEditing = !!ttId;
+  const url = isEditing
+    ? `/api/admin/parks/${parkId}/ticket-types/${ttId}`
+    : `/api/admin/parks/${parkId}/ticket-types/`;
+  const method = isEditing ? "PUT" : "POST";
+
+  const ttData = {
+    name: ttName,
+    price: ttPrice,
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(ttData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to save ticket type.");
+    }
+
+    showAlert("Ticket type saved successfully.", "success");
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("ticketTypeModal")
+    );
+    modal.hide();
+    loadAdminParks(); // Refresh the accordion
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleDeleteTicketType(parkId, ttId) {
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/admin/parks/${parkId}/ticket-types/${ttId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.detail || "Failed to delete ticket type.");
+    }
+
+    showAlert("Ticket type deleted successfully.", "success");
+    loadAdminParks(); // Refresh the accordion
   } catch (error) {
     showAlert(error.message, "danger");
   }
