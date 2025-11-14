@@ -1,11 +1,12 @@
 """
 Service layer for order management logic.
 """
+from typing import List, Optional
 from uuid import UUID
 
 from supabase import Client
 
-from app.models.order import Order, OrderCreate, OrderItem
+from app.models.order import Order, OrderCreate
 
 
 async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> Order:
@@ -74,3 +75,58 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
     )
 
     return created_order_obj
+
+
+async def get_orders_for_customer(db: Client, customer_id: UUID) -> List[Order]:
+    """Fetches all orders for a specific customer."""
+    response = (
+        db.table("orders")
+        .select("*, order_items(*)")
+        .eq("customer_id", str(customer_id))
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return [Order(**o) for o in response.data]
+
+
+async def get_order_by_id(
+    db: Client, order_id: UUID, customer_id: UUID
+) -> Optional[Order]:
+    """Fetches a single order by its ID, ensuring it belongs to the customer."""
+    response = (
+        db.table("orders")
+        .select("*, order_items(*)")
+        .eq("id", str(order_id))
+        .eq("customer_id", str(customer_id))
+        .single()
+        .execute()
+    )
+    if response.data:
+        return Order(**response.data)
+    return None
+
+
+async def cancel_order(db: Client, order_id: UUID, customer_id: UUID) -> Order:
+    """
+    Cancels an order for a customer.
+
+    Raises:
+        ValueError: If the order is not found, does not belong to the user,
+                    or is already cancelled.
+    """
+    order = await get_order_by_id(db, order_id, customer_id)
+    if not order:
+        raise ValueError("Order not found or you do not have permission to cancel it")
+
+    if order.status == "cancelled":
+        raise ValueError("Order is already cancelled")
+
+    response = (
+        db.table("orders")
+        .update({"status": "cancelled"})
+        .eq("id", str(order_id))
+        .execute()
+    )
+
+    order.status = response.data[0]["status"]
+    return order

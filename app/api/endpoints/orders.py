@@ -1,6 +1,9 @@
 """
 API endpoints for customer orders.
 """
+from typing import List
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
@@ -28,6 +31,58 @@ async def create_new_order(
     try:
         order = await order_service.create_order(
             db, order_in=order_in, customer_id=current_user.id
+        )
+        return order
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get("/orders/", response_model=List[Order])
+async def read_user_orders(
+    db: Client = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    """
+    Retrieve all orders for the current user.
+    """
+    return await order_service.get_orders_for_customer(db, customer_id=current_user.id)
+
+
+@router.get("/orders/{order_id}", response_model=Order)
+async def read_user_order(
+    order_id: UUID,
+    db: Client = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    """
+    Retrieve a specific order for the current user.
+    """
+    order = await order_service.get_order_by_id(
+        db, order_id=order_id, customer_id=current_user.id
+    )
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found or you do not have permission to view it",
+        )
+    return order
+
+
+@router.delete("/orders/{order_id}", response_model=Order)
+async def cancel_user_order(
+    order_id: UUID,
+    db: Client = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    """
+    Cancel an order for the current user.
+    """
+    try:
+        order = await order_service.cancel_order(
+            db, order_id=order_id, customer_id=current_user.id
         )
         return order
     except ValueError as e:
