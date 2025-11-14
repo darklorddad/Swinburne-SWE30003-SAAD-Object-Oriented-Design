@@ -36,6 +36,12 @@ class User(UserBase):
         orm_mode = True
 
 
+class UserInDB(User):
+    """Model for user data as stored in the database, including hashed password."""
+
+    password_hash: str
+
+
 class Token(BaseModel):
     """Model for the access token response."""
 
