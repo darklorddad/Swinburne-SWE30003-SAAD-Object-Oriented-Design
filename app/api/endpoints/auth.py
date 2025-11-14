@@ -52,3 +52,11 @@ async def create_new_user(user_in: UserCreate, db: Client = Depends(deps.get_db)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+
+
+@router.get("/users/me", response_model=User)
+async def read_users_me(current_user: User = Depends(deps.get_current_active_user)):
+    """
+    Fetch the current logged in user.
+    """
+    return current_user
