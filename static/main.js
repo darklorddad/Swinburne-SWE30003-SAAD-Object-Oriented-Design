@@ -172,15 +172,24 @@ function removeToken() {
 function updateNav() {
   const navItems = document.getElementById("nav-items");
   const token = getToken();
+  const userStr = localStorage.getItem("user");
 
-  if (token) {
+  if (token && userStr) {
+    const user = JSON.parse(userStr);
+    const adminLink = user.is_admin
+      ? `<li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>`
+      : "";
+
     navItems.innerHTML = `
+            <li class="nav-item">
+                <span class="navbar-text me-3">Hello, ${
+                  user.full_name || user.email
+                }</span>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="/profile">Profile</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/admin">Admin</a>
-            </li>
+            ${adminLink}
             <li class="nav-item">
                 <a class="nav-link" href="#" id="logout-btn">Logout</a>
             </li>
@@ -215,6 +224,7 @@ async function handleLogin(event) {
     }
 
     setToken(data.access_token);
+    localStorage.setItem("user", JSON.stringify(data.user));
     window.location.href = "/"; // Redirect to home page
   } catch (error) {
     showAlert(error.message, "danger");
@@ -693,6 +703,7 @@ async function handleRegister(event) {
 
 function handleLogout() {
   removeToken();
+  localStorage.removeItem("user");
   window.location.href = "/login";
 }
 
