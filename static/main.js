@@ -11,6 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
     registerForm.addEventListener("submit", handleRegister);
   }
 
+  const createParkForm = document.getElementById("create-park-form");
+  if (createParkForm) {
+    createParkForm.addEventListener("submit", handleCreatePark);
+  }
+
   if (window.location.pathname === "/profile") {
     loadProfileData();
   }
@@ -21,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (window.location.pathname === "/admin") {
     loadAdminDashboard();
+    loadAdminParks();
   }
 
   if (window.location.pathname.startsWith("/parks/")) {
@@ -36,6 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const orderId = event.target.dataset.orderId;
       if (confirm("Are you sure you want to cancel this order?")) {
         await cancelOrder(orderId);
+      }
+    }
+    if (event.target.classList.contains("delete-park-btn")) {
+      const parkId = event.target.dataset.parkId;
+      if (
+        confirm("Are you sure you want to delete this park? This is irreversible.")
+      ) {
+        await handleDeletePark(parkId);
       }
     }
   });
@@ -100,6 +114,113 @@ async function handleLogin(event) {
 
     setToken(data.access_token);
     window.location.href = "/"; // Redirect to home page
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleCreatePark(event) {
+  event.preventDefault();
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  const parkName = document.getElementById("park-name").value;
+  const parkLocation = document.getElementById("park-location").value;
+  const parkDescription = document.getElementById("park-description").value;
+
+  const parkData = {
+    name: parkName,
+    location: parkLocation,
+    description: parkDescription,
+  };
+
+  try {
+    const response = await fetch("/api/admin/parks/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(parkData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to create park.");
+    }
+
+    showAlert("Park created successfully.", "success");
+    document.getElementById("create-park-form").reset();
+    loadAdminParks(); // Refresh the list of parks
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function loadAdminParks() {
+  const token = getToken();
+  if (!token) return;
+
+  const container = document.getElementById("parks-management-container");
+  try {
+    const response = await fetch("/api/admin/parks/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Failed to fetch parks.");
+
+    const parks = await response.json();
+    if (parks.length === 0) {
+      container.innerHTML = "<p>No parks have been created yet.</p>";
+      return;
+    }
+
+    const parksHtml = parks
+      .map(
+        (park) => `
+      <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+        <div>
+          <strong>${park.name}</strong>
+          <small class="d-block text-muted">${park.location || "No location"}</small>
+        </div>
+        <div>
+          <button class="btn btn-danger btn-sm delete-park-btn" data-park-id="${
+            park.id
+          }">Delete</button>
+        </div>
+      </div>
+    `
+      )
+      .join("");
+
+    container.innerHTML = parksHtml;
+  } catch (error) {
+    container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+  }
+}
+
+async function handleDeletePark(parkId) {
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/admin/parks/${parkId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.detail || "Failed to delete park.");
+    }
+
+    showAlert("Park deleted successfully.", "success");
+    loadAdminParks(); // Refresh the list
   } catch (error) {
     showAlert(error.message, "danger");
   }

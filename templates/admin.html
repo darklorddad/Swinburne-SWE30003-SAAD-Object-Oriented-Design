@@ -16,4 +16,43 @@
         </div>
     </div>
 </div>
+
+<hr class="my-4">
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                Manage Parks
+            </div>
+            <div class="card-body" id="parks-management-container">
+                <p>Loading parks...</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Add New Park
+            </div>
+            <div class="card-body">
+                <form id="create-park-form">
+                    <div class="mb-3">
+                        <label for="park-name" class="form-label">Park Name</label>
+                        <input type="text" class="form-control" id="park-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="park-location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="park-location">
+                    </div>
+                    <div class="mb-3">
+                        <label for="park-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="park-description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Park</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
