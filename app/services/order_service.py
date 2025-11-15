@@ -14,17 +14,18 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
     """
     Creates a new order for a customer, handling both tickets and merchandise.
 
-    This function validates items, calculates total price, checks stock for
-    merchandise, creates the order and its items, and decrements stock.
+    This function validates items, calculates total price, atomically decrements
+    stock for merchandise, and then creates the order and its items. It will
+    roll back stock changes if the process fails.
 
     Raises:
         ValueError: If an item is not found, out of stock, or invalid.
     """
     total_amount = 0.0
-    order_items_to_create = []
     item_prices = {}
+    merchandise_to_decrement = []
 
-    # First, validate all items, check stock, and calculate total price
+    # First, validate all items and calculate total price
     for item in order_in.items:
         if item.ticket_type_id:
             response = (
@@ -45,7 +46,7 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
         elif item.merchandise_id:
             response = (
                 db.table("merchandise")
-                .select("price, stock")
+                .select("price")
                 .eq("id", str(item.merchandise_id))
                 .eq("is_active", True)
                 .single()
@@ -55,59 +56,81 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
                 raise ValueError(
                     f"Merchandise with id {item.merchandise_id} not found or is inactive"
                 )
-            if response.data["stock"] < item.quantity:
-                raise ValueError(
-                    f"Not enough stock for merchandise id {item.merchandise_id}"
-                )
             price = response.data["price"]
             item_prices[item.merchandise_id] = price
             total_amount += price * item.quantity
+            merchandise_to_decrement.append(
+                {"id": item.merchandise_id, "quantity": item.quantity}
+            )
 
-    # Create the order record
-    order_data = {
-        "customer_id": str(customer_id),
-        "total_amount": total_amount,
-        "status": "pending",
-    }
-    order_response = db.table("orders").insert(order_data).execute()
-    created_order = order_response.data[0]
-    order_id = created_order["id"]
-
-    # Prepare order items for batch insert and decrement stock for merchandise
-    for item in order_in.items:
-        item_data = {
-            "order_id": order_id,
-            "quantity": item.quantity,
-            "ticket_type_id": str(item.ticket_type_id) if item.ticket_type_id else None,
-            "merchandise_id": str(item.merchandise_id) if item.merchandise_id else None,
-            "visit_date": str(item.visit_date) if item.visit_date else None,
-            "price_at_purchase": item_prices[
-                item.ticket_type_id or item.merchandise_id
-            ],
-        }
-        order_items_to_create.append(item_data)
-
-        if item.merchandise_id:
-            # Decrement stock using an atomic RPC call
-            db.rpc(
+    # Atomically decrement stock for all merchandise items, with rollback on failure
+    decremented_merch = []
+    try:
+        for merch in merchandise_to_decrement:
+            # The RPC function returns true on success, false on failure
+            response = db.rpc(
                 "decrement_stock",
-                {"merch_id": str(item.merchandise_id), "decrement_by": item.quantity},
+                {"merch_id": str(merch["id"]), "decrement_by": merch["quantity"]},
             ).execute()
 
-    # Batch insert order items
-    items_response = db.table("order_items").insert(order_items_to_create).execute()
+            # If the RPC call fails or returns false, there was not enough stock
+            if not response.data:
+                raise ValueError(f"Not enough stock for merchandise id {merch['id']}")
 
-    # Construct the final Order object to return
-    created_order_obj = Order(
-        id=order_id,
-        customer_id=customer_id,
-        status=created_order["status"],
-        total_amount=created_order["total_amount"],
-        created_at=created_order["created_at"],
-        items=[OrderItem(**item) for item in items_response.data],
-    )
+            decremented_merch.append(merch)
 
-    return created_order_obj
+        # If we get here, all stock was successfully decremented.
+        # Now create the order and its items.
+        order_data = {
+            "customer_id": str(customer_id),
+            "total_amount": total_amount,
+            "status": "pending",
+        }
+        order_response = db.table("orders").insert(order_data).execute()
+        created_order = order_response.data[0]
+        order_id = created_order["id"]
+
+        order_items_to_create = []
+        for item in order_in.items:
+            item_data = {
+                "order_id": order_id,
+                "quantity": item.quantity,
+                "ticket_type_id": str(item.ticket_type_id)
+                if item.ticket_type_id
+                else None,
+                "merchandise_id": str(item.merchandise_id)
+                if item.merchandise_id
+                else None,
+                "visit_date": str(item.visit_date) if item.visit_date else None,
+                "price_at_purchase": item_prices[
+                    item.ticket_type_id or item.merchandise_id
+                ],
+            }
+            order_items_to_create.append(item_data)
+
+        items_response = (
+            db.table("order_items").insert(order_items_to_create).execute()
+        )
+
+        created_order_obj = Order(
+            id=order_id,
+            customer_id=customer_id,
+            status=created_order["status"],
+            total_amount=created_order["total_amount"],
+            created_at=created_order["created_at"],
+            items=[OrderItem(**item) for item in items_response.data],
+        )
+
+        return created_order_obj
+
+    except ValueError as e:
+        # Rollback: increment stock for items that were successfully decremented
+        for merch in decremented_merch:
+            db.rpc(
+                "increment_stock",
+                {"merch_id": str(merch["id"]), "increment_by": merch["quantity"]},
+            ).execute()
+        raise e
 
 
 async def get_orders_for_customer(db: Client, customer_id: UUID) -> List[Order]:
