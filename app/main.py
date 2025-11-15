@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -17,10 +17,12 @@ templates = Jinja2Templates(directory="templates")
 
 
 # Include API routers
-app.include_router(auth.router, tags=["auth"])
-app.include_router(admin.router, prefix="/api", tags=["admin"])
-app.include_router(orders.router, prefix="/api", tags=["orders"])
-app.include_router(parks.router, prefix="/api", tags=["parks"])
+api_router = APIRouter(prefix="/api")
+api_router.include_router(auth.router, tags=["auth"])
+api_router.include_router(admin.router, tags=["admin"])
+api_router.include_router(orders.router, tags=["orders"])
+api_router.include_router(parks.router, tags=["parks"])
+app.include_router(api_router)
 
 
 @app.get("/", response_class=HTMLResponse)

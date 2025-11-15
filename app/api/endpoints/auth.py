@@ -15,7 +15,7 @@ router = APIRouter()
 settings = get_settings()
 
 
-@router.post("/api/token", response_model=Token)
+@router.post("/token", response_model=Token)
 async def login_for_access_token(
     db: Client = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
@@ -47,7 +47,7 @@ async def login_for_access_token(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.message)
 
 
-@router.post("/api/users/", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post("/users/", response_model=User, status_code=status.HTTP_201_CREATED)
 async def create_new_user(user_in: UserCreate, db: Client = Depends(deps.get_db)):
     """
     Create a new user.
@@ -62,7 +62,7 @@ async def create_new_user(user_in: UserCreate, db: Client = Depends(deps.get_db)
         )
 
 
-@router.get("/api/users/me", response_model=User)
+@router.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(deps.get_current_active_user)):
     """
     Fetch the current logged in user.
@@ -70,7 +70,7 @@ async def read_users_me(current_user: User = Depends(deps.get_current_active_use
     return current_user
 
 
-@router.put("/api/users/me", response_model=User)
+@router.put("/users/me", response_model=User)
 async def update_user_me(
     user_update: UserUpdate,
     db: Client = Depends(deps.get_db),
@@ -89,7 +89,7 @@ async def update_user_me(
     return user
 
 
-@router.post("/api/password-recovery/{email}", status_code=status.HTTP_200_OK)
+@router.post("/password-recovery/{email}", status_code=status.HTTP_200_OK)
 async def recover_password(email: str, db: Client = Depends(deps.get_db)):
     """
     Password Recovery.
@@ -107,7 +107,7 @@ async def recover_password(email: str, db: Client = Depends(deps.get_db)):
     }
 
 
-@router.post("/api/reset-password/", status_code=status.HTTP_200_OK)
+@router.post("/reset-password/", status_code=status.HTTP_200_OK)
 async def reset_password(
     new_password_data: NewPassword, db: Client = Depends(deps.get_db)
 ):
