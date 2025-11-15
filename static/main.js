@@ -1283,7 +1283,7 @@ async function handleOrderSubmit(event) {
   if (validationFailed) return;
 
   if (items.length === 0) {
-    showAlert("Please select at least one ticket.", "warning");
+    showAlert("Please select at least one item to order.", "warning");
     return;
   }
 
