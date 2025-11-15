@@ -1,10 +1,9 @@
 """
 API endpoints for user authentication and registration.
 """
-from datetime import timedelta
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from gotrue.errors import AuthApiError
 from supabase import Client
 
 from app.api import deps
@@ -23,20 +22,29 @@ async def login_for_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests.
     """
-    user = await auth_service.authenticate_user(
-        db, email=form_data.username, password=form_data.password
-    )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    try:
+        session = db.auth.sign_in_with_password(
+            {"email": form_data.username, "password": form_data.password}
         )
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = auth_service.create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer", "user": user}
+        if not session.user or not session.session:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Login failed",
+            )
+        # Fetch the full user profile from the public table
+        user_profile = await auth_service.get_user_profile_by_id(db, session.user.id)
+        if not user_profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found"
+            )
+        return {
+            "access_token": session.session.access_token,
+            "token_type": "bearer",
+            "user": user_profile,
+        }
+
+    except AuthApiError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=e.message)
 
 
 @router.post("/users/", response_model=User, status_code=status.HTTP_201_CREATED)
@@ -86,20 +94,14 @@ async def recover_password(email: str, db: Client = Depends(deps.get_db)):
     """
     Password Recovery.
     """
-    user = await auth_service.get_user_by_email(db, email)
-    if not user:
-        # We don't want to reveal if a user exists or not for security reasons.
-        # We return a generic message in both cases.
-        print(f"Password recovery requested for non-existent user: {email}")
-        return {
-            "msg": "If an account with this email exists, a password recovery link has been sent."
-        }
+    try:
+        db.auth.reset_password_for_email(email)
+    except AuthApiError as e:
+        # Still return a generic message to avoid leaking user existence
+        print(f"Password recovery error for {email}: {e.message}")
 
-    password_reset_token = auth_service.create_password_reset_token(email=email)
-    # In a real app, you would email this token. For this demo, we print it.
-    # This is a simplification for the assignment.
-    # The user will have to manually copy this token from the console.
-    print(f"Password reset token for {email}: {password_reset_token}")
+    # We don't want to reveal if a user exists or not for security reasons.
+    # We return a generic message in both cases.
     return {
         "msg": "If an account with this email exists, a password recovery link has been sent."
     }
@@ -112,19 +114,13 @@ async def reset_password(
     """
     Reset password.
     """
-    email = auth_service.get_email_from_password_reset_token(
-        token=new_password_data.token
-    )
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
+    try:
+        # The token from the password reset email is a short-lived access token.
+        # We use it to authenticate the user and update their password.
+        db.auth.update_user(
+            {"password": new_password_data.new_password},
+            jwt=new_password_data.token,
         )
-    user = await auth_service.get_user_by_email(db, email=email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-    await auth_service.reset_user_password(
-        db, user=user, new_password=new_password_data.new_password
-    )
-    return {"msg": "Password updated successfully"}
+        return {"msg": "Password updated successfully"}
+    except AuthApiError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message)

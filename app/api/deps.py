@@ -6,12 +6,11 @@ client or the current user, which can be injected into path operation functions.
 """
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from supabase import Client
 
 from app.core.config import get_settings
 from app.core.database import supabase
-from app.models.user import TokenData, UserInDB
+from app.models.user import User
 from app.services import auth_service
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
@@ -27,7 +26,7 @@ def get_db() -> Client:
 
 async def get_current_user(
     db: Client = Depends(get_db), token: str = Depends(oauth2_scheme)
-) -> UserInDB:
+) -> User:
     """
     Decodes the JWT token to get the current user.
     """
@@ -37,24 +36,22 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
-        email: str = payload.get("sub")
-        if email is None:
+        auth_user = db.auth.get_user(token).user
+        if not auth_user:
             raise credentials_exception
-        token_data = TokenData(email=email)
-    except JWTError:
+    except Exception:
         raise credentials_exception
-    user = await auth_service.get_user_by_email(db, email=token_data.email)
-    if user is None:
+
+    # Fetch the user's public profile
+    user_profile = await auth_service.get_user_profile_by_id(db, user_id=auth_user.id)
+    if user_profile is None:
         raise credentials_exception
-    return user
+    return user_profile
 
 
 async def get_current_active_user(
-    current_user: UserInDB = Depends(get_current_user),
-) -> UserInDB:
+    current_user: User = Depends(get_current_user),
+) -> User:
     """
     Checks if the current user is active.
     """
@@ -64,8 +61,8 @@ async def get_current_active_user(
 
 
 async def get_current_active_admin(
-    current_user: UserInDB = Depends(get_current_user),
-) -> UserInDB:
+    current_user: User = Depends(get_current_user),
+) -> User:
     """
     Checks if the current user is an active admin.
     """

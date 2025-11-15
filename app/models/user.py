@@ -42,10 +42,6 @@ class User(UserBase):
         from_attributes = True
 
 
-class UserInDB(User):
-    """Model for user data as stored in the database, including hashed password."""
-
-    password_hash: str
 
 
 class Token(BaseModel):

@@ -1,78 +1,32 @@
 """
 Service layer for handling authentication and user management logic.
 
-This includes password hashing, JWT creation, and database interactions for
-creating, fetching, and authenticating users.
+This includes database interactions for creating and fetching user profiles.
+Core authentication is handled by Supabase.
 """
-from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+from gotrue.errors import AuthApiError
 from supabase import Client
 
-from app.core.config import get_settings
-from app.models.user import User, UserCreate, UserInDB, UserUpdate
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-settings = get_settings()
+from app.models.user import User, UserCreate, UserUpdate
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifies a plain password against a hashed password."""
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    """Hashes a plain password."""
-    return pwd_context.hash(password)
-
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Creates a JWT access token."""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-    )
-    return encoded_jwt
-
-
-def create_password_reset_token(email: str) -> str:
-    """Creates a password reset token."""
-    delta = timedelta(hours=1)
-    to_encode = {"exp": datetime.utcnow() + delta, "sub": email}
-    encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-    )
-    return encoded_jwt
-
-
-async def get_user_by_email(db: Client, email: str) -> Optional[UserInDB]:
-    """Fetches a user from the database by email."""
+async def get_user_by_email(db: Client, email: str) -> Optional[User]:
+    """Fetches a user's public profile from the database by email."""
     response = db.table("users").select("*").eq("email", email).execute()
     if response.data:
-        return UserInDB(**response.data[0])
+        return User(**response.data[0])
     return None
 
 
-async def authenticate_user(
-    db: Client, email: str, password: str
-) -> Optional[UserInDB]:
-    """Authenticates a user by email and password."""
-    user_in_db = await get_user_by_email(db, email)
-    if not user_in_db:
-        return None
-    if not verify_password(password, user_in_db.password_hash):
-        return None
-    return user_in_db
+async def get_user_profile_by_id(db: Client, user_id: UUID) -> Optional[User]:
+    """Fetches a user's public profile from the database by ID."""
+    response = db.table("users").select("*").eq("id", str(user_id)).single().execute()
+    if response.data:
+        return User(**response.data)
+    return None
 
 
 async def create_user(db: Client, user: UserCreate) -> User:
@@ -82,21 +36,26 @@ async def create_user(db: Client, user: UserCreate) -> User:
     Raises:
         ValueError: If a user with the same email already exists.
     """
-    existing_user = await get_user_by_email(db, user.email)
-    if existing_user:
-        raise ValueError("User with this email already exists")
+    try:
+        # Create user in Supabase Auth
+        auth_response = db.auth.sign_up(
+            {"email": user.email, "password": user.password}
+        )
+        auth_user = auth_response.user
+        if not auth_user:
+            raise ValueError("Could not create user in Supabase Auth")
 
-    hashed_password = get_password_hash(user.password)
-    user_data = {
-        "email": user.email,
-        "full_name": user.full_name,
-        "password_hash": hashed_password,
-    }
-    response = db.table("users").insert(user_data).execute()
+        # Create corresponding public profile in 'users' table
+        profile_data = {
+            "id": str(auth_user.id),
+            "email": auth_user.email,
+            "full_name": user.full_name,
+        }
+        profile_response = db.table("users").insert(profile_data).execute()
 
-    created_user_data = response.data[0]
-
-    return User(**created_user_data)
+        return User(**profile_response.data[0])
+    except AuthApiError as e:
+        raise ValueError(e.message)
 
 
 async def update_user(
@@ -122,21 +81,3 @@ async def update_user(
     if response.data:
         return User(**response.data[0])
     return None
-
-
-def get_email_from_password_reset_token(token: str) -> Optional[str]:
-    """Decodes a password reset token and returns the user's email."""
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
-        return email
-    except JWTError:
-        return None
-
-
-async def reset_user_password(db: Client, user: UserInDB, new_password: str):
-    """Updates the user's password hash in the database."""
-    hashed_password = get_password_hash(new_password)
-    db.table("users").update({"password_hash": hashed_password}).eq(
-        "id", str(user.id)
-    ).execute()
