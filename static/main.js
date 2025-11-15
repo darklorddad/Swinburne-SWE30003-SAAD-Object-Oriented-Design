@@ -871,7 +871,7 @@ async function handleProfileUpdate(event) {
       throw new Error(data.detail || "Failed to update profile.");
     }
 
-    showAlert("Profile updated successfully.", "success");
+    showBottomRightNotification("Profile updated successfully.", "success");
     // Optionally, re-set the value in case the backend modifies it
     document.getElementById("profile-full-name").value = data.full_name || "";
   } catch (error) {
@@ -933,9 +933,38 @@ function showAlert(message, type = "info") {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     `;
-  // Clear previous alerts
   placeholder.innerHTML = "";
   placeholder.append(wrapper);
+}
+
+function showBottomRightNotification(message, type = "success") {
+  let notificationContainer = document.getElementById("bottom-right-notifications");
+  if (!notificationContainer) {
+    notificationContainer = document.createElement("div");
+    notificationContainer.id = "bottom-right-notifications";
+    notificationContainer.style.cssText = "position: fixed; bottom: 20px; right: 20px; z-index: 9999; max-width: 450px;";
+    document.body.appendChild(notificationContainer);
+  }
+
+  const notificationId = "notification-" + Date.now();
+  const notification = document.createElement("div");
+  notification.id = notificationId;
+  notification.className = `alert alert-${type} alert-dismissible fade show`;
+  notification.style.cssText = "margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); padding: 1rem 1.5rem; font-size: 1rem; min-width: 300px; display: flex; align-items: center; justify-content: space-between; gap: 1rem;";
+  notification.innerHTML = `
+    <div style="flex: 1; word-wrap: break-word; margin: 0;">${message}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="flex-shrink: 0; margin: 0;"></button>
+  `;
+
+  notificationContainer.appendChild(notification);
+
+  setTimeout(() => {
+    const alertElement = document.getElementById(notificationId);
+    if (alertElement && alertElement.parentNode) {
+      const bsAlert = new bootstrap.Alert(alertElement);
+      bsAlert.close();
+    }
+  }, 5000);
 }
 
 async function loadProfileData() {
@@ -966,7 +995,13 @@ async function loadProfileData() {
 
     const ordersContainer = document.getElementById("orders-container");
     if (ordersData.length === 0) {
-      ordersContainer.innerHTML = "<p>You have no orders.</p>";
+      ordersContainer.innerHTML = `
+        <div class="card card mb-4">
+            <div class="card-body card-body">
+                <p class="mb-0" style="color: #666; text-align: center; padding: 2rem;">You have no orders.</p>
+            </div>
+        </div>
+      `;
       return;
     }
 

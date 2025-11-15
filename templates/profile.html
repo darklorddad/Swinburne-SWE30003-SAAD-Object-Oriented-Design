@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="profile-wrapper">
 <h2 class="page-title">My Profile</h2>
 <div id="alert-placeholder"></div>
 <div class="card card mb-4">
@@ -24,6 +25,11 @@
 
 <h3 class="section-title">My Orders</h3>
 <div id="orders-container">
-    <p class="loading">Loading orders...</p>
+    <div class="card card mb-4">
+        <div class="card-body card-body">
+            <p class="loading mb-0">Loading orders...</p>
+        </div>
+    </div>
+</div>
 </div>
 {% endblock %}
