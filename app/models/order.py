@@ -38,6 +38,18 @@ class OrderCreate(BaseModel):
     items: List[OrderItemCreate]
 
 
+class OrderItemTicketTypeInfo(BaseModel):
+    """Model for nested ticket type info in an order item."""
+
+    name: str
+
+
+class OrderItemMerchandiseInfo(BaseModel):
+    """Model for nested merchandise info in an order item."""
+
+    name: str
+
+
 class OrderItem(BaseModel):
     """Model for representing an item within an order, read from the database."""
 
@@ -48,6 +60,8 @@ class OrderItem(BaseModel):
     quantity: int
     visit_date: Optional[date] = None
     price_at_purchase: float
+    ticket_types: Optional[OrderItemTicketTypeInfo] = None
+    merchandise: Optional[OrderItemMerchandiseInfo] = None
 
     class Config:
         from_attributes = True

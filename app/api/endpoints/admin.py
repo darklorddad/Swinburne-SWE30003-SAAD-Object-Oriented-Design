@@ -114,7 +114,7 @@ async def read_ticket_types_for_park(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
         )
-    return await park_service.get_ticket_types_for_park(db, park_id)
+    return await admin_service.get_all_ticket_types_for_park(db, park_id)
 
 
 @router.put(

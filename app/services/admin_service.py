@@ -124,6 +124,18 @@ async def delete_ticket_type(db: Client, park_id: UUID, ticket_type_id: UUID) ->
     return bool(response.data)
 
 
+async def get_all_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketType]:
+    """Fetches all ticket types (active and inactive) for a park."""
+    response = (
+        db.table("ticket_types")
+        .select("*")
+        .eq("park_id", str(park_id))
+        .order("name")
+        .execute()
+    )
+    return [TicketType(**tt) for tt in response.data]
+
+
 async def create_merchandise(
     db: Client, merchandise_in: MerchandiseCreate, park_id: UUID
 ) -> Merchandise:

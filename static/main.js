@@ -441,10 +441,13 @@ async function loadAdminParks() {
         const ticketTypesHtml =
           park.ticketTypes.length > 0
             ? park.ticketTypes
-                .map(
-                  (tt) => `
+                .map((tt) => {
+                  const statusBadge = tt.is_active
+                    ? ""
+                    : ' <span class="badge bg-secondary">Inactive</span>';
+                  return `
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>${tt.name} - RM ${tt.price.toFixed(2)}</span>
+                    <span>${tt.name} - RM ${tt.price.toFixed(2)}${statusBadge}</span>
                     <div>
                         <button
                             class="btn btn-outline-secondary btn-sm edit-tt-btn"
@@ -466,8 +469,8 @@ async function loadAdminParks() {
                         </button>
                     </div>
                 </li>
-            `
-                )
+            `;
+                })
                 .join("")
             : '<li class="list-group-item">No ticket types found for this park.</li>';
 
