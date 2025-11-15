@@ -40,11 +40,12 @@ async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketTyp
 
 
 async def get_merchandise_for_park(db: Client, park_id: UUID) -> List[Merchandise]:
-    """Fetches all merchandise for a specific park."""
+    """Fetches all active merchandise for a specific park."""
     response = (
         db.table("merchandise")
         .select("*")
         .eq("park_id", str(park_id))
+        .eq("is_active", True)
         .order("name")
         .execute()
     )

@@ -36,6 +36,7 @@ class Merchandise(MerchandiseBase):
 
     id: UUID
     park_id: UUID
+    is_active: bool = True
 
     class Config:
         """Pydantic configuration."""

@@ -181,7 +181,7 @@ async def read_merchandise_for_park(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
         )
-    return await park_service.get_merchandise_for_park(db, park_id)
+    return await admin_service.get_all_merchandise_for_park(db, park_id)
 
 
 @router.post(

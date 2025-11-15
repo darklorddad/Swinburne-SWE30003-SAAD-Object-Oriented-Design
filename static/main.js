@@ -477,11 +477,14 @@ async function loadAdminParks() {
         const merchandiseHtml =
           park.merchandise.length > 0
             ? park.merchandise
-                .map(
-                  (m) => `
+                .map((m) => {
+                  const statusBadge = m.is_active
+                    ? ""
+                    : ' <span class="badge bg-secondary">Inactive</span>';
+                  return `
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                        ${m.name} - RM ${m.price.toFixed(2)}<br>
+                        ${m.name} - RM ${m.price.toFixed(2)}${statusBadge}<br>
                         <small class="text-muted">Stock: ${m.stock}</small>
                     </div>
                     <div>
@@ -507,8 +510,8 @@ async function loadAdminParks() {
                         </button>
                     </div>
                 </li>
-            `
-                )
+            `;
+                })
                 .join("")
             : '<li class="list-group-item">No merchandise found for this park.</li>';
 

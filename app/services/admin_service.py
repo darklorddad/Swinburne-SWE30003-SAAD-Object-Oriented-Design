@@ -136,6 +136,18 @@ async def get_all_ticket_types_for_park(db: Client, park_id: UUID) -> List[Ticke
     return [TicketType(**tt) for tt in response.data]
 
 
+async def get_all_merchandise_for_park(db: Client, park_id: UUID) -> List[Merchandise]:
+    """Fetches all merchandise (active and inactive) for a park."""
+    response = (
+        db.table("merchandise")
+        .select("*")
+        .eq("park_id", str(park_id))
+        .order("name")
+        .execute()
+    )
+    return [Merchandise(**m) for m in response.data]
+
+
 async def create_merchandise(
     db: Client, merchandise_in: MerchandiseCreate, park_id: UUID
 ) -> Merchandise:
@@ -191,10 +203,13 @@ async def update_merchandise(
 
 
 async def delete_merchandise(db: Client, park_id: UUID, merchandise_id: UUID) -> bool:
-    """Deletes merchandise, ensuring it belongs to the correct park."""
+    """
+    Soft-deletes merchandise by setting its is_active flag to false.
+    This ensures that historical order data remains intact.
+    """
     response = (
         db.table("merchandise")
-        .delete()
+        .update({"is_active": False})
         .eq("id", str(merchandise_id))
         .eq("park_id", str(park_id))
         .execute()
