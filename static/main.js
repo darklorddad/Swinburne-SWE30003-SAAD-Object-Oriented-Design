@@ -1316,6 +1316,7 @@ async function loadAdminDashboard() {
         <h5>Overall Summary</h5>
         <p><strong>Total Revenue:</strong> RM 0.00</p>
         <p><strong>Total Tickets Sold:</strong> 0</p>
+        <p><strong>Total Merchandise Sold:</strong> 0</p>
         <hr>
         <p>No park data available to generate statistics.</p>
       `;
@@ -1328,6 +1329,7 @@ async function loadAdminDashboard() {
         <tr>
             <td>${p.park_name}</td>
             <td>${p.tickets_sold}</td>
+            <td>${p.merchandise_items_sold}</td>
             <td>RM ${p.total_revenue.toFixed(2)}</td>
         </tr>
     `
@@ -1338,6 +1340,9 @@ async function loadAdminDashboard() {
         <h5>Overall Summary</h5>
         <p><strong>Total Revenue:</strong> RM ${stats.total_revenue.toFixed(2)}</p>
         <p><strong>Total Tickets Sold:</strong> ${stats.total_tickets_sold}</p>
+        <p><strong>Total Merchandise Sold:</strong> ${
+          stats.total_merchandise_items_sold
+        }</p>
         <hr>
         <h5>Revenue by Park</h5>
         <table class="table">
@@ -1345,6 +1350,7 @@ async function loadAdminDashboard() {
                 <tr>
                     <th>Park</th>
                     <th>Tickets Sold</th>
+                    <th>Merchandise Sold</th>
                     <th>Total Revenue</th>
                 </tr>
             </thead>

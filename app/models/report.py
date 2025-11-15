@@ -14,6 +14,7 @@ class ParkStatistic(BaseModel):
     park_name: str
     total_revenue: float
     tickets_sold: int
+    merchandise_items_sold: int
 
 
 class VisitorStatistics(BaseModel):
@@ -21,4 +22,5 @@ class VisitorStatistics(BaseModel):
 
     total_revenue: float
     total_tickets_sold: int
+    total_merchandise_items_sold: int
     revenue_by_park: List[ParkStatistic]

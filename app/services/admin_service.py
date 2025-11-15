@@ -186,7 +186,7 @@ async def get_visitor_statistics(db: Client) -> VisitorStatistics:
     response = (
         db.table("orders")
         .select(
-            "status, order_items(quantity, price_at_purchase, ticket_types(park_id, parks(name)))"
+            "status, order_items(quantity, price_at_purchase, ticket_types(park_id, parks(name)), merchandise(park_id, parks(name)))"
         )
         .neq("status", "cancelled")
         .execute()
@@ -194,29 +194,50 @@ async def get_visitor_statistics(db: Client) -> VisitorStatistics:
 
     if not response.data:
         return VisitorStatistics(
-            total_revenue=0, total_tickets_sold=0, revenue_by_park=[]
+            total_revenue=0,
+            total_tickets_sold=0,
+            total_merchandise_items_sold=0,
+            revenue_by_park=[],
         )
 
     total_revenue = 0.0
     total_tickets_sold = 0
-    park_stats_raw = defaultdict(lambda: {"revenue": 0.0, "tickets": 0, "name": ""})
+    total_merchandise_items_sold = 0
+    park_stats_raw = defaultdict(
+        lambda: {"revenue": 0.0, "tickets": 0, "merch": 0, "name": ""}
+    )
 
     for order in response.data:
         for item in order["order_items"]:
-            # Ensure nested data exists before processing
+            park_id = None
+            park_name = None
+            is_ticket = False
+            is_merch = False
+
             if item.get("ticket_types") and item["ticket_types"].get("parks"):
                 park_id = item["ticket_types"]["park_id"]
                 park_name = item["ticket_types"]["parks"]["name"]
+                is_ticket = True
+            elif item.get("merchandise") and item["merchandise"].get("parks"):
+                park_id = item["merchandise"]["park_id"]
+                park_name = item["merchandise"]["parks"]["name"]
+                is_merch = True
+
+            if park_id and park_name:
                 quantity = item["quantity"]
                 price = item["price_at_purchase"]
                 revenue = quantity * price
 
                 total_revenue += revenue
-                total_tickets_sold += quantity
-
                 park_stats_raw[park_id]["revenue"] += revenue
-                park_stats_raw[park_id]["tickets"] += quantity
                 park_stats_raw[park_id]["name"] = park_name
+
+                if is_ticket:
+                    total_tickets_sold += quantity
+                    park_stats_raw[park_id]["tickets"] += quantity
+                elif is_merch:
+                    total_merchandise_items_sold += quantity
+                    park_stats_raw[park_id]["merch"] += quantity
 
     revenue_by_park = [
         ParkStatistic(
@@ -224,6 +245,7 @@ async def get_visitor_statistics(db: Client) -> VisitorStatistics:
             park_name=stats["name"],
             total_revenue=stats["revenue"],
             tickets_sold=stats["tickets"],
+            merchandise_items_sold=stats["merch"],
         )
         for pid, stats in park_stats_raw.items()
     ]
@@ -234,5 +256,6 @@ async def get_visitor_statistics(db: Client) -> VisitorStatistics:
     return VisitorStatistics(
         total_revenue=total_revenue,
         total_tickets_sold=total_tickets_sold,
+        total_merchandise_items_sold=total_merchandise_items_sold,
         revenue_by_park=revenue_by_park,
     )
