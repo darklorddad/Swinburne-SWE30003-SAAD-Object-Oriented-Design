@@ -7,7 +7,7 @@ Core authentication is handled by Supabase.
 from typing import Optional
 from uuid import UUID
 
-from gotrue.errors import AuthApiError
+from supabase_auth.errors import AuthApiError
 from supabase import Client
 
 from app.models.user import User, UserCreate, UserUpdate
