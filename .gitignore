@@ -1,3 +1,9 @@
+.aider*
+dld*
+*.sql
+supabase/
+Documents/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
