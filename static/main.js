@@ -972,10 +972,16 @@ async function loadProfileData() {
                 <h6>Items:</h6>
                 <ul>
                     ${order.items
-                      .map(
-                        (item) =>
-                          `<li>${item.quantity} x Ticket (Visit: ${item.visit_date})</li>`
-                      )
+                      .map((item) => {
+                        if (item.ticket_type_id && item.ticket_types) {
+                          return `<li>${item.quantity} x ${
+                            item.ticket_types.name
+                          } (Visit: ${item.visit_date})</li>`;
+                        } else if (item.merchandise_id && item.merchandise) {
+                          return `<li>${item.quantity} x ${item.merchandise.name}</li>`;
+                        }
+                        return `<li>${item.quantity} x Unknown Item</li>`;
+                      })
                       .join("")}
                 </ul>
                 ${
@@ -1076,17 +1082,22 @@ async function loadParkDetail() {
   const orderFormContainer = document.getElementById("order-form-container");
 
   try {
-    // Fetch park details and ticket types in parallel
-    const [parkResponse, ticketTypesResponse] = await Promise.all([
-      fetch(`/api/parks/${parkId}`),
-      fetch(`/api/parks/${parkId}/ticket-types/`),
-    ]);
+    // Fetch park details, ticket types, and merchandise in parallel
+    const [parkResponse, ticketTypesResponse, merchandiseResponse] =
+      await Promise.all([
+        fetch(`/api/parks/${parkId}`),
+        fetch(`/api/parks/${parkId}/ticket-types/`),
+        fetch(`/api/parks/${parkId}/merchandise/`),
+      ]);
 
     if (!parkResponse.ok) throw new Error("Failed to fetch park details.");
     const park = await parkResponse.json();
 
     if (!ticketTypesResponse.ok) throw new Error("Failed to fetch ticket types.");
     const ticketTypes = await ticketTypesResponse.json();
+
+    if (!merchandiseResponse.ok) throw new Error("Failed to fetch merchandise.");
+    const merchandise = await merchandiseResponse.json();
 
     // Render park details
     parkDetailContainer.innerHTML = `
@@ -1098,26 +1109,29 @@ async function loadParkDetail() {
     // Render order form if logged in
     const token = getToken();
     if (token) {
-      if (ticketTypes.length === 0) {
+      if (ticketTypes.length === 0 && merchandise.length === 0) {
         orderFormContainer.innerHTML =
-          "<p>No tickets available for this park at the moment.</p>";
+          "<p>No tickets or merchandise available for this park at the moment.</p>";
       } else {
         const today = new Date().toISOString().split("T")[0];
-        const ticketInputs = ticketTypes
-          .map(
-            (tt) => `
+        const ticketInputs =
+          ticketTypes.length > 0
+            ? `<h3>Book Tickets</h3>` +
+              ticketTypes
+                .map(
+                  (tt) => `
                     <div class="mb-3 border p-3 rounded">
                         <h5>${tt.name} (RM ${tt.price.toFixed(2)})</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="quantity-${
+                                <label for="quantity-ticket-${
                                   tt.id
                                 }" class="form-label">Quantity</label>
-                                <input type="number" id="quantity-${
+                                <input type="number" id="quantity-ticket-${
                                   tt.id
                                 }" class="form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
-              tt.id
-            }">
+                    tt.id
+                  }">
                             </div>
                             <div class="col-md-6">
                                 <label for="visit-date-${
@@ -1130,13 +1144,44 @@ async function loadParkDetail() {
                         </div>
                     </div>
                 `
-          )
-          .join("");
+                )
+                .join("")
+            : "";
+
+        const merchandiseInputs =
+          merchandise.length > 0
+            ? `<h3>Purchase Merchandise</h3>` +
+              merchandise
+                .map(
+                  (m) => `
+                    <div class="mb-3 border p-3 rounded">
+                        <h5>${m.name} (RM ${m.price.toFixed(2)})</h5>
+                        <p class="mb-1">${m.description || ""}</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="quantity-merch-${
+                                  m.id
+                                }" class="form-label">Quantity</label>
+                                <input type="number" id="quantity-merch-${
+                                  m.id
+                                }" class="form-control merchandise-quantity" min="0" value="0" data-merchandise-id="${
+                    m.id
+                  }" max="${m.stock}">
+                                <small class="text-muted">Stock: ${
+                                  m.stock
+                                }</small>
+                            </div>
+                        </div>
+                    </div>
+                `
+                )
+                .join("")
+            : "";
 
         orderFormContainer.innerHTML = `
-                    <h3>Book Tickets</h3>
                     <form id="order-form">
                         ${ticketInputs}
+                        ${merchandiseInputs}
                         <button type="submit" class="btn btn-success mt-3">Place Order</button>
                     </form>
                 `;
@@ -1162,10 +1207,10 @@ async function handleOrderSubmit(event) {
   }
 
   const items = [];
-  const quantityInputs = document.querySelectorAll(".ticket-quantity");
+  const ticketQuantityInputs = document.querySelectorAll(".ticket-quantity");
   let validationFailed = false;
 
-  quantityInputs.forEach((input) => {
+  ticketQuantityInputs.forEach((input) => {
     if (validationFailed) return;
     const quantity = parseInt(input.value, 10);
     if (quantity > 0) {
@@ -1186,6 +1231,22 @@ async function handleOrderSubmit(event) {
         ticket_type_id: ticketTypeId,
         quantity: quantity,
         visit_date: visitDate,
+      });
+    }
+  });
+
+  if (validationFailed) return;
+
+  const merchandiseQuantityInputs = document.querySelectorAll(
+    ".merchandise-quantity"
+  );
+  merchandiseQuantityInputs.forEach((input) => {
+    const quantity = parseInt(input.value, 10);
+    if (quantity > 0) {
+      const merchandiseId = input.dataset.merchandiseId;
+      items.push({
+        merchandise_id: merchandiseId,
+        quantity: quantity,
       });
     }
   });

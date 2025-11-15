@@ -108,7 +108,7 @@ async def get_orders_for_customer(db: Client, customer_id: UUID) -> List[Order]:
     """Fetches all orders for a specific customer."""
     response = (
         db.table("orders")
-        .select("*, order_items(*)")
+        .select("*, order_items(*, ticket_types(name), merchandise(name))")
         .eq("customer_id", str(customer_id))
         .order("created_at", desc=True)
         .execute()
@@ -122,7 +122,7 @@ async def get_order_by_id(
     """Fetches a single order by its ID, ensuring it belongs to the customer."""
     response = (
         db.table("orders")
-        .select("*, order_items(*)")
+        .select("*, order_items(*, ticket_types(name), merchandise(name))")
         .eq("id", str(order_id))
         .eq("customer_id", str(customer_id))
         .single()
