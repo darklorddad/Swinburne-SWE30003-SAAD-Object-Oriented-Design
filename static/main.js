@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
     saveTicketTypeBtn.addEventListener("click", handleSaveTicketType);
   }
 
+  const saveMerchBtn = document.getElementById("save-merch-changes-btn");
+  if (saveMerchBtn) {
+    saveMerchBtn.addEventListener("click", handleSaveMerchandise);
+  }
+
   const editParkModal = document.getElementById("editParkModal");
   if (editParkModal) {
     editParkModal.addEventListener("show.bs.modal", (event) => {
@@ -83,6 +88,46 @@ document.addEventListener("DOMContentLoaded", () => {
         modalTtIdInput.value = "";
         modalTtNameInput.value = "";
         modalTtPriceInput.value = "";
+      }
+    });
+  }
+
+  const merchandiseModal = document.getElementById("merchandiseModal");
+  if (merchandiseModal) {
+    merchandiseModal.addEventListener("show.bs.modal", (event) => {
+      const button = event.relatedTarget;
+      const parkId = button.getAttribute("data-park-id");
+      const merchId = button.getAttribute("data-merch-id");
+      const merchName = button.getAttribute("data-merch-name");
+      const merchDescription = button.getAttribute("data-merch-description");
+      const merchPrice = button.getAttribute("data-merch-price");
+      const merchStock = button.getAttribute("data-merch-stock");
+
+      const modalTitle = merchandiseModal.querySelector(".modal-title");
+      const modalParkIdInput = merchandiseModal.querySelector("#merch-park-id");
+      const modalMerchIdInput = merchandiseModal.querySelector("#merch-id");
+      const modalMerchNameInput = merchandiseModal.querySelector("#merch-name");
+      const modalMerchDescInput =
+        merchandiseModal.querySelector("#merch-description");
+      const modalMerchPriceInput =
+        merchandiseModal.querySelector("#merch-price");
+      const modalMerchStockInput =
+        merchandiseModal.querySelector("#merch-stock");
+
+      modalParkIdInput.value = parkId;
+      if (merchId) {
+        // Editing existing merchandise
+        modalTitle.textContent = "Edit Merchandise";
+        modalMerchIdInput.value = merchId;
+        modalMerchNameInput.value = merchName;
+        modalMerchDescInput.value = merchDescription;
+        modalMerchPriceInput.value = merchPrice;
+        modalMerchStockInput.value = merchStock;
+      } else {
+        // Adding new merchandise
+        modalTitle.textContent = "Add New Merchandise";
+        modalMerchIdInput.value = "";
+        document.getElementById("merchandise-form").reset();
       }
     });
   }
@@ -152,6 +197,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const ttId = event.target.dataset.ttId;
       if (confirm("Are you sure you want to delete this ticket type?")) {
         await handleDeleteTicketType(parkId, ttId);
+      }
+    }
+    if (event.target.classList.contains("delete-merch-btn")) {
+      const parkId = event.target.dataset.parkId;
+      const merchId = event.target.dataset.merchId;
+      if (confirm("Are you sure you want to delete this merchandise?")) {
+        await handleDeleteMerchandise(parkId, merchId);
       }
     }
   });
@@ -361,24 +413,30 @@ async function loadAdminParks() {
       return;
     }
 
-    // Fetch ticket types for all parks in parallel
-    const parksWithTicketTypesPromises = parks.map(async (park) => {
-      const ticketTypesResponse = await fetch(
-        `/api/admin/parks/${park.id}/ticket-types/`,
-        {
+    // Fetch ticket types and merchandise for all parks in parallel
+    const parksWithDetailsPromises = parks.map(async (park) => {
+      const [ticketTypesResponse, merchandiseResponse] = await Promise.all([
+        fetch(`/api/admin/parks/${park.id}/ticket-types/`, {
           headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        }),
+        fetch(`/api/admin/parks/${park.id}/merchandise/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
       const ticketTypes = ticketTypesResponse.ok
         ? await ticketTypesResponse.json()
         : [];
-      return { ...park, ticketTypes };
+      const merchandise = merchandiseResponse.ok
+        ? await merchandiseResponse.json()
+        : [];
+      return { ...park, ticketTypes, merchandise };
     });
 
-    const parksWithTicketTypes = await Promise.all(parksWithTicketTypesPromises);
+    const parksWithDetails = await Promise.all(parksWithDetailsPromises);
 
     const accordionId = "parks-accordion";
-    const parksHtml = parksWithTicketTypes
+    const parksHtml = parksWithDetails
       .map((park) => {
         const ticketTypesHtml =
           park.ticketTypes.length > 0
@@ -412,6 +470,44 @@ async function loadAdminParks() {
                 )
                 .join("")
             : '<li class="list-group-item">No ticket types found for this park.</li>';
+
+        const merchandiseHtml =
+          park.merchandise.length > 0
+            ? park.merchandise
+                .map(
+                  (m) => `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        ${m.name} - RM ${m.price.toFixed(2)}<br>
+                        <small class="text-muted">Stock: ${m.stock}</small>
+                    </div>
+                    <div>
+                        <button
+                            class="btn btn-outline-secondary btn-sm edit-merch-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#merchandiseModal"
+                            data-park-id="${park.id}"
+                            data-merch-id="${m.id}"
+                            data-merch-name="${m.name}"
+                            data-merch-description="${m.description || ""}"
+                            data-merch-price="${m.price}"
+                            data-merch-stock="${m.stock}"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            class="btn btn-outline-danger btn-sm delete-merch-btn"
+                            data-park-id="${park.id}"
+                            data-merch-id="${m.id}"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </li>
+            `
+                )
+                .join("")
+            : '<li class="list-group-item">No merchandise found for this park.</li>';
 
         return `
         <div class="accordion-item">
@@ -466,6 +562,21 @@ async function loadAdminParks() {
                         data-park-id="${park.id}"
                     >
                         Add Ticket Type
+                    </button>
+
+                    <hr class="my-3">
+
+                    <h6>Merchandise</h6>
+                    <ul class="list-group mb-3">
+                        ${merchandiseHtml}
+                    </ul>
+                    <button
+                        class="btn btn-primary btn-sm add-merch-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#merchandiseModal"
+                        data-park-id="${park.id}"
+                    >
+                        Add Merchandise
                     </button>
                 </div>
             </div>
@@ -623,6 +734,92 @@ async function handleUpdatePark() {
     );
     modal.hide();
     loadAdminParks(); // Refresh the list of parks
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleSaveMerchandise() {
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  const parkId = document.getElementById("merch-park-id").value;
+  const merchId = document.getElementById("merch-id").value;
+  const merchName = document.getElementById("merch-name").value;
+  const merchDescription = document.getElementById("merch-description").value;
+  const merchPrice = parseFloat(document.getElementById("merch-price").value);
+  const merchStock = parseInt(document.getElementById("merch-stock").value, 10);
+
+  if (!merchName || !merchPrice || isNaN(merchStock)) {
+    showAlert("Name, price, and stock are required.", "warning");
+    return;
+  }
+
+  const isEditing = !!merchId;
+  const url = isEditing
+    ? `/api/admin/parks/${parkId}/merchandise/${merchId}`
+    : `/api/admin/parks/${parkId}/merchandise/`;
+  const method = isEditing ? "PUT" : "POST";
+
+  const merchData = {
+    name: merchName,
+    description: merchDescription,
+    price: merchPrice,
+    stock: merchStock,
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(merchData),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to save merchandise.");
+    }
+
+    showAlert("Merchandise saved successfully.", "success");
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("merchandiseModal")
+    );
+    modal.hide();
+    loadAdminParks(); // Refresh the accordion
+  } catch (error) {
+    showAlert(error.message, "danger");
+  }
+}
+
+async function handleDeleteMerchandise(parkId, merchId) {
+  const token = getToken();
+  if (!token) {
+    showAlert("Authentication error. Please log in again.", "danger");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/admin/parks/${parkId}/merchandise/${merchId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.detail || "Failed to delete merchandise.");
+    }
+
+    showAlert("Merchandise deleted successfully.", "success");
+    loadAdminParks(); // Refresh the accordion
   } catch (error) {
     showAlert(error.message, "danger");
   }

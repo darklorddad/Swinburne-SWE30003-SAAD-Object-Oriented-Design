@@ -118,4 +118,42 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for adding/editing merchandise -->
+<div class="modal fade" id="merchandiseModal" tabindex="-1" aria-labelledby="merchandiseModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="merchandiseModalLabel">Add/Edit Merchandise</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="merchandise-form">
+          <input type="hidden" id="merch-park-id">
+          <input type="hidden" id="merch-id">
+          <div class="mb-3">
+            <label for="merch-name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="merch-name" required>
+          </div>
+          <div class="mb-3">
+            <label for="merch-description" class="form-label">Description</label>
+            <textarea class="form-control" id="merch-description" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="merch-price" class="form-label">Price (RM)</label>
+            <input type="number" class="form-control" id="merch-price" step="0.01" min="0" required>
+          </div>
+          <div class="mb-3">
+            <label for="merch-stock" class="form-label">Stock</label>
+            <input type="number" class="form-control" id="merch-stock" min="0" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-merch-changes-btn">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
