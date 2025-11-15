@@ -6,38 +6,56 @@ from uuid import UUID
 
 from supabase import Client
 
+from app.models.merchandise import Merchandise
 from app.models.order import Order, OrderCreate, OrderItem
 
 
 async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> Order:
     """
-    Creates a new order for a customer.
+    Creates a new order for a customer, handling both tickets and merchandise.
 
-    This function calculates the total price based on the current ticket prices,
-    creates an order record, and then creates the associated order item records.
+    This function validates items, calculates total price, checks stock for
+    merchandise, creates the order and its items, and decrements stock.
 
     Raises:
-        ValueError: If any of the provided ticket_type_ids are not found.
+        ValueError: If an item is not found, out of stock, or invalid.
     """
     total_amount = 0.0
     order_items_to_create = []
-    ticket_type_prices = {}
+    item_prices = {}
 
-    # First, validate all ticket types and calculate total price
+    # First, validate all items, check stock, and calculate total price
     for item in order_in.items:
-        response = (
-            db.table("ticket_types")
-            .select("price")
-            .eq("id", str(item.ticket_type_id))
-            .single()
-            .execute()
-        )
-        if not response.data:
-            raise ValueError(f"TicketType with id {item.ticket_type_id} not found")
-
-        price = response.data["price"]
-        ticket_type_prices[item.ticket_type_id] = price
-        total_amount += price * item.quantity
+        if item.ticket_type_id:
+            response = (
+                db.table("ticket_types")
+                .select("price")
+                .eq("id", str(item.ticket_type_id))
+                .single()
+                .execute()
+            )
+            if not response.data:
+                raise ValueError(f"TicketType with id {item.ticket_type_id} not found")
+            price = response.data["price"]
+            item_prices[item.ticket_type_id] = price
+            total_amount += price * item.quantity
+        elif item.merchandise_id:
+            response = (
+                db.table("merchandise")
+                .select("price, stock")
+                .eq("id", str(item.merchandise_id))
+                .single()
+                .execute()
+            )
+            if not response.data:
+                raise ValueError(f"Merchandise with id {item.merchandise_id} not found")
+            if response.data["stock"] < item.quantity:
+                raise ValueError(
+                    f"Not enough stock for merchandise id {item.merchandise_id}"
+                )
+            price = response.data["price"]
+            item_prices[item.merchandise_id] = price
+            total_amount += price * item.quantity
 
     # Create the order record
     order_data = {
@@ -49,17 +67,26 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
     created_order = order_response.data[0]
     order_id = created_order["id"]
 
-    # Prepare order items for batch insert
+    # Prepare order items for batch insert and decrement stock for merchandise
     for item in order_in.items:
-        order_items_to_create.append(
-            {
-                "order_id": order_id,
-                "ticket_type_id": str(item.ticket_type_id),
-                "quantity": item.quantity,
-                "visit_date": str(item.visit_date),
-                "price_at_purchase": ticket_type_prices[item.ticket_type_id],
-            }
-        )
+        item_data = {
+            "order_id": order_id,
+            "quantity": item.quantity,
+            "ticket_type_id": str(item.ticket_type_id) if item.ticket_type_id else None,
+            "merchandise_id": str(item.merchandise_id) if item.merchandise_id else None,
+            "visit_date": str(item.visit_date) if item.visit_date else None,
+            "price_at_purchase": item_prices[
+                item.ticket_type_id or item.merchandise_id
+            ],
+        }
+        order_items_to_create.append(item_data)
+
+        if item.merchandise_id:
+            # Decrement stock using an atomic RPC call
+            db.rpc(
+                "decrement_stock",
+                {"merch_id": str(item.merchandise_id), "decrement_by": item.quantity},
+            ).execute()
 
     # Batch insert order items
     items_response = db.table("order_items").insert(order_items_to_create).execute()
@@ -108,7 +135,7 @@ async def get_order_by_id(
 
 async def cancel_order(db: Client, order_id: UUID, customer_id: UUID) -> Order:
     """
-    Cancels an order for a customer.
+    Cancels an order for a customer and restores stock for merchandise items.
 
     Raises:
         ValueError: If the order is not found, does not belong to the user,
@@ -120,6 +147,15 @@ async def cancel_order(db: Client, order_id: UUID, customer_id: UUID) -> Order:
 
     if order.status == "cancelled":
         raise ValueError("Order is already cancelled")
+
+    # Restore stock for any merchandise items in the order
+    for item in order.items:
+        if item.merchandise_id:
+            # Increment stock using an atomic RPC call
+            db.rpc(
+                "increment_stock",
+                {"merch_id": str(item.merchandise_id), "increment_by": item.quantity},
+            ).execute()
 
     response = (
         db.table("orders")

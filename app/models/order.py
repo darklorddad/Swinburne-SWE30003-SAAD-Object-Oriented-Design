@@ -2,18 +2,36 @@
 Pydantic models for Order data structures.
 """
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 
 
 class OrderItemCreate(BaseModel):
     """Model for creating an item within an order."""
 
-    ticket_type_id: UUID
     quantity: int = Field(..., gt=0)
-    visit_date: date
+    ticket_type_id: Optional[UUID] = None
+    merchandise_id: Optional[UUID] = None
+    visit_date: Optional[date] = None
+
+    @root_validator
+    def check_item_type(cls, values):
+        """Ensure item is for a ticket or merchandise, but not both."""
+        ticket_id, merch_id = values.get("ticket_type_id"), values.get(
+            "merchandise_id"
+        )
+        visit_date = values.get("visit_date")
+        if ticket_id is not None and merch_id is not None:
+            raise ValueError("OrderItem cannot be for both a ticket and merchandise")
+        if ticket_id is None and merch_id is None:
+            raise ValueError("OrderItem must be for either a ticket or merchandise")
+        if ticket_id is not None and visit_date is None:
+            raise ValueError("Visit date is required for tickets")
+        if merch_id is not None and visit_date is not None:
+            raise ValueError("Visit date should not be provided for merchandise")
+        return values
 
 
 class OrderCreate(BaseModel):
@@ -27,9 +45,10 @@ class OrderItem(BaseModel):
 
     id: UUID
     order_id: UUID
-    ticket_type_id: UUID
+    ticket_type_id: Optional[UUID] = None
+    merchandise_id: Optional[UUID] = None
     quantity: int
-    visit_date: date
+    visit_date: Optional[date] = None
     price_at_purchase: float
 
     class Config:
