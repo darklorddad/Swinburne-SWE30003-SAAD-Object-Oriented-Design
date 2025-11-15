@@ -438,6 +438,9 @@ async function loadAdminParks() {
     const accordionId = "parks-accordion";
     const parksHtml = parksWithDetails
       .map((park) => {
+        const statusBadge = park.is_active
+          ? ""
+          : ' <span class="badge bg-secondary">Inactive</span>';
         const ticketTypesHtml =
           park.ticketTypes.length > 0
             ? park.ticketTypes
@@ -521,7 +524,7 @@ async function loadAdminParks() {
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
                   park.id
                 }" aria-expanded="false" aria-controls="collapse-${park.id}">
-                    ${park.name}
+                    ${park.name}${statusBadge}
                 </button>
             </h2>
             <div id="collapse-${

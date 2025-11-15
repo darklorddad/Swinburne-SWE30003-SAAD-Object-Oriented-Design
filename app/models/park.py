@@ -31,6 +31,7 @@ class Park(ParkBase):
     """Model for representing a park read from the database."""
 
     id: UUID
+    is_active: bool = True
 
     class Config:
         """Pydantic configuration."""

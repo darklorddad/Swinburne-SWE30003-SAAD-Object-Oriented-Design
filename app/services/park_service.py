@@ -12,8 +12,8 @@ from app.models.ticket import TicketType
 
 
 async def get_parks(db: Client) -> List[Park]:
-    """Fetches all parks from the database."""
-    response = db.table("parks").select("*").order("name").execute()
+    """Fetches all active parks from the database."""
+    response = db.table("parks").select("*").eq("is_active", True).order("name").execute()
     parks = [Park(**park_data) for park_data in response.data]
     return parks
 

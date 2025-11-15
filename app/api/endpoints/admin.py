@@ -37,9 +37,9 @@ async def create_new_park(park_in: ParkCreate, db: Client = Depends(deps.get_db)
 )
 async def read_parks(db: Client = Depends(deps.get_db)):
     """
-    Retrieve all parks. (Admin only)
+    Retrieve all parks (active and inactive). (Admin only)
     """
-    return await park_service.get_parks(db)
+    return await admin_service.get_all_parks(db)
 
 
 @router.put(

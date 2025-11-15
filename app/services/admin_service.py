@@ -37,20 +37,36 @@ async def update_park(
 
 
 async def delete_park(db: Client, park_id: UUID) -> bool:
-    """Deletes a park and all its associated ticket types and merchandise."""
-    # This ensures data integrity by removing dependent records first. For the
-    # scope of this assignment, sequential deletion is a robust simplification.
-    # In a production system, this would ideally be a single atomic transaction.
+    """
+    Soft-deletes a park and all its associated ticket types and merchandise.
+    """
+    # This is not a true transaction, but for the assignment's scope,
+    # sequential deactivation is sufficient.
 
-    # Delete associated merchandise
-    db.table("merchandise").delete().eq("park_id", str(park_id)).execute()
+    # Deactivate associated merchandise
+    db.table("merchandise").update({"is_active": False}).eq(
+        "park_id", str(park_id)
+    ).execute()
 
-    # Delete associated ticket types
-    db.table("ticket_types").delete().eq("park_id", str(park_id)).execute()
+    # Deactivate associated ticket types
+    db.table("ticket_types").update({"is_active": False}).eq(
+        "park_id", str(park_id)
+    ).execute()
 
-    # Finally, delete the park itself
-    response = db.table("parks").delete().eq("id", str(park_id)).execute()
+    # Finally, deactivate the park itself
+    response = (
+        db.table("parks")
+        .update({"is_active": False})
+        .eq("id", str(park_id))
+        .execute()
+    )
     return bool(response.data)
+
+
+async def get_all_parks(db: Client) -> List[Park]:
+    """Fetches all parks (active and inactive) from the database."""
+    response = db.table("parks").select("*").order("name").execute()
+    return [Park(**park_data) for park_data in response.data]
 
 
 async def create_ticket_type(
