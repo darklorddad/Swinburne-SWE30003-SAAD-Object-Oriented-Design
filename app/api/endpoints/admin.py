@@ -164,6 +164,26 @@ async def delete_ticket_type_for_park(
         )
 
 
+@router.get(
+    "/parks/{park_id}/merchandise/",
+    response_model=List[Merchandise],
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def read_merchandise_for_park(
+    park_id: UUID, db: Client = Depends(deps.get_db)
+):
+    """
+    Retrieve all merchandise for a specific park. (Admin only)
+    """
+    # Check if park exists first
+    park = await park_service.get_park_by_id(db, park_id)
+    if not park:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
+        )
+    return await park_service.get_merchandise_for_park(db, park_id)
+
+
 @router.post(
     "/parks/{park_id}/merchandise/",
     response_model=Merchandise,
