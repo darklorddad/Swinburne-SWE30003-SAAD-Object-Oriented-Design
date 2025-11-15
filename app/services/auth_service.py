@@ -23,9 +23,9 @@ async def get_user_by_email(db: Client, email: str) -> Optional[User]:
 
 async def get_user_profile_by_id(db: Client, user_id: UUID) -> Optional[User]:
     """Fetches a user's public profile from the database by ID."""
-    response = db.table("users").select("*").eq("id", str(user_id)).single().execute()
+    response = db.table("users").select("*").eq("id", str(user_id)).execute()
     if response.data:
-        return User(**response.data)
+        return User(**response.data[0])
     return None
 
 
