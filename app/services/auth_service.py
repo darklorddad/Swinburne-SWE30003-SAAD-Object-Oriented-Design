@@ -57,9 +57,9 @@ def create_password_reset_token(email: str) -> str:
 
 async def get_user_by_email(db: Client, email: str) -> Optional[UserInDB]:
     """Fetches a user from the database by email."""
-    response = db.table("users").select("*").eq("email", email).single().execute()
+    response = db.table("users").select("*").eq("email", email).execute()
     if response.data:
-        return UserInDB(**response.data)
+        return UserInDB(**response.data[0])
     return None
 
 
