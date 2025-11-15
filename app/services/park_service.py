@@ -27,11 +27,12 @@ async def get_park_by_id(db: Client, park_id: UUID) -> Optional[Park]:
 
 
 async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketType]:
-    """Fetches all ticket types for a specific park."""
+    """Fetches all active ticket types for a specific park."""
     response = (
         db.table("ticket_types")
         .select("*")
         .eq("park_id", str(park_id))
+        .eq("is_active", True)
         .order("price")
         .execute()
     )

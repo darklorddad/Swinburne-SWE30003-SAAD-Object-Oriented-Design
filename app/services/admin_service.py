@@ -110,10 +110,13 @@ async def update_ticket_type(
 
 
 async def delete_ticket_type(db: Client, park_id: UUID, ticket_type_id: UUID) -> bool:
-    """Deletes a ticket type, ensuring it belongs to the correct park."""
+    """
+    Soft-deletes a ticket type by setting its is_active flag to false.
+    This ensures that historical order data remains intact.
+    """
     response = (
         db.table("ticket_types")
-        .delete()
+        .update({"is_active": False})
         .eq("id", str(ticket_type_id))
         .eq("park_id", str(park_id))
         .execute()

@@ -151,7 +151,10 @@ async def delete_ticket_type_for_park(
     park_id: UUID, ticket_type_id: UUID, db: Client = Depends(deps.get_db)
 ):
     """
-    Delete a ticket type for a specific park. (Admin only)
+    Soft-delete a ticket type for a specific park. (Admin only)
+
+    This archives the ticket type by setting it to inactive, rather than
+    deleting it, to preserve historical order data.
     """
     success = await admin_service.delete_ticket_type(db, park_id, ticket_type_id)
     if not success:
