@@ -1250,8 +1250,19 @@ async function handleOrderSubmit(event) {
     ".merchandise-quantity"
   );
   merchandiseQuantityInputs.forEach((input) => {
+    if (validationFailed) return;
     const quantity = parseInt(input.value, 10);
     if (quantity > 0) {
+      const maxStock = parseInt(input.getAttribute("max"), 10);
+      if (quantity > maxStock) {
+        const merchName = input.closest(".border").querySelector("h5").textContent;
+        showAlert(
+          `Quantity for ${merchName} exceeds available stock (${maxStock}).`,
+          "warning"
+        );
+        validationFailed = true;
+        return;
+      }
       const merchandiseId = input.dataset.merchandiseId;
       items.push({
         merchandise_id: merchandiseId,
