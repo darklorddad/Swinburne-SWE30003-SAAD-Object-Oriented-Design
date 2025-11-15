@@ -1,24 +1,244 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-light rounded-3">
+<div class="ash_hero-wrapper">
+<div class="ash_hero">
+    <video class="ash_hero-video" autoplay muted loop playsinline>
+        <source src="/assets/video2.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="ash_hero-overlay"></div>
     <div class="container-fluid py-5">
         <h1 class="display-5 fw-bold">Welcome to the National Parks Online System</h1>
         <p class="col-md-8 fs-4">
             Your one-stop solution for booking tickets to Sarawak's beautiful national parks.
             Browse our parks below and start your adventure!
         </p>
+        <div class="ash_hero-arrow">
+            <span class="material-symbols-outlined">keyboard_double_arrow_down</span>
+        </div>
     </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Our Parks</h2>
-    <form class="d-flex" id="search-form" onsubmit="return false;">
-        <input class="form-control me-2" type="search" id="search-input" placeholder="Search parks..." aria-label="Search">
-    </form>
+<!-- Quick Visitor Essentials Section -->
+<div class="ash_essentials-section">
+    <h2 class="ash_section-title text-center">Quick Visitor Essentials</h2>
+    <div class="row">
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <div class="ash_essential-item">
+                <div class="ash_essential-icon">🕐</div>
+                <h6 class="ash_essential-title">Opening Hours</h6>
+                <p class="ash_essential-text">Daily: 8:00 AM - 6:00 PM</p>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <div class="ash_essential-item">
+                <div class="ash_essential-icon">💰</div>
+                <h6 class="ash_essential-title">Entrance Fees</h6>
+                <p class="ash_essential-text">From RM 10 per person</p>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <div class="ash_essential-item">
+                <div class="ash_essential-icon">🌤️</div>
+                <h6 class="ash_essential-title">Weather Info</h6>
+                <p class="ash_essential-text">Tropical climate year-round</p>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <div class="ash_essential-item">
+                <div class="ash_essential-icon">🗺️</div>
+                <h6 class="ash_essential-title">Directions</h6>
+                <p class="ash_essential-text">Easy access from Kuching</p>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <div class="ash_essential-item">
+                <div class="ash_essential-icon">📍</div>
+                <h6 class="ash_essential-title">Park Map</h6>
+                <p class="ash_essential-text">Download or view online</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- News Section -->
+<div class="ash_news-section">
+    <h2 class="ash_section-title text-center">Latest News & Updates</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card ash_news-card">
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2070" class="card-img-top" alt="New Trail Opening">
+                <div class="card-body">
+                    <div class="ash_news-date">March 15, 2025</div>
+                    <h5 class="card-title">New Hiking Trail Opens in Bako National Park</h5>
+                    <p class="card-text">We're excited to announce the opening of a new 5km hiking trail that offers stunning views of the coastline and diverse wildlife. The trail is suitable for all fitness levels.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card ash_news-card">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070" class="card-img-top" alt="Wildlife Conservation">
+                <div class="card-body">
+                    <div class="ash_news-date">March 10, 2025</div>
+                    <h5 class="card-title">Wildlife Conservation Program Launched</h5>
+                    <p class="card-text">Our new conservation initiative aims to protect endangered species in Sarawak's national parks. Visitors can now participate in guided wildlife observation tours.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card ash_news-card">
+                <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2070" class="card-img-top" alt="Seasonal Events">
+                <div class="card-body">
+                    <div class="ash_news-date">March 5, 2025</div>
+                    <h5 class="card-title">Spring Nature Festival Coming Soon</h5>
+                    <p class="card-text">Join us for our annual Spring Nature Festival featuring guided tours, photography workshops, and special events for families. Book your tickets early!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nature Fun Facts Section -->
+<div class="ash_funfacts-section">
+    <h2 class="ash_section-title text-center">Amazing Nature Facts</h2>
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="ash_funfact-card">
+                <div class="ash_funfact-icon">🌳</div>
+                <h5 class="ash_funfact-title">Ancient Forests</h5>
+                <p class="ash_funfact-text">Sarawak's rainforests are over 130 million years old, making them some of the oldest in the world!</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="ash_funfact-card">
+                <div class="ash_funfact-icon">🦋</div>
+                <h5 class="ash_funfact-title">Biodiversity Hotspot</h5>
+                <p class="ash_funfact-text">Our parks are home to over 8,000 species of flowering plants and countless unique animal species.</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="ash_funfact-card">
+                <div class="ash_funfact-icon">🌿</div>
+                <h5 class="ash_funfact-title">Carbon Sink</h5>
+                <p class="ash_funfact-text">These forests absorb millions of tons of CO2 annually, playing a crucial role in climate regulation.</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="ash_funfact-card">
+                <div class="ash_funfact-icon">🌊</div>
+                <h5 class="ash_funfact-title">Water Source</h5>
+                <p class="ash_funfact-text">The parks protect vital watersheds that supply clean water to thousands of communities.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activities Section -->
+<div class="ash_activities-section">
+    <h2 class="ash_section-title text-center">Activities Visitors Can Do</h2>
+    <div class="row">
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <a href="#" class="ash_activity-item">
+                <div class="ash_activity-icon">🥾</div>
+                <h6 class="ash_activity-title">Hiking</h6>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <a href="#" class="ash_activity-item">
+                <div class="ash_activity-icon">⛺</div>
+                <h6 class="ash_activity-title">Camping</h6>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <a href="#" class="ash_activity-item">
+                <div class="ash_activity-icon">🦅</div>
+                <h6 class="ash_activity-title">Wildlife Watching</h6>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <a href="#" class="ash_activity-item">
+                <div class="ash_activity-icon">🚴</div>
+                <h6 class="ash_activity-title">Cycling</h6>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <a href="#" class="ash_activity-item">
+                <div class="ash_activity-icon">🚣</div>
+                <h6 class="ash_activity-title">Boating</h6>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6 mb-4">
+            <a href="#" class="ash_activity-item">
+                <div class="ash_activity-icon">👥</div>
+                <h6 class="ash_activity-title">Guided Tours</h6>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="ash_section-header-wrapper">
+    <div class="ash_section-header">
+        <h2>Our Parks</h2>
+        <form class="d-flex" id="search-form" onsubmit="return false;">
+            <input class="form-control me-2 ash_search-input" type="search" id="search-input" placeholder="Search parks..." aria-label="Search">
+        </form>
+    </div>
 </div>
 <div id="parks-container" class="row">
     <!-- Parks will be loaded here by JavaScript -->
     <p>Loading parks...</p>
+</div>
+
+<!-- Plan Your Visit Section -->
+<div class="ash_plan-section">
+    <h2 class="ash_section-title text-center">Plan Your Visit</h2>
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="ash_plan-card">
+                <div class="ash_plan-icon">📅</div>
+                <h5 class="ash_plan-title">Itineraries</h5>
+                <ul class="ash_plan-list">
+                    <li>1 Day Adventure</li>
+                    <li>Weekend Getaway</li>
+                    <li>Family-Friendly</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="ash_plan-card">
+                <div class="ash_plan-icon">🚗</div>
+                <h5 class="ash_plan-title">Transportation</h5>
+                <ul class="ash_plan-list">
+                    <li>Public Transport</li>
+                    <li>Private Vehicles</li>
+                    <li>Guided Tours</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="ash_plan-card">
+                <div class="ash_plan-icon">🎒</div>
+                <h5 class="ash_plan-title">What to Pack</h5>
+                <ul class="ash_plan-list">
+                    <li>Comfortable Shoes</li>
+                    <li>Water Bottle</li>
+                    <li>Sun Protection</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="ash_plan-card">
+                <div class="ash_plan-icon">♿</div>
+                <h5 class="ash_plan-title">Accessibility</h5>
+                <ul class="ash_plan-list">
+                    <li>Wheelchair Access</li>
+                    <li>Accessible Facilities</li>
+                    <li>Special Assistance</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 {% endblock %}

@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>My Profile</h2>
+<h2 class="ash_page-title">My Profile</h2>
 <div id="alert-placeholder"></div>
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">User Information</h5>
+<div class="card ash_card mb-4">
+    <div class="card-header ash_card-header">
+        <h5 class="mb-0">User Information</h5>
+    </div>
+    <div class="card-body ash_card-body">
         <form id="profile-update-form">
             <div class="mb-3">
-                <label for="profile-full-name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="profile-full-name">
+                <label for="profile-full-name" class="form-label ash_form-label">Full Name</label>
+                <input type="text" class="form-control ash_form-control" id="profile-full-name">
             </div>
             <div class="mb-3">
-                <label for="profile-email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="profile-email" disabled>
+                <label for="profile-email" class="form-label ash_form-label">Email</label>
+                <input type="email" class="form-control ash_form-control" id="profile-email" disabled>
             </div>
-            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <button type="submit" class="btn btn-primary ash_btn-primary">Update Profile</button>
         </form>
     </div>
 </div>
 
-<h3>My Orders</h3>
+<h3 class="ash_section-title">My Orders</h3>
 <div id="orders-container">
-    <p>Loading orders...</p>
+    <p class="ash_loading">Loading orders...</p>
 </div>
 {% endblock %}
