@@ -142,13 +142,25 @@ document.addEventListener("DOMContentLoaded", () => {
     passwordRecoveryForm.addEventListener("submit", handlePasswordRecovery);
   }
 
-  const tokenSubmitForm = document.getElementById("token-submit-form");
-  if (tokenSubmitForm) {
-    tokenSubmitForm.addEventListener("submit", handleTokenSubmit);
-  }
-
   const resetPasswordForm = document.getElementById("reset-password-form");
   if (resetPasswordForm) {
+    // On page load, extract token from URL fragment and populate the hidden field
+    const hash = window.location.hash;
+    if (hash) {
+      const params = new URLSearchParams(hash.substring(1)); // remove #
+      const accessToken = params.get("access_token");
+      if (accessToken) {
+        const tokenInput = document.getElementById("reset-token");
+        if (tokenInput) {
+          tokenInput.value = accessToken;
+        }
+      } else {
+        const error = params.get("error_description");
+        if (error) {
+          showAlert(error.replace(/\+/g, " "), "danger");
+        }
+      }
+    }
     resetPasswordForm.addEventListener("submit", handleResetPassword);
   }
 
@@ -299,22 +311,10 @@ async function handlePasswordRecovery(event) {
     }
 
     showAlert(data.msg, "info");
-    // Hide email form and show token form
-    document.getElementById("email-form-section").classList.add("d-none");
-    document.getElementById("token-form-section").classList.remove("d-none");
+    // Disable the form to prevent multiple submissions
+    form.querySelector("button[type='submit']").disabled = true;
   } catch (error) {
     showAlert(error.message, "danger");
-  }
-}
-
-function handleTokenSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
-  const token = form.querySelector("#recovery-token").value;
-  if (token) {
-    window.location.href = `/reset-password?token=${token}`;
-  } else {
-    showAlert("Please enter the recovery token.", "warning");
   }
 }
 

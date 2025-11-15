@@ -84,10 +84,8 @@ async def password_recovery_page(request: Request):
 
 
 @app.get("/reset-password", response_class=HTMLResponse)
-async def reset_password_page(request: Request, token: str):
+async def reset_password_page(request: Request):
     """
-    Serves the password reset page, capturing the token from the URL.
+    Serves the password reset page. The token is handled client-side from the URL fragment.
     """
-    return templates.TemplateResponse(
-        "reset_password.html", {"request": request, "token": token}
-    )
+    return templates.TemplateResponse("reset_password.html", {"request": request})
