@@ -1,7 +1,7 @@
 """
 API endpoints for user authentication and registration.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from supabase_auth.errors import AuthApiError
 from supabase import Client
@@ -90,12 +90,13 @@ async def update_user_me(
 
 
 @router.post("/password-recovery/{email}", status_code=status.HTTP_200_OK)
-async def recover_password(email: str, db: Client = Depends(deps.get_db)):
+async def recover_password(email: str, request: Request, db: Client = Depends(deps.get_db)):
     """
     Password Recovery.
     """
     try:
-        db.auth.reset_password_for_email(email)
+        reset_url = f"{request.url.scheme}://{request.url.netloc}/reset-password"
+        db.auth.reset_password_for_email(email, redirect_to=reset_url)
     except AuthApiError as e:
         # Still return a generic message to avoid leaking user existence
         print(f"Password recovery error for {email}: {e.message}")
