@@ -660,10 +660,13 @@ async function handleSaveTicketType() {
     }
 
     showAlert("Ticket type saved successfully.", "success");
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById("ticketTypeModal")
-    );
-    modal.hide();
+    const modalEl = document.getElementById("ticketTypeModal");
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) {
+        modal.hide();
+      }
+    }
     loadAdminParks(); // Refresh the accordion
   } catch (error) {
     showAlert(error.message, "danger");
@@ -729,10 +732,13 @@ async function handleUpdatePark() {
     }
 
     showAlert("Park updated successfully.", "success");
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById("editParkModal")
-    );
-    modal.hide();
+    const modalEl = document.getElementById("editParkModal");
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) {
+        modal.hide();
+      }
+    }
     loadAdminParks(); // Refresh the list of parks
   } catch (error) {
     showAlert(error.message, "danger");
@@ -787,10 +793,13 @@ async function handleSaveMerchandise() {
     }
 
     showAlert("Merchandise saved successfully.", "success");
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById("merchandiseModal")
-    );
-    modal.hide();
+    const modalEl = document.getElementById("merchandiseModal");
+    if (modalEl) {
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) {
+        modal.hide();
+      }
+    }
     loadAdminParks(); // Refresh the accordion
   } catch (error) {
     showAlert(error.message, "danger");
