@@ -1,5 +1,5 @@
 /* Custom styles */
-@keyframes ash_fadeInUp {
+@keyframes fadeInUp {
     from {
         opacity: 0;
         transform: translateY(30px);
@@ -10,7 +10,7 @@
     }
 }
 
-@keyframes ash_slideInLeft {
+@keyframes slideInLeft {
     from {
         opacity: 0;
         transform: translateX(-50px);
@@ -21,7 +21,7 @@
     }
 }
 
-@keyframes ash_pulse {
+@keyframes pulse {
     0%, 100% {
         transform: scale(1);
     }
@@ -30,7 +30,7 @@
     }
 }
 
-@keyframes ash_bounce {
+@keyframes bounce {
     0%, 100% {
         transform: translateY(0);
     }
@@ -39,7 +39,7 @@
     }
 }
 
-@keyframes ash_gradient {
+@keyframes gradient {
     0% {
         background-position: 0% 50%;
     }
@@ -51,7 +51,7 @@
     }
 }
 
-@keyframes ash_shimmer {
+@keyframes shimmer {
     0% {
         background-position: -1000px 0;
     }
@@ -117,7 +117,7 @@ body::before {
 
 main {
     flex: 1;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
@@ -127,13 +127,13 @@ main.container {
     padding-bottom: 0 !important;
 }
 
-#main-content:has(.ash_hero) {
+#main-content:has(.hero) {
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
 
 /* Alternative for browsers that don't support :has() */
-.ash_hero-wrapper {
+.hero-wrapper {
     margin-top: -1.5rem !important;
     margin-bottom: 0 !important;
     margin-left: calc(-50vw + 50%);
@@ -142,7 +142,7 @@ main.container {
     position: relative;
 }
 
-.ash_navbar {
+.navbar {
     background: transparent !important;
     box-shadow: none !important;
     backdrop-filter: none;
@@ -157,7 +157,7 @@ main.container {
 }
 
 /* Fallback for pages without hero section */
-body:not(:has(.ash_hero)) .ash_navbar {
+body:not(:has(.hero)) .navbar {
     position: relative;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%) !important;
     box-shadow: 0 4px 20px rgba(45, 80, 22, 0.4);
@@ -165,14 +165,14 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Alternative for browsers without :has() support */
-.no-hero-page .ash_navbar {
+.no-hero-page .navbar {
     position: relative;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%) !important;
     box-shadow: 0 4px 20px rgba(45, 80, 22, 0.4);
     border-bottom: 3px solid rgba(255, 255, 255, 0.2);
 }
 
-.no-hero-page .ash_brand {
+.no-hero-page .brand {
     background: linear-gradient(45deg, #fff, #f0f0f0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -180,7 +180,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     text-shadow: none;
 }
 
-.ash_brand {
+.brand {
     font-weight: 700;
     font-size: 1.5rem;
     color: white !important;
@@ -189,15 +189,15 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Navbar toggle button styling */
-.ash_navbar .navbar-toggler {
+.navbar .navbar-toggler {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
-.ash_navbar .navbar-toggler-icon {
+.navbar .navbar-toggler-icon {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-.ash_navbar .nav-link {
+.navbar .nav-link {
     color: rgba(255, 255, 255, 0.95) !important;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -210,7 +210,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     align-items: center;
 }
 
-.ash_navbar .navbar-text {
+.navbar .navbar-text {
     color: rgba(255, 255, 255, 0.95) !important;
     font-weight: 500;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -220,19 +220,19 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin: 0;
 }
 
-.ash_navbar .nav-item {
+.navbar .nav-item {
     display: flex;
     align-items: center;
 }
 
-.ash_navbar .nav-link:hover {
+.navbar .nav-link:hover {
     color: #fff !important;
     background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.ash_hero {
+.hero {
     position: relative;
     width: 100vw;
     height: 100vh;
@@ -242,13 +242,13 @@ body:not(:has(.ash_hero)) .ash_navbar {
     text-align: center;
     overflow: hidden;
     margin: 0 calc(-50vw + 50%) 0 calc(-50vw + 50%);
-    animation: ash_fadeInUp 1s ease-out;
+    animation: fadeInUp 1s ease-out;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.ash_hero-video {
+.hero-video {
     position: absolute;
     top: 0;
     left: 0;
@@ -258,7 +258,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_hero-overlay {
+.hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -268,12 +268,12 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_hero .container-fluid {
+.hero .container-fluid {
     position: relative;
     z-index: 2;
 }
 
-.ash_hero h1 {
+.hero h1 {
     font-family: "Poppins", sans-serif;
     font-weight: 700;
     font-style: normal;
@@ -283,7 +283,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin-bottom: 1.5rem;
 }
 
-.ash_hero p {
+.hero p {
     font-family: "Poppins", sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -296,7 +296,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     line-height: 1.8;
 }
 
-.ash_hero-arrow {
+.hero-arrow {
     text-align: center;
     margin-top: 3rem;
     cursor: pointer;
@@ -305,7 +305,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     align-items: center;
 }
 
-.ash_hero-arrow .material-symbols-outlined {
+.hero-arrow .material-symbols-outlined {
     font-variation-settings:
         'FILL' 0,
         'wght' 400,
@@ -314,10 +314,10 @@ body:not(:has(.ash_hero)) .ash_navbar {
     font-size: 4rem;
     color: #ffffff !important;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), 0 1px 5px rgba(0, 0, 0, 0.3);
-    animation: ash_bounce 2s ease-in-out infinite;
+    animation: bounce 2s ease-in-out infinite;
 }
 
-.ash_section-header-wrapper {
+.section-header-wrapper {
     margin-top: 0;
     margin-bottom: 0;
     padding: 0;
@@ -329,7 +329,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 10;
 }
 
-.ash_section-header {
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -343,13 +343,13 @@ body:not(:has(.ash_hero)) .ash_navbar {
     backdrop-filter: blur(10px);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    animation: ash_slideInLeft 0.8s ease-out;
+    animation: slideInLeft 0.8s ease-out;
     position: relative;
     overflow: visible;
     z-index: 10;
 }
 
-.ash_section-header::before {
+.section-header::before {
     content: '';
     position: absolute;
     top: 0;
@@ -360,12 +360,12 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_section-header > * {
+.section-header > * {
     position: relative;
     z-index: 1;
 }
 
-.ash_section-header h2 {
+.section-header h2 {
     font-weight: 700;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     -webkit-background-clip: text;
@@ -375,7 +375,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin: 0;
 }
 
-.ash_search-input {
+.search-input {
     border-radius: 50px;
     padding: 0.75rem 1.5rem;
     border: 2px solid #2d5016;
@@ -385,19 +385,19 @@ body:not(:has(.ash_hero)) .ash_navbar {
     font-weight: 500;
 }
 
-.ash_search-input:focus {
+.search-input:focus {
     border-color: #3d6b1f;
     box-shadow: 0 0 0 0.25rem rgba(45, 80, 22, 0.4), 0 8px 25px rgba(45, 80, 22, 0.3);
     outline: none;
     transform: scale(1.02);
 }
 
-.ash_search-input::placeholder {
+.search-input::placeholder {
     color: #999;
     font-style: italic;
 }
 
-.ash_park-card {
+.park-card {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
@@ -405,7 +405,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     overflow: hidden;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
     position: relative;
-    animation: ash_fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.6s ease-out;
     animation-fill-mode: both;
     width: 100%;
     display: flex;
@@ -413,14 +413,14 @@ body:not(:has(.ash_hero)) .ash_navbar {
     height: 100%;
 }
 
-.ash_park-card:nth-child(1) { animation-delay: 0.1s; }
-.ash_park-card:nth-child(2) { animation-delay: 0.2s; }
-.ash_park-card:nth-child(3) { animation-delay: 0.3s; }
-.ash_park-card:nth-child(4) { animation-delay: 0.4s; }
-.ash_park-card:nth-child(5) { animation-delay: 0.5s; }
-.ash_park-card:nth-child(6) { animation-delay: 0.6s; }
+.park-card:nth-child(1) { animation-delay: 0.1s; }
+.park-card:nth-child(2) { animation-delay: 0.2s; }
+.park-card:nth-child(3) { animation-delay: 0.3s; }
+.park-card:nth-child(4) { animation-delay: 0.4s; }
+.park-card:nth-child(5) { animation-delay: 0.5s; }
+.park-card:nth-child(6) { animation-delay: 0.6s; }
 
-.ash_park-card::before {
+.park-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -432,16 +432,16 @@ body:not(:has(.ash_hero)) .ash_navbar {
     transition: transform 0.4s ease;
 }
 
-.ash_park-card:hover::before {
+.park-card:hover::before {
     transform: scaleX(1);
 }
 
-.ash_park-card:hover {
+.park-card:hover {
     transform: translateY(-15px) scale(1.02);
     box-shadow: 0 15px 40px rgba(45, 80, 22, 0.3);
 }
 
-.ash_park-card .card-img-top {
+.park-card .card-img-top {
     height: 250px;
     object-fit: cover;
     width: 100%;
@@ -449,11 +449,11 @@ body:not(:has(.ash_hero)) .ash_navbar {
     transition: transform 0.4s ease;
 }
 
-.ash_park-card:hover .card-img-top {
+.park-card:hover .card-img-top {
     transform: scale(1.1);
 }
 
-.ash_park-card .card-body {
+.park-card .card-body {
     padding: 2rem;
     position: relative;
     z-index: 1;
@@ -462,7 +462,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     flex-grow: 1;
 }
 
-.ash_park-card .card-title {
+.park-card .card-title {
     font-weight: 700;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     -webkit-background-clip: text;
@@ -472,14 +472,14 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin-bottom: 1rem;
 }
 
-.ash_park-card .card-text {
+.park-card .card-text {
     color: #666;
     line-height: 1.6;
     margin-bottom: 1.5rem;
     flex-grow: 1;
 }
 
-.ash_btn-primary {
+.btn-primary {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     border: none;
     border-radius: 50px;
@@ -491,7 +491,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     overflow: hidden;
 }
 
-.ash_btn-primary::before {
+.btn-primary::before {
     content: '';
     position: absolute;
     top: 0;
@@ -502,21 +502,21 @@ body:not(:has(.ash_hero)) .ash_navbar {
     transition: left 0.5s;
 }
 
-.ash_btn-primary:hover::before {
+.btn-primary:hover::before {
     left: 100%;
 }
 
-.ash_btn-primary:hover {
+.btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.5);
     background: linear-gradient(135deg, #3d6b1f 0%, #2d5016 100%);
 }
 
-.ash_btn-primary:active {
+.btn-primary:active {
     transform: translateY(0);
 }
 
-.ash_footer {
+.footer {
     background: #1a2e0d !important;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     border-top: 3px solid rgba(45, 80, 22, 0.3);
@@ -526,13 +526,13 @@ body:not(:has(.ash_hero)) .ash_navbar {
     overflow: hidden;
 }
 
-.ash_footer-content {
+.footer-content {
     position: relative;
     z-index: 1;
     padding: 3rem 0 2rem;
 }
 
-.ash_footer-title {
+.footer-title {
     color: #ffffff;
     font-weight: 700;
     font-size: 1.5rem;
@@ -540,13 +540,13 @@ body:not(:has(.ash_hero)) .ash_navbar {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.ash_footer-text {
+.footer-text {
     color: rgba(255, 255, 255, 0.9);
     line-height: 1.6;
     font-size: 0.95rem;
 }
 
-.ash_footer-heading {
+.footer-heading {
     color: #ffffff;
     font-weight: 600;
     font-size: 1.1rem;
@@ -555,37 +555,37 @@ body:not(:has(.ash_hero)) .ash_navbar {
     letter-spacing: 0.5px;
 }
 
-.ash_footer-links {
+.footer-links {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.ash_footer-links li {
+.footer-links li {
     margin-bottom: 0.75rem;
     color: rgba(255, 255, 255, 0.85);
     font-size: 0.95rem;
 }
 
-.ash_footer-links a {
+.footer-links a {
     color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     transition: color 0.3s ease, transform 0.2s ease;
     display: inline-block;
 }
 
-.ash_footer-links a:hover {
+.footer-links a:hover {
     color: #ffffff;
     transform: translateX(5px);
 }
 
-.ash_footer-social {
+.footer-social {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.ash_social-link {
+.social-link {
     color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     transition: color 0.3s ease, transform 0.2s ease;
@@ -593,12 +593,12 @@ body:not(:has(.ash_hero)) .ash_navbar {
     font-size: 0.95rem;
 }
 
-.ash_social-link:hover {
+.social-link:hover {
     color: #ffffff;
     transform: translateX(5px);
 }
 
-.ash_footer-bottom {
+.footer-bottom {
     position: relative;
     z-index: 1;
     padding: 1.5rem 0;
@@ -606,33 +606,33 @@ body:not(:has(.ash_hero)) .ash_navbar {
     background: rgba(10, 26, 10, 0.5);
 }
 
-.ash_footer-bottom p {
+.footer-bottom p {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
     margin: 0;
 }
 
 @media (max-width: 768px) {
-    .ash_footer-content {
+    .footer-content {
         padding: 2rem 0 1.5rem;
     }
     
-    .ash_footer-title {
+    .footer-title {
         font-size: 1.3rem;
     }
     
-    .ash_footer-heading {
+    .footer-heading {
         font-size: 1rem;
         margin-top: 1.5rem;
     }
     
-    .ash_footer-heading:first-of-type {
+    .footer-heading:first-of-type {
         margin-top: 0;
     }
 }
 
 #parks-container {
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     margin-top: 0;
     margin-bottom: 0;
     padding: 0;
@@ -704,19 +704,19 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Form Styling */
-.ash_form-container {
+.form-container {
     max-width: 500px;
     margin: 2rem auto;
     padding: 3rem;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 255, 0.95) 100%);
     border-radius: 25px;
     box-shadow: 0 20px 60px rgba(45, 80, 22, 0.3);
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     position: relative;
     overflow: hidden;
 }
 
-.ash_form-container::before {
+.form-container::before {
     content: '';
     position: absolute;
     top: 0;
@@ -726,7 +726,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     background: linear-gradient(90deg, #2d5016 0%, #3d6b1f 50%, #4a7c2a 100%);
 }
 
-.ash_form-title {
+.form-title {
     font-weight: 700;
     font-size: 2.5rem;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
@@ -737,14 +737,14 @@ body:not(:has(.ash_hero)) .ash_navbar {
     text-align: center;
 }
 
-.ash_form-label {
+.form-label {
     font-weight: 600;
     color: #2c3e50;
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
 }
 
-.ash_form-control {
+.form-control {
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     padding: 0.75rem 1.25rem;
@@ -753,32 +753,32 @@ body:not(:has(.ash_hero)) .ash_navbar {
     font-size: 1rem;
 }
 
-.ash_form-control:focus {
+.form-control:focus {
     border-color: #2d5016;
     box-shadow: 0 0 0 0.25rem rgba(45, 80, 22, 0.25), 0 4px 15px rgba(45, 80, 22, 0.2);
     outline: none;
     transform: translateY(-2px);
 }
 
-.ash_form-control:disabled {
+.form-control:disabled {
     background: #f5f5f5;
     cursor: not-allowed;
 }
 
-.ash_form-link {
+.form-link {
     color: #2d5016;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
-.ash_form-link:hover {
+.form-link:hover {
     color: #3d6b1f;
     text-decoration: underline;
 }
 
 /* Card Styling */
-.ash_card {
+.card {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
@@ -786,15 +786,15 @@ body:not(:has(.ash_hero)) .ash_navbar {
     overflow: hidden;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
     margin-bottom: 1.5rem;
-    animation: ash_fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.6s ease-out;
 }
 
-.ash_card:hover {
+.card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(45, 80, 22, 0.25);
 }
 
-.ash_card-header {
+.card-header {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     color: white;
     font-weight: 600;
@@ -803,11 +803,11 @@ body:not(:has(.ash_hero)) .ash_navbar {
     font-size: 1.1rem;
 }
 
-.ash_card-body {
+.card-body {
     padding: 2rem;
 }
 
-.ash_card-title {
+.card-title {
     font-weight: 700;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     -webkit-background-clip: text;
@@ -817,7 +817,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin-bottom: 1rem;
 }
 
-.ash_page-title {
+.page-title {
     font-weight: 700;
     font-size: 2.5rem;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
@@ -825,10 +825,19 @@ body:not(:has(.ash_hero)) .ash_navbar {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 2rem;
-    animation: ash_slideInLeft 0.8s ease-out;
+    animation: slideInLeft 0.8s ease-out;
 }
 
-.ash_section-title {
+.admin-wrapper .page-title {
+    color: #ffffff !important;
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: #ffffff;
+    background-clip: unset;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.section-title {
     font-weight: 700;
     font-size: 2rem;
     color: #ffffff;
@@ -838,7 +847,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Button Variants */
-.ash_btn-secondary {
+.btn-secondary {
     background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
     border: none;
     border-radius: 50px;
@@ -849,13 +858,13 @@ body:not(:has(.ash_hero)) .ash_navbar {
     color: white;
 }
 
-.ash_btn-secondary:hover {
+.btn-secondary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(149, 165, 166, 0.4);
     color: white;
 }
 
-.ash_btn-danger {
+.btn-danger {
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     border: none;
     border-radius: 50px;
@@ -866,13 +875,69 @@ body:not(:has(.ash_hero)) .ash_navbar {
     color: white;
 }
 
-.ash_btn-danger:hover {
+.btn-danger:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
     color: white;
 }
 
-.ash_btn-success {
+/* Spacing between Edit Park and Delete Park buttons - ensure same size */
+.admin-wrapper .edit-park-btn,
+.admin-wrapper .delete-park-btn {
+    padding: 0.5rem 1.5rem !important;
+    font-size: 0.875rem !important;
+    width: 130px !important;
+    height: 38px !important;
+    display: inline-block !important;
+    box-sizing: border-box !important;
+    line-height: 1.5 !important;
+}
+
+/* Make Edit Park and Delete Park buttons display horizontally */
+.admin-wrapper .d-flex.justify-content-between.align-items-center > div:last-child {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    margin-left: 1.5rem !important;
+}
+
+.admin-wrapper .edit-park-btn {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+.admin-wrapper .delete-park-btn {
+    margin-left: 0 !important;
+}
+
+/* Make Edit and Delete buttons for ticket types and merchandise the same size */
+.admin-wrapper .edit-tt-btn,
+.admin-wrapper .delete-tt-btn,
+.admin-wrapper .edit-merch-btn,
+.admin-wrapper .delete-merch-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    min-width: 90px !important;
+    width: auto !important;
+    height: 38px !important;
+    display: inline-block !important;
+    box-sizing: border-box !important;
+    line-height: 1.5 !important;
+    white-space: nowrap !important;
+}
+
+.admin-wrapper .edit-tt-btn,
+.admin-wrapper .edit-merch-btn {
+    margin-right: 0.5rem !important;
+}
+
+.admin-wrapper .delete-tt-btn,
+.admin-wrapper .delete-merch-btn {
+    margin-left: 0 !important;
+}
+
+.btn-success {
     background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
     border: none;
     border-radius: 50px;
@@ -883,54 +948,54 @@ body:not(:has(.ash_hero)) .ash_navbar {
     color: white;
 }
 
-.ash_btn-success:hover {
+.btn-success:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
     color: white;
 }
 
 /* Modal Styling */
-.ash_modal-content {
+.modal-content {
     border: none;
     border-radius: 25px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
 
-.ash_modal-header {
+.modal-header {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     color: white;
     border-bottom: none;
     padding: 1.5rem;
 }
 
-.ash_modal-title {
+.modal-title {
     font-weight: 700;
     font-size: 1.5rem;
     color: white;
 }
 
-.ash_modal-body {
+.modal-body {
     padding: 2rem;
 }
 
-.ash_modal-footer {
+.modal-footer {
     border-top: 1px solid #e0e0e0;
     padding: 1.5rem;
     background: #f8f9fa;
 }
 
-.ash_btn-close {
+.btn-close {
     filter: brightness(0) invert(1);
     opacity: 0.9;
 }
 
-.ash_btn-close:hover {
+.btn-close:hover {
     opacity: 1;
 }
 
 /* Order Cards */
-.ash_order-card {
+.order-card {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
@@ -938,15 +1003,15 @@ body:not(:has(.ash_hero)) .ash_navbar {
     overflow: hidden;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
     transition: all 0.3s ease;
-    animation: ash_fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.6s ease-out;
 }
 
-.ash_order-card:hover {
+.order-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(45, 80, 22, 0.25);
 }
 
-.ash_order-card .card-header {
+.order-card .card-header {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     color: white;
     font-weight: 600;
@@ -955,17 +1020,51 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Admin Dashboard */
-.ash_admin-card {
+.admin-wrapper {
+    background-image: 
+        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop'),
+        linear-gradient(135deg, rgba(26, 46, 13, 0.5) 0%, rgba(45, 80, 22, 0.4) 100%);
+    background-size: 100% 100%, 100% 100%;
+    background-position: center center, center center;
+    background-repeat: no-repeat, no-repeat;
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 0;
+    margin: -1.5rem calc(-50vw + 50%) 0 calc(-50vw + 50%);
+    padding-left: calc(50vw - 50%);
+    padding-right: calc(50vw - 50%);
+    width: 100vw;
+    position: relative;
+}
+
+.admin-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(45, 80, 22, 0.15) 0%, rgba(10, 26, 10, 0.3) 100%);
+    z-index: 0;
+}
+
+.admin-wrapper > * {
+    position: relative;
+    z-index: 1;
+}
+
+.admin-card {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
     margin-bottom: 2rem;
     overflow: hidden;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
-    animation: ash_fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.6s ease-out;
 }
 
-.ash_admin-card .card-header {
+.admin-card .card-header {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     color: white;
     font-weight: 600;
@@ -974,38 +1073,38 @@ body:not(:has(.ash_hero)) .ash_navbar {
     font-size: 1.2rem;
 }
 
-.ash_table {
+.table {
     border-radius: 15px;
     overflow: hidden;
 }
 
-.ash_table thead {
+.table thead {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     color: white;
 }
 
-.ash_table thead th {
+.table thead th {
     border: none;
     padding: 1rem;
     font-weight: 600;
 }
 
-.ash_table tbody tr {
+.table tbody tr {
     transition: all 0.3s ease;
 }
 
-.ash_table tbody tr:hover {
+.table tbody tr:hover {
     background: rgba(45, 80, 22, 0.05);
     transform: scale(1.01);
 }
 
-.ash_table tbody td {
+.table tbody td {
     padding: 1rem;
     border-color: #e0e0e0;
 }
 
 /* Accordion Styling */
-.ash_accordion-item {
+.accordion-item {
     border: none;
     border-radius: 15px !important;
     margin-bottom: 1rem;
@@ -1014,7 +1113,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
 }
 
-.ash_accordion-button {
+.accordion-button {
     background: linear-gradient(135deg, rgba(45, 80, 22, 0.1) 0%, rgba(61, 107, 31, 0.1) 100%);
     border: none;
     font-weight: 600;
@@ -1022,22 +1121,22 @@ body:not(:has(.ash_hero)) .ash_navbar {
     padding: 1.25rem 1.5rem;
 }
 
-.ash_accordion-button:not(.collapsed) {
+.accordion-button:not(.collapsed) {
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
     color: white;
     box-shadow: none;
 }
 
-.ash_accordion-button:focus {
+.accordion-button:focus {
     box-shadow: 0 0 0 0.25rem rgba(45, 80, 22, 0.25);
 }
 
-.ash_accordion-body {
+.accordion-body {
     padding: 1.5rem;
 }
 
 /* List Group */
-.ash_list-group-item {
+.list-group-item {
     border: 1px solid #e0e0e0;
     border-radius: 12px !important;
     margin-bottom: 0.5rem;
@@ -1045,14 +1144,14 @@ body:not(:has(.ash_hero)) .ash_navbar {
     background: white;
 }
 
-.ash_list-group-item:hover {
+.list-group-item:hover {
     background: rgba(45, 80, 22, 0.05);
     border-color: #2d5016;
     transform: translateX(5px);
 }
 
 /* Badge Styling */
-.ash_badge {
+.badge {
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-weight: 600;
@@ -1060,24 +1159,24 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Park Detail Page */
-.ash_park-detail-container {
+.park-detail-container {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 255, 0.95) 100%);
     border-radius: 25px;
     padding: 2.5rem;
     box-shadow: 0 20px 60px rgba(45, 80, 22, 0.2);
     margin-bottom: 2rem;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
 }
 
-.ash_order-form-container {
+.order-form-container {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 255, 0.95) 100%);
     border-radius: 25px;
     padding: 2.5rem;
     box-shadow: 0 20px 60px rgba(45, 80, 22, 0.2);
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
 }
 
-.ash_ticket-section, .ash_merchandise-section {
+.ticket-section, .merchandise-section {
     background: white;
     border-radius: 15px;
     padding: 1.5rem;
@@ -1086,29 +1185,29 @@ body:not(:has(.ash_hero)) .ash_navbar {
     transition: all 0.3s ease;
 }
 
-.ash_ticket-section:hover, .ash_merchandise-section:hover {
+.ticket-section:hover, .merchandise-section:hover {
     border-color: #2d5016;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
 }
 
 /* Alert Styling */
-.ash_alert {
+.alert {
     border-radius: 15px;
     border: none;
     padding: 1rem 1.5rem;
     font-weight: 500;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    animation: ash_fadeInUp 0.5s ease-out;
+    animation: fadeInUp 0.5s ease-out;
 }
 
 /* Textarea */
-.ash_form-control textarea, textarea.ash_form-control {
+.form-control textarea, textarea.form-control {
     min-height: 100px;
     resize: vertical;
 }
 
 /* Loading States */
-.ash_loading {
+.loading {
     text-align: center;
     padding: 2rem;
     color: #2d5016;
@@ -1116,18 +1215,18 @@ body:not(:has(.ash_hero)) .ash_navbar {
 }
 
 /* Quick Visitor Essentials Section */
-.ash_essentials-section {
+.essentials-section {
     margin-top: 0;
     margin-bottom: 0;
     padding: 4rem 0;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     position: relative;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
     width: 100vw;
 }
 
-.ash_essentials-section::before {
+.essentials-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1143,7 +1242,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_essentials-section::after {
+.essentials-section::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1154,7 +1253,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_essentials-section > * {
+.essentials-section > * {
     position: relative;
     z-index: 2;
     max-width: 1400px;
@@ -1164,7 +1263,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     padding-right: 8rem;
 }
 
-.ash_essential-item {
+.essential-item {
     text-align: center;
     padding: 1.5rem;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
@@ -1177,68 +1276,68 @@ body:not(:has(.ash_hero)) .ash_navbar {
     align-items: center;
 }
 
-.ash_essential-item:hover {
+.essential-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.2);
 }
 
-.ash_essential-icon {
+.essential-icon {
     font-size: 2.5rem;
     margin-bottom: 0.75rem;
 }
 
-.ash_essential-title {
+.essential-title {
     font-weight: 700;
     color: #2d5016;
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
 
-.ash_essential-text {
+.essential-text {
     color: #666;
     font-size: 0.9rem;
     margin: 0;
 }
 
-.ash_essentials-section .row {
+.essentials-section .row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-.ash_essentials-section .col-md-2,
-.ash_essentials-section .col-sm-4,
-.ash_essentials-section .col-6 {
+.essentials-section .col-md-2,
+.essentials-section .col-sm-4,
+.essentials-section .col-6 {
     display: flex;
     flex: 0 0 auto;
     max-width: 20%;
 }
 
 @media (max-width: 992px) {
-    .ash_essentials-section .col-md-2 {
+    .essentials-section .col-md-2 {
         max-width: 33.333333%;
     }
 }
 
 @media (max-width: 576px) {
-    .ash_essentials-section .col-6 {
+    .essentials-section .col-6 {
         max-width: 50%;
     }
 }
 
 /* News Section */
-.ash_news-section {
+.news-section {
     margin-top: 0;
     margin-bottom: 0;
     padding: 4rem 0;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     position: relative;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
     width: 100vw;
 }
 
-.ash_news-section::before {
+.news-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1254,7 +1353,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_news-section::after {
+.news-section::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1265,7 +1364,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_news-section > * {
+.news-section > * {
     position: relative;
     z-index: 2;
     max-width: 1400px;
@@ -1275,7 +1374,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     padding-right: 8rem;
 }
 
-.ash_news-card {
+.news-card {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
@@ -1284,56 +1383,56 @@ body:not(:has(.ash_hero)) .ash_navbar {
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
     margin-bottom: 1.5rem;
     height: 100%;
-    animation: ash_fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.6s ease-out;
 }
 
-.ash_news-card:hover {
+.news-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 40px rgba(45, 80, 22, 0.25);
 }
 
-.ash_news-card .card-img-top {
+.news-card .card-img-top {
     height: 200px;
     object-fit: cover;
     border-radius: 0;
 }
 
-.ash_news-card .card-body {
+.news-card .card-body {
     padding: 1.5rem;
 }
 
-.ash_news-card .card-title {
+.news-card .card-title {
     font-weight: 700;
     color: #2d5016;
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
 }
 
-.ash_news-card .card-text {
+.news-card .card-text {
     color: #666;
     line-height: 1.6;
     margin-bottom: 1rem;
 }
 
-.ash_news-date {
+.news-date {
     color: #3d6b1f;
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 /* Fun Facts Section */
-.ash_funfacts-section {
+.funfacts-section {
     margin-top: 0;
     margin-bottom: 0;
     padding: 4rem 0;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     position: relative;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
     width: 100vw;
 }
 
-.ash_funfacts-section::before {
+.funfacts-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1349,7 +1448,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_funfacts-section::after {
+.funfacts-section::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1362,7 +1461,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_funfacts-section > * {
+.funfacts-section > * {
     position: relative;
     z-index: 2;
     max-width: 1400px;
@@ -1372,16 +1471,16 @@ body:not(:has(.ash_hero)) .ash_navbar {
     padding-right: 8rem;
 }
 
-.ash_funfacts-section .row {
+.funfacts-section .row {
     display: flex;
     flex-wrap: wrap;
 }
 
-.ash_funfacts-section .col-md-3 {
+.funfacts-section .col-md-3 {
     display: flex;
 }
 
-.ash_funfact-card {
+.funfact-card {
     border: none;
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
@@ -1391,7 +1490,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin-bottom: 1.5rem;
     padding: 2rem;
     text-align: center;
-    animation: ash_fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.6s ease-out;
     position: relative;
     width: 100%;
     display: flex;
@@ -1399,7 +1498,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     height: 100%;
 }
 
-.ash_funfact-card::before {
+.funfact-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1409,43 +1508,43 @@ body:not(:has(.ash_hero)) .ash_navbar {
     background: linear-gradient(90deg, #2d5016 0%, #3d6b1f 50%, #4a7c2a 100%);
 }
 
-.ash_funfact-card:hover {
+.funfact-card:hover {
     transform: translateY(-10px) scale(1.02);
     box-shadow: 0 15px 40px rgba(45, 80, 22, 0.3);
 }
 
-.ash_funfact-icon {
+.funfact-icon {
     font-size: 3rem;
     color: #2d5016;
     margin-bottom: 1rem;
 }
 
-.ash_funfact-title {
+.funfact-title {
     font-weight: 700;
     color: #2d5016;
     font-size: 1.5rem;
     margin-bottom: 1rem;
 }
 
-.ash_funfact-text {
+.funfact-text {
     color: #666;
     line-height: 1.8;
     font-size: 1rem;
 }
 
 /* Activities Section */
-.ash_activities-section {
+.activities-section {
     margin-top: 0;
     margin-bottom: 0;
     padding: 4rem 0;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     position: relative;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
     width: 100vw;
 }
 
-.ash_activities-section::before {
+.activities-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1461,7 +1560,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_activities-section::after {
+.activities-section::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1474,7 +1573,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_activities-section > * {
+.activities-section > * {
     position: relative;
     z-index: 2;
     max-width: 1400px;
@@ -1484,18 +1583,18 @@ body:not(:has(.ash_hero)) .ash_navbar {
     padding-right: 8rem;
 }
 
-.ash_activities-section .row {
+.activities-section .row {
     display: flex;
     flex-wrap: wrap;
 }
 
-.ash_activities-section .col-md-2,
-.ash_activities-section .col-sm-4,
-.ash_activities-section .col-6 {
+.activities-section .col-md-2,
+.activities-section .col-sm-4,
+.activities-section .col-6 {
     display: flex;
 }
 
-.ash_activity-item {
+.activity-item {
     text-align: center;
     padding: 2rem 1.5rem;
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
@@ -1513,7 +1612,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     position: relative;
 }
 
-.ash_activity-item::before {
+.activity-item::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1526,51 +1625,51 @@ body:not(:has(.ash_hero)) .ash_navbar {
     transition: transform 0.3s ease;
 }
 
-.ash_activity-item:hover {
+.activity-item:hover {
     transform: translateY(-8px);
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.2);
     text-decoration: none;
     color: inherit;
 }
 
-.ash_activity-item:hover::before {
+.activity-item:hover::before {
     transform: scaleX(1);
 }
 
-.ash_activity-icon {
+.activity-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
     transition: transform 0.3s ease;
 }
 
-.ash_activity-item:hover .ash_activity-icon {
+.activity-item:hover .activity-icon {
     transform: scale(1.1);
 }
 
-.ash_activity-title {
+.activity-title {
     font-weight: 700;
     color: #2d5016;
     font-size: 1rem;
     margin: 0;
 }
 
-.ash_activity-item:hover .ash_activity-title {
+.activity-item:hover .activity-title {
     color: #3d6b1f;
 }
 
 /* Plan Your Visit Section */
-.ash_plan-section {
+.plan-section {
     margin-top: 0;
     margin-bottom: 0;
     padding: 4rem 0 0 0;
-    animation: ash_fadeInUp 0.8s ease-out;
+    animation: fadeInUp 0.8s ease-out;
     position: relative;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
     width: 100vw;
 }
 
-.ash_plan-section::before {
+.plan-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1586,7 +1685,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 0;
 }
 
-.ash_plan-section::after {
+.plan-section::after {
     content: '';
     position: absolute;
     top: 0;
@@ -1600,7 +1699,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_plan-section > * {
+.plan-section > * {
     position: relative;
     z-index: 2;
     max-width: 1400px;
@@ -1612,16 +1711,16 @@ body:not(:has(.ash_hero)) .ash_navbar {
     margin-bottom: 0;
 }
 
-.ash_plan-section .row {
+.plan-section .row {
     display: flex;
     flex-wrap: wrap;
 }
 
-.ash_plan-section .col-md-3 {
+.plan-section .col-md-3 {
     display: flex;
 }
 
-.ash_plan-card {
+.plan-card {
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
@@ -1636,7 +1735,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     overflow: hidden;
 }
 
-.ash_plan-card::before {
+.plan-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1648,24 +1747,24 @@ body:not(:has(.ash_hero)) .ash_navbar {
     z-index: 1;
 }
 
-.ash_plan-card:hover {
+.plan-card:hover {
     transform: translateY(-10px) scale(1.02);
     box-shadow: 0 15px 40px rgba(45, 80, 22, 0.3);
 }
 
-.ash_plan-icon {
+.plan-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
 }
 
-.ash_plan-title {
+.plan-title {
     font-weight: 700;
     color: #2d5016;
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
-.ash_plan-list {
+.plan-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -1673,7 +1772,7 @@ body:not(:has(.ash_hero)) .ash_navbar {
     flex-grow: 1;
 }
 
-.ash_plan-list li {
+.plan-list li {
     color: #666;
     padding: 0.75rem 0;
     border-bottom: 1px solid rgba(45, 80, 22, 0.1);
@@ -1681,11 +1780,11 @@ body:not(:has(.ash_hero)) .ash_navbar {
     padding-left: 1.5rem;
 }
 
-.ash_plan-list li:last-child {
+.plan-list li:last-child {
     border-bottom: none;
 }
 
-.ash_plan-list li::before {
+.plan-list li::before {
     content: '✓';
     position: absolute;
     left: 0;
@@ -1695,45 +1794,45 @@ body:not(:has(.ash_hero)) .ash_navbar {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .ash_hero {
+    .hero {
         height: 100vh;
         max-height: 100vh;
         padding: 4rem 0;
     }
     
-    .ash_hero h1 {
+    .hero h1 {
         font-size: 2.5rem;
     }
     
-    .ash_essentials-section,
-    .ash_news-section,
-    .ash_funfacts-section,
-    .ash_activities-section,
-    .ash_section-header,
+    .essentials-section,
+    .news-section,
+    .funfacts-section,
+    .activities-section,
+    .section-header,
     #parks-container,
-    .ash_plan-section {
+    .plan-section {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
     
-    .ash_brand {
+    .brand {
         margin-left: 1rem;
     }
     
-    .ash_hero-video {
+    .hero-video {
         object-position: center;
     }
     
-    .ash_form-container {
+    .form-container {
         padding: 2rem 1.5rem;
         margin: 1rem;
     }
     
-    .ash_page-title {
+    .page-title {
         font-size: 2rem;
     }
     
-    .ash_section-header {
+    .section-header {
         flex-direction: column;
         gap: 1rem;
     }

@@ -449,11 +449,11 @@ async function loadAdminParks() {
                     ? ""
                     : ' <span class="badge bg-secondary">Inactive</span>';
                   return `
-                <li class="list-group-item ash_list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item list-group-item d-flex justify-content-between align-items-center">
                     <span>${tt.name} - RM ${tt.price.toFixed(2)}${statusBadge}</span>
                     <div>
                         <button
-                            class="btn btn-outline-secondary btn-sm ash_btn-secondary edit-tt-btn"
+                            class="btn btn-outline-secondary btn-sm btn-secondary edit-tt-btn"
                             data-bs-toggle="modal"
                             data-bs-target="#ticketTypeModal"
                             data-park-id="${park.id}"
@@ -464,7 +464,7 @@ async function loadAdminParks() {
                             Edit
                         </button>
                         <button
-                            class="btn btn-outline-danger btn-sm ash_btn-danger delete-tt-btn"
+                            class="btn btn-outline-danger btn-sm btn-danger delete-tt-btn"
                             data-park-id="${park.id}"
                             data-tt-id="${tt.id}"
                         >
@@ -475,7 +475,7 @@ async function loadAdminParks() {
             `;
                 })
                 .join("")
-            : '<li class="list-group-item ash_list-group-item">No ticket types found for this park.</li>';
+            : '<li class="list-group-item list-group-item">No ticket types found for this park.</li>';
 
         const merchandiseHtml =
           park.merchandise.length > 0
@@ -485,14 +485,14 @@ async function loadAdminParks() {
                     ? ""
                     : ' <span class="badge bg-secondary">Inactive</span>';
                   return `
-                <li class="list-group-item ash_list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         ${m.name} - RM ${m.price.toFixed(2)}${statusBadge}<br>
                         <small class="text-muted">Stock: ${m.stock}</small>
                     </div>
                     <div>
                         <button
-                            class="btn btn-outline-secondary btn-sm ash_btn-secondary edit-merch-btn"
+                            class="btn btn-outline-secondary btn-sm btn-secondary edit-merch-btn"
                             data-bs-toggle="modal"
                             data-bs-target="#merchandiseModal"
                             data-park-id="${park.id}"
@@ -505,7 +505,7 @@ async function loadAdminParks() {
                             Edit
                         </button>
                         <button
-                            class="btn btn-outline-danger btn-sm ash_btn-danger delete-merch-btn"
+                            class="btn btn-outline-danger btn-sm btn-danger delete-merch-btn"
                             data-park-id="${park.id}"
                             data-merch-id="${m.id}"
                         >
@@ -516,12 +516,12 @@ async function loadAdminParks() {
             `;
                 })
                 .join("")
-            : '<li class="list-group-item ash_list-group-item">No merchandise found for this park.</li>';
+            : '<li class="list-group-item list-group-item">No merchandise found for this park.</li>';
 
         return `
-        <div class="accordion-item ash_accordion-item">
+        <div class="accordion-item accordion-item">
             <h2 class="accordion-header" id="heading-${park.id}">
-                <button class="accordion-button collapsed ash_accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
+                <button class="accordion-button collapsed accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
                   park.id
                 }" aria-expanded="false" aria-controls="collapse-${park.id}">
                     ${park.name}${statusBadge}
@@ -532,7 +532,7 @@ async function loadAdminParks() {
             }" class="accordion-collapse collapse" aria-labelledby="heading-${
           park.id
         }" data-bs-parent="#${accordionId}">
-                <div class="accordion-body ash_accordion-body">
+                <div class="accordion-body accordion-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <strong>Location:</strong> ${
@@ -544,7 +544,7 @@ async function loadAdminParks() {
                         </div>
                         <div>
                             <button
-                                class="btn btn-secondary btn-sm ash_btn-secondary edit-park-btn"
+                                class="btn btn-secondary btn-sm btn-secondary edit-park-btn"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editParkModal"
                                 data-park-id="${park.id}"
@@ -554,7 +554,7 @@ async function loadAdminParks() {
                             >
                                 Edit Park
                             </button>
-                            <button class="btn btn-danger btn-sm ash_btn-danger delete-park-btn" data-park-id="${
+                            <button class="btn btn-danger btn-sm btn-danger delete-park-btn" data-park-id="${
                               park.id
                             }">Delete Park</button>
                         </div>
@@ -565,7 +565,7 @@ async function loadAdminParks() {
                         ${ticketTypesHtml}
                     </ul>
                     <button
-                        class="btn btn-primary btn-sm ash_btn-primary add-tt-btn"
+                        class="btn btn-primary btn-sm btn-primary add-tt-btn"
                         data-bs-toggle="modal"
                         data-bs-target="#ticketTypeModal"
                         data-park-id="${park.id}"
@@ -580,7 +580,7 @@ async function loadAdminParks() {
                         ${merchandiseHtml}
                     </ul>
                     <button
-                        class="btn btn-primary btn-sm ash_btn-primary add-merch-btn"
+                        class="btn btn-primary btn-sm btn-primary add-merch-btn"
                         data-bs-toggle="modal"
                         data-bs-target="#merchandiseModal"
                         data-park-id="${park.id}"
@@ -928,7 +928,7 @@ function showAlert(message, type = "info") {
 
   const wrapper = document.createElement("div");
   wrapper.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible ash_alert" role="alert">
+        <div class="alert alert-${type} alert-dismissible alert" role="alert">
             <div>${message}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -973,15 +973,15 @@ async function loadProfileData() {
     const ordersHtml = ordersData
       .map(
         (order) => `
-        <div class="card ash_order-card mb-3">
-            <div class="card-header ash_card-header d-flex justify-content-between">
+        <div class="card order-card mb-3">
+            <div class="card-header card-header d-flex justify-content-between">
                 <span>Order ID: ${order.id}</span>
                 <span>Date: ${new Date(
                   order.created_at
                 ).toLocaleDateString()}</span>
             </div>
-            <div class="card-body ash_card-body">
-                <h5 class="card-title ash_card-title">Status: <span class="badge ash_badge bg-${
+            <div class="card-body card-body">
+                <h5 class="card-title card-title">Status: <span class="badge badge bg-${
                   order.status === "cancelled" ? "danger" : "success"
                 }">${order.status}</span></h5>
                 <p class="card-text">Total: RM ${order.total_amount.toFixed(
@@ -1004,7 +1004,7 @@ async function loadProfileData() {
                 </ul>
                 ${
                   order.status !== "cancelled"
-                    ? `<button class="btn btn-danger btn-sm ash_btn-danger cancel-order-btn" data-order-id="${order.id}">Cancel Order</button>`
+                    ? `<button class="btn btn-danger btn-sm btn-danger cancel-order-btn" data-order-id="${order.id}">Cancel Order</button>`
                     : ""
                 }
             </div>
@@ -1097,7 +1097,7 @@ function renderParks(parks) {
     .map(
       (park, index) => `
       <div class="col-md-4 mb-4">
-          <div class="card ash_park-card">
+          <div class="card park-card">
               <img src="${getParkImage(park.name, index)}" class="card-img-top" alt="${park.name}" loading="lazy">
               <div class="card-body">
                   <h5 class="card-title">${park.name}</h5>
@@ -1106,7 +1106,7 @@ function renderParks(parks) {
                   }</p>
                   <a href="/parks/${
                     park.id
-                  }" class="btn btn-primary ash_btn-primary">View Details</a>
+                  }" class="btn btn-primary btn-primary">View Details</a>
               </div>
           </div>
       </div>
@@ -1168,30 +1168,30 @@ async function loadParkDetail() {
         const today = new Date().toISOString().split("T")[0];
         const ticketInputs =
           ticketTypes.length > 0
-            ? `<h3 class="ash_section-title">Book Tickets</h3>` +
+            ? `<h3 class="section-title">Book Tickets</h3>` +
               ticketTypes
                 .map(
                   (tt) => `
-                    <div class="ash_ticket-section mb-3">
+                    <div class="ticket-section mb-3">
                         <h5 style="color: #2d5016; font-weight: 600;">${tt.name} (RM ${tt.price.toFixed(2)})</h5>
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="quantity-ticket-${
                                   tt.id
-                                }" class="form-label ash_form-label">Quantity</label>
+                                }" class="form-label form-label">Quantity</label>
                                 <input type="number" id="quantity-ticket-${
                                   tt.id
-                                }" class="form-control ash_form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
+                                }" class="form-control form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
                     tt.id
                   }">
                             </div>
                             <div class="col-md-6">
                                 <label for="visit-date-${
                                   tt.id
-                                }" class="form-label ash_form-label">Visit Date</label>
+                                }" class="form-label form-label">Visit Date</label>
                                 <input type="date" id="visit-date-${
                                   tt.id
-                                }" class="form-control ash_form-control visit-date" min="${today}">
+                                }" class="form-control form-control visit-date" min="${today}">
                             </div>
                         </div>
                     </div>
@@ -1202,21 +1202,21 @@ async function loadParkDetail() {
 
         const merchandiseInputs =
           merchandise.length > 0
-            ? `<h3 class="ash_section-title">Purchase Merchandise</h3>` +
+            ? `<h3 class="section-title">Purchase Merchandise</h3>` +
               merchandise
                 .map(
                   (m) => `
-                    <div class="ash_merchandise-section mb-3">
+                    <div class="merchandise-section mb-3">
                         <h5 style="color: #2d5016; font-weight: 600;">${m.name} (RM ${m.price.toFixed(2)})</h5>
                         <p class="mb-1">${m.description || ""}</p>
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="quantity-merch-${
                                   m.id
-                                }" class="form-label ash_form-label">Quantity</label>
+                                }" class="form-label form-label">Quantity</label>
                                 <input type="number" id="quantity-merch-${
                                   m.id
-                                }" class="form-control ash_form-control merchandise-quantity" min="0" value="0" data-merchandise-id="${
+                                }" class="form-control form-control merchandise-quantity" min="0" value="0" data-merchandise-id="${
                     m.id
                   }" max="${m.stock}">
                                 <small class="text-muted">Stock: ${
@@ -1234,7 +1234,7 @@ async function loadParkDetail() {
                     <form id="order-form">
                         ${ticketInputs}
                         ${merchandiseInputs}
-                        <button type="submit" class="btn btn-success ash_btn-success mt-3">Place Order</button>
+                        <button type="submit" class="btn btn-success btn-success mt-3">Place Order</button>
                     </form>
                 `;
         document
@@ -1246,7 +1246,7 @@ async function loadParkDetail() {
         '<p><a href="/login">Log in</a> to book tickets.</p>';
     }
   } catch (error) {
-    parkDetailContainer.innerHTML = `<div class="alert alert-danger ash_alert">${error.message}</div>`;
+    parkDetailContainer.innerHTML = `<div class="alert alert-danger alert">${error.message}</div>`;
   }
 }
 
@@ -1408,7 +1408,7 @@ async function loadAdminDashboard() {
         }</p>
         <hr>
         <h5>Revenue by Park</h5>
-        <table class="table ash_table">
+        <table class="table table">
             <thead>
                 <tr>
                     <th>Park</th>
