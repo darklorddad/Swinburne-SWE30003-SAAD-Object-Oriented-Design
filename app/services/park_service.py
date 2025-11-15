@@ -19,8 +19,15 @@ async def get_parks(db: Client) -> List[Park]:
 
 
 async def get_park_by_id(db: Client, park_id: UUID) -> Optional[Park]:
-    """Fetches a single park by its ID."""
-    response = db.table("parks").select("*").eq("id", str(park_id)).single().execute()
+    """Fetches a single active park by its ID."""
+    response = (
+        db.table("parks")
+        .select("*")
+        .eq("id", str(park_id))
+        .eq("is_active", True)
+        .single()
+        .execute()
+    )
     if response.data:
         return Park(**response.data)
     return None
