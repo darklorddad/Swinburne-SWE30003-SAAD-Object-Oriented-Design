@@ -6,6 +6,7 @@ from uuid import UUID
 
 from supabase import Client
 
+from app.models.merchandise import Merchandise
 from app.models.park import Park
 from app.models.ticket import TicketType
 
@@ -35,3 +36,15 @@ async def get_ticket_types_for_park(db: Client, park_id: UUID) -> List[TicketTyp
         .execute()
     )
     return [TicketType(**tt) for tt in response.data]
+
+
+async def get_merchandise_for_park(db: Client, park_id: UUID) -> List[Merchandise]:
+    """Fetches all merchandise for a specific park."""
+    response = (
+        db.table("merchandise")
+        .select("*")
+        .eq("park_id", str(park_id))
+        .order("name")
+        .execute()
+    )
+    return [Merchandise(**m) for m in response.data]

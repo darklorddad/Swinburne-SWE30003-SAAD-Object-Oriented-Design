@@ -9,6 +9,7 @@ from supabase import Client
 
 from app.api import deps
 from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.merchandise import Merchandise, MerchandiseCreate, MerchandiseUpdate
 from app.models.report import VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
 from app.services import admin_service, park_service
@@ -157,6 +158,70 @@ async def delete_ticket_type_for_park(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket type not found or does not belong to this park",
+        )
+
+
+@router.post(
+    "/admin/parks/{park_id}/merchandise/",
+    response_model=Merchandise,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def create_new_merchandise_for_park(
+    park_id: UUID,
+    merchandise_in: MerchandiseCreate,
+    db: Client = Depends(deps.get_db),
+):
+    """
+    Create new merchandise for a specific park. (Admin only)
+    """
+    try:
+        return await admin_service.create_merchandise(db, merchandise_in, park_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+
+@router.put(
+    "/admin/parks/{park_id}/merchandise/{merchandise_id}",
+    response_model=Merchandise,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def update_merchandise_for_park(
+    park_id: UUID,
+    merchandise_id: UUID,
+    merchandise_in: MerchandiseUpdate,
+    db: Client = Depends(deps.get_db),
+):
+    """
+    Update merchandise for a specific park. (Admin only)
+    """
+    merchandise = await admin_service.update_merchandise(
+        db, park_id, merchandise_id, merchandise_in
+    )
+    if not merchandise:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Merchandise not found or does not belong to this park",
+        )
+    return merchandise
+
+
+@router.delete(
+    "/admin/parks/{park_id}/merchandise/{merchandise_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(deps.get_current_active_admin)],
+)
+async def delete_merchandise_for_park(
+    park_id: UUID, merchandise_id: UUID, db: Client = Depends(deps.get_db)
+):
+    """
+    Delete merchandise for a specific park. (Admin only)
+    """
+    success = await admin_service.delete_merchandise(db, park_id, merchandise_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Merchandise not found or does not belong to this park",
         )
 
 

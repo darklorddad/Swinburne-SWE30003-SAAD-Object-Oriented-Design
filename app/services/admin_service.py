@@ -8,6 +8,7 @@ from uuid import UUID
 from supabase import Client
 
 from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.merchandise import Merchandise, MerchandiseCreate, MerchandiseUpdate
 from app.models.report import ParkStatistic, VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
 from app.services.park_service import get_park_by_id
@@ -103,6 +104,72 @@ async def delete_ticket_type(db: Client, park_id: UUID, ticket_type_id: UUID) ->
         db.table("ticket_types")
         .delete()
         .eq("id", str(ticket_type_id))
+        .eq("park_id", str(park_id))
+        .execute()
+    )
+    return bool(response.data)
+
+
+async def create_merchandise(
+    db: Client, merchandise_in: MerchandiseCreate, park_id: UUID
+) -> Merchandise:
+    """Creates new merchandise for a park."""
+    park = await get_park_by_id(db, park_id)
+    if not park:
+        raise ValueError("Park not found")
+
+    data = merchandise_in.dict()
+    data["park_id"] = str(park_id)
+    response = db.table("merchandise").insert(data).execute()
+    return Merchandise(**response.data[0])
+
+
+async def update_merchandise(
+    db: Client,
+    park_id: UUID,
+    merchandise_id: UUID,
+    merchandise_update: MerchandiseUpdate,
+) -> Optional[Merchandise]:
+    """Updates existing merchandise, ensuring it belongs to the correct park."""
+    verify_response = (
+        db.table("merchandise")
+        .select("id")
+        .eq("id", str(merchandise_id))
+        .eq("park_id", str(park_id))
+        .single()
+        .execute()
+    )
+    if not verify_response.data:
+        return None
+
+    update_data = merchandise_update.dict(exclude_unset=True)
+    if not update_data:
+        get_response = (
+            db.table("merchandise")
+            .select("*")
+            .eq("id", str(merchandise_id))
+            .single()
+            .execute()
+        )
+        return Merchandise(**get_response.data) if get_response.data else None
+
+    response = (
+        db.table("merchandise")
+        .update(update_data)
+        .eq("id", str(merchandise_id))
+        .execute()
+    )
+    if response.data:
+        return Merchandise(**response.data[0])
+    return None
+
+
+async def delete_merchandise(db: Client, park_id: UUID, merchandise_id: UUID) -> bool:
+    """Deletes merchandise, ensuring it belongs to the correct park."""
+    response = (
+        db.table("merchandise")
+        .delete()
+        .eq("id", str(merchandise_id))
         .eq("park_id", str(park_id))
         .execute()
     )

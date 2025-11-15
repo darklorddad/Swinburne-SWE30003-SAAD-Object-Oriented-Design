@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
 from app.api import deps
+from app.models.merchandise import Merchandise
 from app.models.park import Park
 from app.models.ticket import TicketType
 from app.services import park_service
@@ -50,3 +51,18 @@ async def read_public_ticket_types_for_park(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
         )
     return await park_service.get_ticket_types_for_park(db, park_id)
+
+
+@router.get("/parks/{park_id}/merchandise/", response_model=List[Merchandise])
+async def read_public_merchandise_for_park(
+    park_id: UUID, db: Client = Depends(deps.get_db)
+):
+    """
+    Retrieve all merchandise for a specific park for public viewing.
+    """
+    park = await park_service.get_park_by_id(db, park_id)
+    if not park:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
+        )
+    return await park_service.get_merchandise_for_park(db, park_id)
