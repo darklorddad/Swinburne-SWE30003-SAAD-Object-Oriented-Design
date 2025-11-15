@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/orders/",
+    "/",
     response_model=Order,
     status_code=status.HTTP_201_CREATED,
 )
@@ -40,7 +40,7 @@ async def create_new_order(
         )
 
 
-@router.get("/orders/", response_model=List[Order])
+@router.get("/", response_model=List[Order])
 async def read_user_orders(
     db: Client = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
@@ -51,7 +51,7 @@ async def read_user_orders(
     return await order_service.get_orders_for_customer(db, customer_id=current_user.id)
 
 
-@router.get("/orders/{order_id}", response_model=Order)
+@router.get("/{order_id}", response_model=Order)
 async def read_user_order(
     order_id: UUID,
     db: Client = Depends(deps.get_db),
@@ -71,7 +71,7 @@ async def read_user_order(
     return order
 
 
-@router.delete("/orders/{order_id}", response_model=Order)
+@router.delete("/{order_id}", response_model=Order)
 async def cancel_user_order(
     order_id: UUID,
     db: Client = Depends(deps.get_db),

@@ -16,7 +16,7 @@ from app.services import park_service
 router = APIRouter()
 
 
-@router.get("/parks/", response_model=List[Park])
+@router.get("/", response_model=List[Park])
 async def read_public_parks(db: Client = Depends(deps.get_db)):
     """
     Retrieve all parks for public viewing.
@@ -24,7 +24,7 @@ async def read_public_parks(db: Client = Depends(deps.get_db)):
     return await park_service.get_parks(db)
 
 
-@router.get("/parks/{park_id}", response_model=Park)
+@router.get("/{park_id}", response_model=Park)
 async def read_public_park(park_id: UUID, db: Client = Depends(deps.get_db)):
     """
     Retrieve a single park by its ID for public viewing.
@@ -37,7 +37,7 @@ async def read_public_park(park_id: UUID, db: Client = Depends(deps.get_db)):
     return park
 
 
-@router.get("/parks/{park_id}/ticket-types/", response_model=List[TicketType])
+@router.get("/{park_id}/ticket-types/", response_model=List[TicketType])
 async def read_public_ticket_types_for_park(
     park_id: UUID, db: Client = Depends(deps.get_db)
 ):
@@ -53,7 +53,7 @@ async def read_public_ticket_types_for_park(
     return await park_service.get_ticket_types_for_park(db, park_id)
 
 
-@router.get("/parks/{park_id}/merchandise/", response_model=List[Merchandise])
+@router.get("/{park_id}/merchandise/", response_model=List[Merchandise])
 async def read_public_merchandise_for_park(
     park_id: UUID, db: Client = Depends(deps.get_db)
 ):

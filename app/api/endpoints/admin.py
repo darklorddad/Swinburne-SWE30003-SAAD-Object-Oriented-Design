@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/admin/parks/",
+    "/parks/",
     response_model=Park,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(deps.get_current_active_admin)],
@@ -31,7 +31,7 @@ async def create_new_park(park_in: ParkCreate, db: Client = Depends(deps.get_db)
 
 
 @router.get(
-    "/admin/parks/",
+    "/parks/",
     response_model=List[Park],
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -43,7 +43,7 @@ async def read_parks(db: Client = Depends(deps.get_db)):
 
 
 @router.put(
-    "/admin/parks/{park_id}",
+    "/parks/{park_id}",
     response_model=Park,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -62,7 +62,7 @@ async def update_existing_park(
 
 
 @router.delete(
-    "/admin/parks/{park_id}",
+    "/parks/{park_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -78,7 +78,7 @@ async def delete_existing_park(park_id: UUID, db: Client = Depends(deps.get_db))
 
 
 @router.post(
-    "/admin/parks/{park_id}/ticket-types/",
+    "/parks/{park_id}/ticket-types/",
     response_model=TicketType,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(deps.get_current_active_admin)],
@@ -98,7 +98,7 @@ async def create_new_ticket_type_for_park(
 
 
 @router.get(
-    "/admin/parks/{park_id}/ticket-types/",
+    "/parks/{park_id}/ticket-types/",
     response_model=List[TicketType],
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -118,7 +118,7 @@ async def read_ticket_types_for_park(
 
 
 @router.put(
-    "/admin/parks/{park_id}/ticket-types/{ticket_type_id}",
+    "/parks/{park_id}/ticket-types/{ticket_type_id}",
     response_model=TicketType,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -143,7 +143,7 @@ async def update_ticket_type_for_park(
 
 
 @router.delete(
-    "/admin/parks/{park_id}/ticket-types/{ticket_type_id}",
+    "/parks/{park_id}/ticket-types/{ticket_type_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -165,7 +165,7 @@ async def delete_ticket_type_for_park(
 
 
 @router.post(
-    "/admin/parks/{park_id}/merchandise/",
+    "/parks/{park_id}/merchandise/",
     response_model=Merchandise,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(deps.get_current_active_admin)],
@@ -185,7 +185,7 @@ async def create_new_merchandise_for_park(
 
 
 @router.put(
-    "/admin/parks/{park_id}/merchandise/{merchandise_id}",
+    "/parks/{park_id}/merchandise/{merchandise_id}",
     response_model=Merchandise,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -210,7 +210,7 @@ async def update_merchandise_for_park(
 
 
 @router.delete(
-    "/admin/parks/{park_id}/merchandise/{merchandise_id}",
+    "/parks/{park_id}/merchandise/{merchandise_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
@@ -229,7 +229,7 @@ async def delete_merchandise_for_park(
 
 
 @router.get(
-    "/admin/statistics/visitors/",
+    "/statistics/visitors/",
     response_model=VisitorStatistics,
     dependencies=[Depends(deps.get_current_active_admin)],
 )

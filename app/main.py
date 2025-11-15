@@ -19,9 +19,9 @@ templates = Jinja2Templates(directory="templates")
 # Include API routers
 api_router = APIRouter(prefix="/api")
 api_router.include_router(auth.router, tags=["auth"])
-api_router.include_router(admin.router, tags=["admin"])
-api_router.include_router(orders.router, tags=["orders"])
-api_router.include_router(parks.router, tags=["parks"])
+api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
+api_router.include_router(orders.router, prefix="/orders", tags=["orders"])
+api_router.include_router(parks.router, prefix="/parks", tags=["parks"])
 app.include_router(api_router)
 
 
