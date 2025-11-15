@@ -2,6 +2,7 @@ fastapi
 jinja2
 passlib[bcrypt]
 pydantic[email]
+pydantic-settings
 python-dotenv
 python-jose[cryptography]
 python-multipart
