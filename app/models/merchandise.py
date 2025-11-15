@@ -40,4 +40,4 @@ class Merchandise(MerchandiseBase):
     class Config:
         """Pydantic configuration."""
 
-        orm_mode = True
+        from_attributes = True

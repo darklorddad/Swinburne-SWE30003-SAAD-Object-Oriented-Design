@@ -39,7 +39,7 @@ class User(UserBase):
     class Config:
         """Pydantic configuration."""
 
-        orm_mode = True
+        from_attributes = True
 
 
 class UserInDB(User):

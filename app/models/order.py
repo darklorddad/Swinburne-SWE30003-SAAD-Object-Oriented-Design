@@ -5,7 +5,7 @@ from datetime import date, datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class OrderItemCreate(BaseModel):
@@ -16,13 +16,11 @@ class OrderItemCreate(BaseModel):
     merchandise_id: Optional[UUID] = None
     visit_date: Optional[date] = None
 
-    @root_validator
-    def check_item_type(cls, values):
+    @model_validator(mode="after")
+    def check_item_type(self):
         """Ensure item is for a ticket or merchandise, but not both."""
-        ticket_id, merch_id = values.get("ticket_type_id"), values.get(
-            "merchandise_id"
-        )
-        visit_date = values.get("visit_date")
+        ticket_id, merch_id = self.ticket_type_id, self.merchandise_id
+        visit_date = self.visit_date
         if ticket_id is not None and merch_id is not None:
             raise ValueError("OrderItem cannot be for both a ticket and merchandise")
         if ticket_id is None and merch_id is None:
@@ -31,7 +29,7 @@ class OrderItemCreate(BaseModel):
             raise ValueError("Visit date is required for tickets")
         if merch_id is not None and visit_date is not None:
             raise ValueError("Visit date should not be provided for merchandise")
-        return values
+        return self
 
 
 class OrderCreate(BaseModel):
@@ -52,7 +50,7 @@ class OrderItem(BaseModel):
     price_at_purchase: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Order(BaseModel):
@@ -66,4 +64,4 @@ class Order(BaseModel):
     items: List[OrderItem] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
