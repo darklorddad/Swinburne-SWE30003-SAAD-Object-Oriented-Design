@@ -31,11 +31,14 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
                 db.table("ticket_types")
                 .select("price")
                 .eq("id", str(item.ticket_type_id))
+                .eq("is_active", True)
                 .single()
                 .execute()
             )
             if not response.data:
-                raise ValueError(f"TicketType with id {item.ticket_type_id} not found")
+                raise ValueError(
+                    f"TicketType with id {item.ticket_type_id} not found or is inactive"
+                )
             price = response.data["price"]
             item_prices[item.ticket_type_id] = price
             total_amount += price * item.quantity
@@ -44,11 +47,14 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
                 db.table("merchandise")
                 .select("price, stock")
                 .eq("id", str(item.merchandise_id))
+                .eq("is_active", True)
                 .single()
                 .execute()
             )
             if not response.data:
-                raise ValueError(f"Merchandise with id {item.merchandise_id} not found")
+                raise ValueError(
+                    f"Merchandise with id {item.merchandise_id} not found or is inactive"
+                )
             if response.data["stock"] < item.quantity:
                 raise ValueError(
                     f"Not enough stock for merchandise id {item.merchandise_id}"
