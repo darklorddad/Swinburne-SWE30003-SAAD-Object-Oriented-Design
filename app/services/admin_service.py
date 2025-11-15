@@ -37,7 +37,18 @@ async def update_park(
 
 
 async def delete_park(db: Client, park_id: UUID) -> bool:
-    """Deletes a park from the database."""
+    """Deletes a park and all its associated ticket types and merchandise."""
+    # This ensures data integrity by removing dependent records first. For the
+    # scope of this assignment, sequential deletion is a robust simplification.
+    # In a production system, this would ideally be a single atomic transaction.
+
+    # Delete associated merchandise
+    db.table("merchandise").delete().eq("park_id", str(park_id)).execute()
+
+    # Delete associated ticket types
+    db.table("ticket_types").delete().eq("park_id", str(park_id)).execute()
+
+    # Finally, delete the park itself
     response = db.table("parks").delete().eq("id", str(park_id)).execute()
     return bool(response.data)
 
