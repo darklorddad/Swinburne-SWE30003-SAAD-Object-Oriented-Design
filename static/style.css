@@ -2082,3 +2082,43 @@ body:not(:has(.hero)) .navbar {
 .toast-body {
     font-weight: 500;
 }
+
+/* Park Detail Page */
+.park-detail-wrapper {
+    background-image: 
+        url('https://images.unsplash.com/photo-1473773508845-188df298d2d1?q=80&w=2070&auto=format&fit=crop'),
+        linear-gradient(135deg, rgba(26, 46, 13, 0.5) 0%, rgba(45, 80, 22, 0.4) 100%);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+    min-height: calc(100vh - 200px);
+    padding: 2rem 0;
+    margin: -1.5rem calc(-50vw + 50%) 0 calc(-50vw + 50%);
+    padding-left: calc(50vw - 50%);
+    padding-right: calc(50vw - 50%);
+    width: 100vw;
+    position: relative;
+}
+
+.park-detail-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(45, 80, 22, 0.15) 0%, rgba(10, 26, 10, 0.3) 100%);
+    z-index: 0;
+}
+
+.park-detail-wrapper > * {
+    position: relative;
+    z-index: 1;
+}
+
+.order-form-container .section-title {
+    color: #2d5016 !important;
+    text-shadow: none !important;
+}

@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="alert-placeholder"></div>
-<div id="park-detail-container" class="park-detail-container">
-    <p class="loading">Loading park details...</p>
-</div>
-
-<div id="order-form-container" class="order-form-container mt-4">
-    <!-- Order form will be built here by JS -->
+<div class="park-detail-wrapper">
+    <div id="alert-placeholder"></div>
+    <div id="park-detail-container" class="park-detail-container">
+        <p class="loading">Loading park details...</p>
+    </div>
+    
+    <div id="order-form-container" class="order-form-container mt-4">
+        <!-- Order form will be built here by JS -->
+    </div>
 </div>
 
 {% block modals %}
