@@ -42,7 +42,7 @@
         <a href="#parks-grid" class="hover:text-white transition-colors no-underline">All Parks</a>
         
         <!-- Auth Links -->
-        <div id="auth-links" class="flex space-x-6 border-l border-gray-500 pl-6">
+        <div id="auth-links" class="flex items-center space-x-6 border-l border-gray-500 pl-6">
             <a href="/login" class="hover:text-white transition-colors no-underline">Login</a>
             <a href="/register" class="hover:text-white transition-colors border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 no-underline">Register</a>
         </div>
@@ -76,7 +76,7 @@
             <video class="w-full h-full object-cover" autoplay muted loop playsinline>
                 <source src="/assets/video2.mp4" type="video/mp4">
             </video>
-            <div class="absolute inset-0 bg-black/40"></div>
+            <div class="absolute inset-0 bg-black/65"></div>
         </div>
         
         <div class="relative z-10 text-center px-4">
@@ -85,7 +85,7 @@
                 Wilderness<br>Awaits
             </h1>
             <div class="reveal-text mt-8">
-                <button onclick="document.getElementById('bako').scrollIntoView({behavior: 'smooth'})" class="explore-btn relative overflow-hidden border border-white px-10 py-4 text-sm font-sans tracking-widest uppercase transition-colors duration-300 text-white hover:text-black hover:bg-white">
+                <button onclick="document.getElementById('bako').scrollIntoView({behavior: 'smooth'})" class="explore-btn relative overflow-hidden bg-white/10 backdrop-blur-sm border border-white/50 px-12 py-5 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]">
                     Explore The Parks
                 </button>
             </div>
@@ -206,11 +206,6 @@
 
     <!-- Section 5: All Parks Grid -->
     <section id="parks-grid" class="snap-section flex flex-col bg-zinc-900 relative">
-         <div class="absolute inset-0 z-0 opacity-20">
-            <img src="https://images.unsplash.com/photo-1519681393784-d8e5b56524dd?q=80&w=2600&auto=format&fit=crop" 
-                 class="w-full h-full object-cover grayscale" alt="Stars">
-        </div>
-
         <div class="relative z-10 w-full h-full flex flex-col pt-24 px-6 md:px-12">
             <div class="flex justify-between items-end mb-8 border-b border-gray-700 pb-4">
                 <div>

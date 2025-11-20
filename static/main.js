@@ -1404,18 +1404,21 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <div class="glass-panel rounded-xl overflow-hidden hover:bg-white/5 transition duration-300 flex flex-col h-full">
-          <div class="h-48 overflow-hidden">
-            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition duration-500 hover:scale-110" alt="${park.name}" loading="lazy">
+      <div class="group relative bg-zinc-800/50 border border-white/10 rounded-2xl overflow-hidden hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-black/50 flex flex-col h-full">
+          <div class="h-64 overflow-hidden relative">
+            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
           </div>
-          <div class="p-6 flex flex-col flex-grow">
-              <h5 class="font-serif text-xl font-bold text-white mb-2">${park.name}</h5>
-              <p class="font-sans text-sm text-gray-300 mb-4 flex-grow line-clamp-3">${
+          <div class="p-8 flex flex-col flex-grow relative">
+              <h5 class="font-serif text-2xl font-bold text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
+              <p class="font-sans text-sm text-gray-400 mb-6 flex-grow line-clamp-3 leading-relaxed">${
                 park.description || "No description available."
               }</p>
               <a href="/parks/${
                 park.id
-              }" class="inline-block text-center border border-white/30 rounded-full py-2 px-4 text-sm uppercase tracking-widest text-white hover:bg-white hover:text-black transition duration-300">View Details</a>
+              }" class="inline-block text-center bg-white text-black font-bold rounded-full py-3 px-6 text-xs uppercase tracking-widest hover:bg-green-500 hover:text-white transition-all duration-300 transform group-hover:translate-y-[-2px]">
+                  Explore Park
+              </a>
           </div>
       </div>
   `
