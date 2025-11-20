@@ -86,3 +86,7 @@ class OrderReschedule(BaseModel):
     """Model for rescheduling an order."""
     new_visit_date: date
 
+
+class RefundRequest(BaseModel):
+    """Model for requesting a refund."""
+    reason: str

@@ -194,6 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault(); // Prevent any default form submission
       await handleRescheduleSubmit();
     }
+    if (event.target.id === "confirm-refund-btn") {
+      event.preventDefault();
+      await handleRefundSubmit();
+    }
     if (event.target.classList.contains("cancel-order-btn")) {
       const orderId = event.target.dataset.orderId;
       if (confirm("Are you sure you want to cancel this order?")) {
@@ -235,6 +239,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const today = new Date().toISOString().split("T")[0];
       document.getElementById("new-visit-date").min = today;
       document.getElementById("new-visit-date").value = ""; 
+    });
+  }
+
+  const refundModal = document.getElementById("refundModal");
+  if (refundModal) {
+    refundModal.addEventListener("show.bs.modal", (event) => {
+      const button = event.relatedTarget;
+      const orderId = button.getAttribute("data-order-id");
+      document.getElementById("refund-order-id").value = orderId;
+      document.getElementById("refund-reason").value = ""; // Clear previous text
+      const alertPlaceholder = document.getElementById("refund-alert-placeholder");
+      if (alertPlaceholder) alertPlaceholder.innerHTML = "";
     });
   }
 });
@@ -1060,21 +1076,24 @@ async function loadProfileData() {
                       .join("")}
                 </ul>
                 ${
-                  order.status !== "cancelled"
+                  order.status !== "cancelled" && order.status !== "refunded"
                     ? `
-                    <div class="mt-3">
-                        <button class="btn btn-primary btn-sm me-2 reschedule-btn" 
-                            data-order-id="${order.id}" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#rescheduleModal">
-                            Reschedule
-                        </button>
-                        <button class="btn btn-danger btn-sm cancel-order-btn" 
-                            data-order-id="${order.id}">
-                            Cancel Order
-                        </button>
-                    </div>
-                    `
+                      <div class="mt-3">
+                          <button class="btn btn-primary btn-sm me-2 reschedule-btn" 
+                              data-order-id="${order.id}" 
+                              data-bs-toggle="modal" 
+                              data-bs-target="#rescheduleModal">
+                              Reschedule
+                          </button>
+                          <!-- CHANGED BUTTON -->
+                          <button class="btn btn-danger btn-sm refund-btn" 
+                              data-order-id="${order.id}"
+                              data-bs-toggle="modal"
+                              data-bs-target="#refundModal">
+                              Request Refund
+                          </button>
+                      </div>
+                      `
                     : ""
                 }
             </div>
@@ -1541,6 +1560,56 @@ async function handleRescheduleSubmit() {
     }
 
     loadProfileData(); // Refresh list to show new date
+  } catch (error) {
+    showBottomRightNotification(error.message, "danger");
+  }
+}
+
+async function handleRefundSubmit() {
+  const token = getToken();
+  const orderId = document.getElementById("refund-order-id").value;
+  const reason = document.getElementById("refund-reason").value;
+
+  if (!reason) {
+    const alertPlaceholder = document.getElementById("refund-alert-placeholder");
+    if (alertPlaceholder) {
+      alertPlaceholder.innerHTML = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          Please provide a reason for the refund.
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+    } else {
+      showAlert("Please provide a reason for the refund.", "warning");
+    }
+    return;
+  }
+
+  const payload = { reason: reason };
+
+  try {
+    const response = await fetch(`/api/orders/${orderId}/refund`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to process refund.");
+    }
+
+    showBottomRightNotification("Refund processed successfully.", "success");
+    
+    // Close Modal
+    const modalEl = document.getElementById("refundModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+
+    loadProfileData(); // Refresh list to show "refunded" status
   } catch (error) {
     showBottomRightNotification(error.message, "danger");
   }

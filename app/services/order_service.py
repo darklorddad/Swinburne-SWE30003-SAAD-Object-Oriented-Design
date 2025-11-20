@@ -233,3 +233,33 @@ async def reschedule_order(
     
     # 4. Return the updated order object
     return await get_order_by_id(db, order_id, customer_id)
+
+
+async def process_refund(
+    db: Client, order_id: UUID, customer_id: UUID, reason: str
+) -> Order:
+    """
+    Processes a refund request: updates status to 'refunded' and saves the reason.
+    """
+    # 1. Verify order exists and belongs to user
+    order = await get_order_by_id(db, order_id, customer_id)
+    if not order:
+        raise ValueError("Order not found or permission denied")
+
+    # 2. Check if already refunded/cancelled
+    if order.status in ["cancelled", "refunded"]:
+        raise ValueError(f"Order is already {order.status}")
+
+    # 3. Update DB: Set status to 'refunded' and save reason
+    response = (
+        db.table("orders")
+        .update({
+            "status": "refunded",
+            "refund_reason": reason
+        })
+        .eq("id", str(order_id))
+        .execute()
+    )
+    
+    # 4. Return updated object
+    return await get_order_by_id(db, order_id, customer_id)
