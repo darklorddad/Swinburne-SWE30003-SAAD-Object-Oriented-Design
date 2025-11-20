@@ -91,7 +91,6 @@ body::before {
 
 main {
     flex: 1;
-    animation: fadeInUp 0.8s ease-out;
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
@@ -99,11 +98,6 @@ main {
 main.container {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
-}
-
-#main-content:has(.hero) {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
 }
 
 /* Scroll Configuration */
