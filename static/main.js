@@ -253,6 +253,50 @@ document.addEventListener("DOMContentLoaded", () => {
       if (alertPlaceholder) alertPlaceholder.innerHTML = "";
     });
   }
+
+    const btnPay = document.getElementById("btn-confirm-payment");
+    if(btnPay) {
+        btnPay.addEventListener("click", async () => {
+            if(!currentOrderPayload) return;
+            
+            const token = getToken();
+            // Disable button to prevent double click
+            btnPay.disabled = true; 
+            btnPay.innerText = "Processing...";
+
+            try {
+                const response = await fetch("/api/orders/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(currentOrderPayload),
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || "Failed.");
+
+                // Close Modal
+                const modalEl = document.getElementById('orderSummaryModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                  modal.hide();
+                }
+
+                showToast("✅ Payment Successful! Redirecting...", "success");
+                
+                setTimeout(() => {
+                    window.location.href = "/profile";
+                }, 1500);
+
+            } catch (error) {
+                showAlert(error.message, "danger");
+                btnPay.disabled = false;
+                btnPay.innerText = "Confirm & Pay";
+            }
+        });
+    }
 });
 
 function getToken() {
@@ -1307,6 +1351,82 @@ function handleParkSearch(event) {
   renderParks(filteredParks);
 }
 
+let currentOrderPayload = null; // Store data temporarily
+
+async function handleOrderSubmit(event) {
+  event.preventDefault();
+  
+  // 1. Collect Data (Same as before)
+  const items = [];
+  let grandTotal = 0;
+  let summaryHtml = "";
+  
+  // Tickets
+  document.querySelectorAll(".ticket-quantity").forEach((input) => {
+    const qty = parseInt(input.value);
+    if (qty > 0) {
+      const name = input.closest(".ticket-section").querySelector("h5").innerText.split(" (")[0];
+      const priceText = input.closest(".ticket-section").querySelector("h5").innerText.split("RM ")[1];
+      const price = priceText ? parseFloat(priceText) : 0;
+      const total = qty * price;
+      grandTotal += total;
+      
+      const dateVal = document.getElementById(`visit-date-${input.dataset.ticketTypeId}`).value;
+      
+      items.push({
+        ticket_type_id: input.dataset.ticketTypeId,
+        quantity: qty,
+        visit_date: dateVal
+      });
+
+      summaryHtml += `
+        <div class="d-flex justify-content-between mb-2">
+            <span>${qty}x ${name} <small class="text-muted">(${dateVal})</small></span>
+            <span>RM ${total.toFixed(2)}</span>
+        </div>`;
+    }
+  });
+
+  // Merchandise (Same logic)
+  document.querySelectorAll(".merchandise-quantity").forEach((input) => {
+    const qty = parseInt(input.value);
+    if (qty > 0) {
+      const name = input.closest(".merchandise-section").querySelector("h5").innerText.split(" (")[0];
+      const priceText = input.closest(".merchandise-section").querySelector("h5").innerText.split("RM ")[1];
+      const price = priceText ? parseFloat(priceText) : 0;
+      const total = qty * price;
+      grandTotal += total;
+
+      items.push({
+        merchandise_id: input.dataset.merchandiseId,
+        quantity: qty
+      });
+
+      summaryHtml += `
+        <div class="d-flex justify-content-between mb-2">
+            <span>${qty}x ${name}</span>
+            <span>RM ${total.toFixed(2)}</span>
+        </div>`;
+    }
+  });
+
+  if (items.length === 0) {
+    showAlert("Please select at least one item.", "warning");
+    return;
+  }
+
+  // 2. Populate Modal
+  document.getElementById("summary-items-list").innerHTML = summaryHtml;
+  document.getElementById("summary-total").innerText = `RM ${grandTotal.toFixed(2)}`;
+  
+  // Store payload for the actual send
+  currentOrderPayload = { items: items };
+
+  // 3. Show Modal
+  const modal = new bootstrap.Modal(document.getElementById('orderSummaryModal'));
+  modal.show();
+}
+
 async function loadParkDetail() {
   const pathParts = window.location.pathname.split("/");
   const parkId = pathParts[pathParts.length - 1];
@@ -1427,184 +1547,6 @@ async function loadParkDetail() {
     }
   } catch (error) {
     parkDetailContainer.innerHTML = `<div class="alert alert-danger alert">${error.message}</div>`;
-  }
-}
-
-async function handleOrderSubmit(event) {
-  event.preventDefault();
-  const token = getToken();
-  if (!token) {
-    showAlert("You must be logged in to place an order.", "warning");
-    return;
-  }
-
-  const items = [];
-  const ticketQuantityInputs = document.querySelectorAll(".ticket-quantity");
-  let validationFailed = false;
-
-  ticketQuantityInputs.forEach((input) => {
-    if (validationFailed) return;
-    const quantity = parseInt(input.value, 10);
-    if (quantity > 0) {
-      const ticketTypeId = input.dataset.ticketTypeId;
-      const visitDateInput = document.getElementById(
-        `visit-date-${ticketTypeId}`
-      );
-      const visitDate = visitDateInput.value;
-
-      if (!visitDate) {
-        const ticketName = input.closest(".ticket-section").querySelector("h5").textContent;
-        showAlert(`Please select a visit date for: ${ticketName}`, "warning");
-        validationFailed = true;
-        return;
-      }
-
-      items.push({
-        ticket_type_id: ticketTypeId,
-        quantity: quantity,
-        visit_date: visitDate,
-      });
-    }
-  });
-
-  if (validationFailed) return;
-
-  const merchandiseQuantityInputs = document.querySelectorAll(
-    ".merchandise-quantity"
-  );
-  merchandiseQuantityInputs.forEach((input) => {
-    if (validationFailed) return;
-    const quantity = parseInt(input.value, 10);
-    if (quantity > 0) {
-      const maxStock = parseInt(input.getAttribute("max"), 10);
-      if (quantity > maxStock) {
-        const merchName = input.closest(".merchandise-section").querySelector("h5").textContent;
-        showAlert(
-          `Quantity for ${merchName} exceeds available stock (${maxStock}).`,
-          "warning"
-        );
-        validationFailed = true;
-        return;
-      }
-      const merchandiseId = input.dataset.merchandiseId;
-      items.push({
-        merchandise_id: merchandiseId,
-        quantity: quantity,
-      });
-    }
-  });
-
-  if (validationFailed) return;
-
-  if (items.length === 0) {
-    showAlert("Please select at least one item to order.", "warning");
-    return;
-  }
-
-  const orderData = { items: items };
-
-  try {
-    const response = await fetch("/api/orders/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(orderData),
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.detail || "Failed to place order.");
-    }
-
-    showAlert(
-      "Order placed successfully! You will be redirected to your profile.",
-      "success"
-    );
-    setTimeout(() => {
-      window.location.href = "/profile";
-    }, 2000);
-  } catch (error) {
-    showAlert(error.message, "danger");
-  }
-}
-
-async function loadAdminDashboard() {
-  const token = getToken();
-  if (!token) {
-    window.location.href = "/login";
-    return;
-  }
-
-  const statsContainer = document.getElementById("statistics-container");
-
-  try {
-    const response = await fetch("/api/admin/statistics/visitors/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (response.status === 403) {
-      throw new Error("You do not have permission to view this page.");
-    }
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.detail || "Failed to fetch visitor statistics.");
-    }
-
-    const stats = await response.json();
-
-    if (stats.revenue_by_park.length === 0) {
-      statsContainer.innerHTML = `
-        <h5>Overall Summary</h5>
-        <p><strong>Total Revenue:</strong> RM 0.00</p>
-        <p><strong>Total Tickets Sold:</strong> 0</p>
-        <p><strong>Total Merchandise Sold:</strong> 0</p>
-        <hr>
-        <p>No park data available to generate statistics.</p>
-      `;
-      return;
-    }
-
-    const parkStatsHtml = stats.revenue_by_park
-      .map(
-        (p) => `
-        <tr>
-            <td>${p.park_name}</td>
-            <td>${p.tickets_sold}</td>
-            <td>${p.merchandise_items_sold}</td>
-            <td>RM ${p.total_revenue.toFixed(2)}</td>
-        </tr>
-    `
-      )
-      .join("");
-
-    statsContainer.innerHTML = `
-        <h5>Overall Summary</h5>
-        <p><strong>Total Revenue:</strong> RM ${stats.total_revenue.toFixed(2)}</p>
-        <p><strong>Total Tickets Sold:</strong> ${stats.total_tickets_sold}</p>
-        <p><strong>Total Merchandise Sold:</strong> ${
-          stats.total_merchandise_items_sold
-        }</p>
-        <hr>
-        <h5>Revenue by Park</h5>
-        <table class="table table">
-            <thead>
-                <tr>
-                    <th>Park</th>
-                    <th>Tickets Sold</th>
-                    <th>Merchandise Sold</th>
-                    <th>Total Revenue</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${parkStatsHtml}
-            </tbody>
-        </table>
-    `;
-  } catch (error) {
-    statsContainer.innerHTML = ""; // Clear the "Loading..." message
-    showAlert(error.message, "danger");
   }
 }
 

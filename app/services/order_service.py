@@ -85,7 +85,7 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
         order_data = {
             "customer_id": str(customer_id),
             "total_amount": total_amount,
-            "status": "pending",
+            "status": "paid",
         }
         order_response = db.table("orders").insert(order_data).execute()
         created_order = order_response.data[0]
