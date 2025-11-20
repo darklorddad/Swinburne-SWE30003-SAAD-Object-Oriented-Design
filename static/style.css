@@ -77,32 +77,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Custom Scrollbar */
-/* Webkit browsers (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    width: 12px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(45, 80, 22, 0.1);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
-    border-radius: 10px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #3d6b1f 0%, #4a7c2a 100%);
-}
-
-/* Firefox */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: #2d5016 rgba(45, 80, 22, 0.1);
-}
 
 body::before {
     content: '';
@@ -594,13 +568,14 @@ body:not(:has(.hero)) .navbar {
 }
 
 .footer {
-    background: #1a2e0d !important;
+    background: #000000 !important;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-    border-top: 3px solid rgba(45, 80, 22, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: #ffffff;
     margin-top: 0;
     position: relative;
     overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
 }
 
 .footer-content {
@@ -680,7 +655,7 @@ body:not(:has(.hero)) .navbar {
     z-index: 1;
     padding: 1.5rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(10, 26, 10, 0.5);
+    background: #000000;
 }
 
 .footer-bottom p {
