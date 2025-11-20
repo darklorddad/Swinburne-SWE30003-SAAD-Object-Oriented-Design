@@ -2064,5 +2064,21 @@ body:not(:has(.hero)) .navbar {
 }
 
 .qr-placeholder img {
-    display: block; 
+    display: block; /* Fixes small gap below image */
+}
+
+/* Toast Notification Styling */
+.toast-container {
+    pointer-events: none; /* Let clicks pass through the container area */
+}
+
+.toast {
+    pointer-events: auto; /* Re-enable clicks on the actual message */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.toast-body {
+    font-weight: 500;
 }

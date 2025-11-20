@@ -956,19 +956,66 @@ function handleLogout() {
   window.location.href = "/login";
 }
 
-function showAlert(message, type = "info") {
-  const placeholder = document.getElementById("alert-placeholder");
-  if (!placeholder) return;
+/**
+ * NEW: Displays a floating Toast notification
+ * Replaces the old static alert system.
+ */
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) {
+    console.warn("Toast container not found. Alerting in console instead:", message);
+    return;
+  }
+  
+  let bgClass = "text-white bg-" + type;
+  if (type === 'warning') {
+    bgClass = "text-dark bg-warning"; // Use dark text for better contrast on yellow
+  }
+  let icon = "";
 
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible alert" role="alert">
-            <div>${message}</div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  // Add a little icon based on type for polish
+  if (type === "success") icon = "✅ ";
+  if (type === "danger") icon = "⚠️ ";
+  if (type === "warning") icon = "✋ ";
+  if (type === "info") icon = "ℹ️ ";
+
+  const toastHtml = `
+    <div class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" style="font-size: 1rem;">
+          ${icon}${message}
         </div>
-    `;
-  placeholder.innerHTML = "";
-  placeholder.append(wrapper);
+        <button type="button" class="btn-close ${type === 'warning' ? '' : 'btn-close-white'} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+
+  // Append to container
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = toastHtml;
+  const toastElement = wrapper.firstElementChild;
+  container.appendChild(toastElement);
+
+  // Initialize Bootstrap Toast
+  const toast = new bootstrap.Toast(toastElement, {
+    delay: 5000, // Disappear after 5 seconds
+    animation: true
+  });
+
+  toast.show();
+
+  // Cleanup DOM after it hides
+  toastElement.addEventListener('hidden.bs.toast', () => {
+    toastElement.remove();
+  });
+}
+
+/**
+ * OVERRIDE: Update the existing showAlert to use Toasts instead.
+ * This ensures all your previous code uses the new system automatically.
+ */
+function showAlert(message, type = "info") {
+    showToast(message, type);
 }
 
 function showBottomRightNotification(message, type = "success") {
@@ -1406,7 +1453,7 @@ async function handleOrderSubmit(event) {
       const visitDate = visitDateInput.value;
 
       if (!visitDate) {
-        const ticketName = input.closest(".border").querySelector("h5").textContent;
+        const ticketName = input.closest(".ticket-section").querySelector("h5").textContent;
         showAlert(`Please select a visit date for: ${ticketName}`, "warning");
         validationFailed = true;
         return;
@@ -1431,7 +1478,7 @@ async function handleOrderSubmit(event) {
     if (quantity > 0) {
       const maxStock = parseInt(input.getAttribute("max"), 10);
       if (quantity > maxStock) {
-        const merchName = input.closest(".border").querySelector("h5").textContent;
+        const merchName = input.closest(".merchandise-section").querySelector("h5").textContent;
         showAlert(
           `Quantity for ${merchName} exceeds available stock (${maxStock}).`,
           "warning"
