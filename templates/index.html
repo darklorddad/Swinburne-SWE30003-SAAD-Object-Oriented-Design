@@ -1,247 +1,240 @@
 {% extends "base.html" %}
 
+{% block head_extra %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    serif: ['"Playfair Display"', 'serif'],
+                    sans: ['"Montserrat"', 'sans-serif'],
+                },
+                colors: {
+                    'forest': '#1a2e1a',
+                    'earth': '#8c6239',
+                    'sand': '#e6dcc8',
+                    'mist': 'rgba(255, 255, 255, 0.1)',
+                },
+                letterSpacing: {
+                    'widest-xl': '0.25em',
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}
+
+{% block body_class %}bg-black text-white antialiased overflow-hidden{% endblock %}
+
+{% block navbar %}
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 glass-nav px-8 py-6 flex justify-between items-center">
+    <div class="text-2xl font-serif font-bold tracking-widest text-white cursor-pointer">
+        SARAWAK<span class="text-green-500">.</span>
+    </div>
+    
+    <div class="hidden md:flex space-x-8 text-sm font-sans tracking-widest uppercase text-gray-300 items-center">
+        <a href="#home" class="hover:text-white transition-colors no-underline">Home</a>
+        <a href="#bako" class="hover:text-white transition-colors no-underline">Bako</a>
+        <a href="#mulu" class="hover:text-white transition-colors no-underline">Mulu</a>
+        <a href="#niah" class="hover:text-white transition-colors no-underline">Niah</a>
+        <a href="#parks-grid" class="hover:text-white transition-colors no-underline">All Parks</a>
+        
+        <!-- Auth Links -->
+        <div id="auth-links" class="flex space-x-6 border-l border-gray-500 pl-6">
+            <a href="/login" class="hover:text-white transition-colors no-underline">Login</a>
+            <a href="/register" class="hover:text-white transition-colors border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 no-underline">Register</a>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Icon -->
+    <div class="md:hidden text-white text-xl cursor-pointer">
+        <i class="fas fa-bars"></i>
+    </div>
+</nav>
+{% endblock %}
+
+{% block main_class %}p-0 m-0 w-full{% endblock %}
+{% block footer %}{% endblock %}
+
 {% block content %}
-<div class="hero-wrapper">
-<div class="hero">
-    <video class="hero-video" autoplay muted loop playsinline>
-        <source src="/assets/video2.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <div class="hero-overlay"></div>
-    <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">Welcome to the National Parks Online System</h1>
-        <p class="col-md-8 fs-4">
-            Your one-stop solution for booking tickets to Sarawak's beautiful national parks.
-            Browse our parks below and start your adventure!
-        </p>
-        <div class="mt-4 mb-4">
-            <a href="#parks-container" class="btn btn-lg hero-cta-btn">Book Your Tickets Now!</a>
-        </div>
-        <div class="hero-arrow">
-            <span class="material-symbols-outlined">keyboard_double_arrow_down</span>
-        </div>
-    </div>
+<!-- Progress Dots -->
+<div class="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 flex flex-col space-y-4 hidden md:flex">
+    <div class="dot w-2 h-2 bg-white rounded-full opacity-100 transition-all duration-300 cursor-pointer" data-target="home"></div>
+    <div class="dot w-2 h-2 bg-white rounded-full opacity-40 transition-all duration-300 hover:opacity-80 cursor-pointer" data-target="bako"></div>
+    <div class="dot w-2 h-2 bg-white rounded-full opacity-40 transition-all duration-300 hover:opacity-80 cursor-pointer" data-target="mulu"></div>
+    <div class="dot w-2 h-2 bg-white rounded-full opacity-40 transition-all duration-300 hover:opacity-80 cursor-pointer" data-target="niah"></div>
+    <div class="dot w-2 h-2 bg-white rounded-full opacity-40 transition-all duration-300 hover:opacity-80 cursor-pointer" data-target="parks-grid"></div>
 </div>
 
-<!-- Quick Visitor Essentials Section -->
-<div class="essentials-section">
-    <h2 class="section-title text-center">Quick Visitor Essentials</h2>
-    <div class="row">
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <div class="essential-item">
-                <div class="essential-icon">🕐</div>
-                <h6 class="essential-title">Opening Hours</h6>
-                <p class="essential-text">Daily: 8:00 AM - 6:00 PM</p>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <div class="essential-item">
-                <div class="essential-icon">💰</div>
-                <h6 class="essential-title">Entrance Fees</h6>
-                <p class="essential-text">From RM 10 per person</p>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <div class="essential-item">
-                <div class="essential-icon">🌤️</div>
-                <h6 class="essential-title">Weather Info</h6>
-                <p class="essential-text">Tropical climate year-round</p>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <div class="essential-item">
-                <div class="essential-icon">🗺️</div>
-                <h6 class="essential-title">Directions</h6>
-                <p class="essential-text">Easy access from Kuching</p>
-            </div>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <div class="essential-item">
-                <div class="essential-icon">📍</div>
-                <h6 class="essential-title">Park Map</h6>
-                <p class="essential-text">Download or view online</p>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Scroll Container -->
+<div class="snap-container" id="scroller">
 
-<!-- News Section -->
-<div class="news-section">
-    <h2 class="section-title text-center">Latest News & Updates</h2>
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card news-card">
-                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2070" class="card-img-top" alt="New Trail Opening">
-                <div class="card-body">
-                    <div class="news-date">March 15, 2025</div>
-                    <h5 class="card-title">New Hiking Trail Opens in Bako National Park</h5>
-                    <p class="card-text">We're excited to announce the opening of a new 5km hiking trail that offers stunning views of the coastline and diverse wildlife. The trail is suitable for all fitness levels.</p>
+    <!-- Section 1: Hero -->
+    <section id="home" class="snap-section flex items-center justify-center">
+        <div class="absolute inset-0 z-0">
+            <video class="w-full h-full object-cover scale-bg" autoplay muted loop playsinline>
+                <source src="/assets/video2.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-black/40"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-4">
+            <p class="reveal-text font-sans text-sm md:text-base tracking-widest-xl uppercase mb-4 text-gray-300">Welcome to Sarawak</p>
+            <h1 class="reveal-text font-serif text-6xl md:text-9xl font-bold mb-6 leading-tight">
+                Wilderness<br>Awaits
+            </h1>
+            <div class="reveal-text mt-8">
+                <button onclick="document.getElementById('bako').scrollIntoView({behavior: 'smooth'})" class="explore-btn relative overflow-hidden border border-white px-10 py-4 text-sm font-sans tracking-widest uppercase transition-colors duration-300 text-white hover:text-black hover:bg-white">
+                    Explore The Parks
+                </button>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 w-full text-center animate-bounce z-20">
+            <i class="fas fa-chevron-down text-white/50 text-xl"></i>
+        </div>
+    </section>
+
+    <!-- Section 2: Bako -->
+    <section id="bako" class="snap-section flex items-center">
+        <div class="absolute inset-0 z-0">
+            <img src="/assets/bako.jpg" 
+                 class="w-full h-full object-cover scale-bg" alt="Bako National Park">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent"></div>
+        </div>
+        
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12">
+            <div class="text-left">
+                <div class="reveal-text flex items-center space-x-4 mb-6 text-green-400">
+                    <span class="h-px w-12 bg-green-400"></span>
+                    <span class="uppercase tracking-widest text-sm font-bold">Coastal Rainforest</span>
+                </div>
+                <h2 class="reveal-text font-serif text-5xl md:text-7xl mb-8 leading-tight">
+                    Bako<br>National Park
+                </h2>
+                <p class="reveal-text font-sans text-gray-300 text-lg max-w-md leading-relaxed mb-8">
+                    Sarawak's oldest national park. Home to the proboscis monkey, bearded pigs, and diverse vegetation from mangroves to kerangas forest.
+                </p>
+                <div class="reveal-text flex space-x-8 text-white/80 font-sans text-sm">
+                    <div class="flex flex-col">
+                        <span class="text-3xl font-serif text-white">1957</span>
+                        <span>Established</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-3xl font-serif text-white">27</span>
+                        <span>sq km</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card news-card">
-                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070" class="card-img-top" alt="Wildlife Conservation">
-                <div class="card-body">
-                    <div class="news-date">March 10, 2025</div>
-                    <h5 class="card-title">Wildlife Conservation Program Launched</h5>
-                    <p class="card-text">Our new conservation initiative aims to protect endangered species in Sarawak's national parks. Visitors can now participate in guided wildlife observation tours.</p>
+    </section>
+
+    <!-- Section 3: Mulu -->
+    <section id="mulu" class="snap-section flex items-center justify-end">
+        <div class="absolute inset-0 z-0">
+            <img src="/assets/mulu.jpg" 
+                 class="w-full h-full object-cover scale-bg" alt="Mulu National Park">
+            <div class="absolute inset-0 bg-gradient-to-l from-black/80 via-black/20 to-transparent"></div>
+        </div>
+        
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 grid md:grid-cols-2 gap-12">
+            <div class="hidden md:block"></div>
+            
+            <div class="text-right md:pl-20">
+                <div class="reveal-text flex items-center justify-end space-x-4 mb-6 text-orange-400">
+                    <span class="uppercase tracking-widest text-sm font-bold">UNESCO World Heritage</span>
+                    <span class="h-px w-12 bg-orange-400"></span>
+                </div>
+                <h2 class="reveal-text font-serif text-5xl md:text-7xl mb-8 leading-tight">
+                    Gunung Mulu<br>National Park
+                </h2>
+                <p class="reveal-text font-sans text-gray-300 text-lg ml-auto max-w-md leading-relaxed mb-8">
+                    Famous for its limestone karst formations, vast cave systems, and the spectacular bat exodus. A true wonder of the natural world.
+                </p>
+                <button onclick="window.location.href='/parks/search?q=mulu'" class="reveal-text glass-panel px-8 py-4 rounded-full text-sm uppercase tracking-widest hover:bg-orange-500/20 transition duration-300 text-white">
+                    View Details <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Niah -->
+    <section id="niah" class="snap-section flex items-center justify-center">
+        <div class="absolute inset-0 z-0">
+            <img src="/assets/niah.jpg" 
+                 class="w-full h-full object-cover scale-bg" alt="Niah National Park">
+            <div class="absolute inset-0 bg-black/40"></div>
+        </div>
+
+        <div class="container mx-auto px-6 z-10 text-center">
+            <div class="reveal-text mb-8">
+                <h2 class="font-serif text-5xl md:text-7xl mb-4">Niah National Park</h2>
+                <p class="font-sans text-xl text-gray-300">The birthplace of civilization in Southeast Asia</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Card 1 -->
+                <div class="reveal-text glass-panel p-8 rounded-xl transform transition hover:-translate-y-2 duration-300 text-left">
+                    <div class="text-4xl text-cyan-300 mb-4"><i class="fas fa-landmark"></i></div>
+                    <h3 class="font-serif text-2xl mb-3">Archaeology</h3>
+                    <p class="font-sans text-sm text-gray-300 leading-relaxed">
+                        Site of the oldest modern human remains discovered in Southeast Asia, dating back 40,000 years.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="reveal-text glass-panel p-8 rounded-xl transform transition hover:-translate-y-2 duration-300 text-left" style="transition-delay: 100ms;">
+                    <div class="text-4xl text-cyan-300 mb-4"><i class="fas fa-mountain"></i></div>
+                    <h3 class="font-serif text-2xl mb-3">Great Cave</h3>
+                    <p class="font-sans text-sm text-gray-300 leading-relaxed">
+                        One of the largest cave entrances in the world, housing swiftlets and bats.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="reveal-text glass-panel p-8 rounded-xl transform transition hover:-translate-y-2 duration-300 text-left" style="transition-delay: 200ms;">
+                    <div class="text-4xl text-cyan-300 mb-4"><i class="fas fa-hiking"></i></div>
+                    <h3 class="font-serif text-2xl mb-3">Jungle Trails</h3>
+                    <p class="font-sans text-sm text-gray-300 leading-relaxed">
+                        Walk through lowland forest on raised plank walks to reach the caves.
+                    </p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card news-card">
-                <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2070" class="card-img-top" alt="Seasonal Events">
-                <div class="card-body">
-                    <div class="news-date">March 5, 2025</div>
-                    <h5 class="card-title">Spring Nature Festival Coming Soon</h5>
-                    <p class="card-text">Join us for our annual Spring Nature Festival featuring guided tours, photography workshops, and special events for families. Book your tickets early!</p>
+    </section>
+
+    <!-- Section 5: All Parks Grid -->
+    <section id="parks-grid" class="snap-section flex flex-col bg-zinc-900 relative overflow-hidden">
+         <div class="absolute inset-0 z-0 opacity-20">
+            <img src="https://images.unsplash.com/photo-1519681393784-d8e5b56524dd?q=80&w=2600&auto=format&fit=crop" 
+                 class="w-full h-full object-cover grayscale" alt="Stars">
+        </div>
+
+        <div class="relative z-10 w-full h-full flex flex-col pt-24 px-6 md:px-12">
+            <div class="flex justify-between items-end mb-8 border-b border-gray-700 pb-4">
+                <div>
+                    <h2 class="font-serif text-4xl md:text-5xl mb-2">Explore All Parks</h2>
+                    <p class="font-sans text-gray-400">Find your next adventure</p>
+                </div>
+                <div class="w-1/3">
+                    <input type="text" id="search-input" placeholder="Search parks..." class="w-full bg-white/10 border border-white/20 rounded-full px-6 py-3 text-white focus:outline-none focus:border-white transition">
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Nature Fun Facts Section -->
-<div class="funfacts-section">
-    <h2 class="section-title text-center">Amazing Nature Facts</h2>
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="funfact-card">
-                <div class="funfact-icon">🌳</div>
-                <h5 class="funfact-title">Ancient Forests</h5>
-                <p class="funfact-text">Sarawak's rainforests are over 130 million years old, making them some of the oldest in the world!</p>
+            <div class="flex-grow overflow-y-auto custom-scrollbar pb-12">
+                <div id="parks-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Parks loaded via JS -->
+                    <p class="text-white">Loading parks...</p>
+                </div>
+            </div>
+            
+            <div class="py-6 text-center text-gray-500 text-xs font-sans border-t border-gray-800">
+                © 2025 Sarawak National Parks. All Rights Reserved.
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="funfact-card">
-                <div class="funfact-icon">🦋</div>
-                <h5 class="funfact-title">Biodiversity Hotspot</h5>
-                <p class="funfact-text">Our parks are home to over 8,000 species of flowering plants and countless unique animal species.</p>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="funfact-card">
-                <div class="funfact-icon">🌿</div>
-                <h5 class="funfact-title">Carbon Sink</h5>
-                <p class="funfact-text">These forests absorb millions of tons of CO2 annually, playing a crucial role in climate regulation.</p>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="funfact-card">
-                <div class="funfact-icon">🌊</div>
-                <h5 class="funfact-title">Water Source</h5>
-                <p class="funfact-text">The parks protect vital watersheds that supply clean water to thousands of communities.</p>
-            </div>
-        </div>
-    </div>
-</div>
+    </section>
 
-<!-- Activities Section -->
-<div class="activities-section">
-    <h2 class="section-title text-center">Activities Visitors Can Do</h2>
-    <div class="row">
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <a href="#" class="activity-item">
-                <div class="activity-icon">🥾</div>
-                <h6 class="activity-title">Hiking</h6>
-            </a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <a href="#" class="activity-item">
-                <div class="activity-icon">⛺</div>
-                <h6 class="activity-title">Camping</h6>
-            </a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <a href="#" class="activity-item">
-                <div class="activity-icon">🦅</div>
-                <h6 class="activity-title">Wildlife Watching</h6>
-            </a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <a href="#" class="activity-item">
-                <div class="activity-icon">🚴</div>
-                <h6 class="activity-title">Cycling</h6>
-            </a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <a href="#" class="activity-item">
-                <div class="activity-icon">🚣</div>
-                <h6 class="activity-title">Boating</h6>
-            </a>
-        </div>
-        <div class="col-md-2 col-sm-4 col-6 mb-4">
-            <a href="#" class="activity-item">
-                <div class="activity-icon">👥</div>
-                <h6 class="activity-title">Guided Tours</h6>
-            </a>
-        </div>
-    </div>
-</div>
-
-<div class="section-header-wrapper">
-    <div class="section-header">
-        <h2>Our Parks</h2>
-        <form class="d-flex" id="search-form" onsubmit="return false;">
-            <input class="form-control me-2 search-input" type="search" id="search-input" placeholder="Search parks..." aria-label="Search">
-        </form>
-    </div>
-</div>
-<div id="parks-container" class="row">
-    <!-- Parks will be loaded here by JavaScript -->
-    <p>Loading parks...</p>
-</div>
-
-<!-- Plan Your Visit Section -->
-<div class="plan-section">
-    <h2 class="section-title text-center">Plan Your Visit</h2>
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="plan-card">
-                <div class="plan-icon">📅</div>
-                <h5 class="plan-title">Itineraries</h5>
-                <ul class="plan-list">
-                    <li>1 Day Adventure</li>
-                    <li>Weekend Getaway</li>
-                    <li>Family-Friendly</li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="plan-card">
-                <div class="plan-icon">🚗</div>
-                <h5 class="plan-title">Transportation</h5>
-                <ul class="plan-list">
-                    <li>Public Transport</li>
-                    <li>Private Vehicles</li>
-                    <li>Guided Tours</li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="plan-card">
-                <div class="plan-icon">🎒</div>
-                <h5 class="plan-title">What to Pack</h5>
-                <ul class="plan-list">
-                    <li>Comfortable Shoes</li>
-                    <li>Water Bottle</li>
-                    <li>Sun Protection</li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="plan-card">
-                <div class="plan-icon">♿</div>
-                <h5 class="plan-title">Accessibility</h5>
-                <ul class="plan-list">
-                    <li>Wheelchair Access</li>
-                    <li>Accessible Facilities</li>
-                    <li>Special Assistance</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
 </div>
 {% endblock %}
