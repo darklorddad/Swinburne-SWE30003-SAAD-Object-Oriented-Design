@@ -1,55 +1,54 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Admin Dashboard</h2>
+<div class="admin-wrapper">
+<h2 class="page-title">Admin Dashboard</h2>
 <div id="alert-placeholder"></div>
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
+        <div class="card admin-card">
+            <div class="card-header card-header">
                 Visitor Statistics
             </div>
-            <div class="card-body" id="statistics-container">
-                <p>Loading statistics...</p>
+            <div class="card-body card-body" id="statistics-container">
+                <p class="loading">Loading statistics...</p>
             </div>
         </div>
     </div>
 </div>
 
-<hr class="my-4">
-
-<div class="row">
+<div class="row mt-4">
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
+        <div class="card admin-card">
+            <div class="card-header card-header">
                 Manage Parks
             </div>
-            <div class="card-body" id="parks-management-container">
-                <p>Loading parks...</p>
+            <div class="card-body card-body" id="parks-management-container">
+                <p class="loading">Loading parks...</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+        <div class="card admin-card">
+            <div class="card-header card-header">
                 Add New Park
             </div>
-            <div class="card-body">
+            <div class="card-body card-body">
                 <form id="create-park-form">
                     <div class="mb-3">
-                        <label for="park-name" class="form-label">Park Name</label>
-                        <input type="text" class="form-control" id="park-name" required>
+                        <label for="park-name" class="form-label form-label">Park Name</label>
+                        <input type="text" class="form-control form-control" id="park-name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="park-location" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="park-location">
+                        <label for="park-location" class="form-label form-label">Location</label>
+                        <input type="text" class="form-control form-control" id="park-location">
                     </div>
                     <div class="mb-3">
-                        <label for="park-description" class="form-label">Description</label>
-                        <textarea class="form-control" id="park-description" rows="3"></textarea>
+                        <label for="park-description" class="form-label form-label">Description</label>
+                        <textarea class="form-control form-control" id="park-description" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Create Park</button>
+                    <button type="submit" class="btn btn-primary btn-primary w-100">Create Park</button>
                 </form>
             </div>
         </div>
@@ -59,31 +58,31 @@
 <!-- Modal for editing a park -->
 <div class="modal fade" id="editParkModal" tabindex="-1" aria-labelledby="editParkModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editParkModalLabel">Edit Park</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content modal-content">
+      <div class="modal-header modal-header">
+        <h5 class="modal-title modal-title" id="editParkModalLabel">Edit Park</h5>
+        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modal-body">
         <form id="edit-park-form">
           <input type="hidden" id="edit-park-id">
           <div class="mb-3">
-            <label for="edit-park-name" class="form-label">Park Name</label>
-            <input type="text" class="form-control" id="edit-park-name" required>
+            <label for="edit-park-name" class="form-label form-label">Park Name</label>
+            <input type="text" class="form-control form-control" id="edit-park-name" required>
           </div>
           <div class="mb-3">
-            <label for="edit-park-location" class="form-label">Location</label>
-            <input type="text" class="form-control" id="edit-park-location">
+            <label for="edit-park-location" class="form-label form-label">Location</label>
+            <input type="text" class="form-control form-control" id="edit-park-location">
           </div>
           <div class="mb-3">
-            <label for="edit-park-description" class="form-label">Description</label>
-            <textarea class="form-control" id="edit-park-description" rows="3"></textarea>
+            <label for="edit-park-description" class="form-label form-label">Description</label>
+            <textarea class="form-control form-control" id="edit-park-description" rows="3"></textarea>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="save-park-changes-btn">Save changes</button>
+      <div class="modal-footer modal-footer">
+        <button type="button" class="btn btn-secondary btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-primary" id="save-park-changes-btn">Save changes</button>
       </div>
     </div>
   </div>
@@ -92,28 +91,28 @@
 <!-- Modal for adding/editing a ticket type -->
 <div class="modal fade" id="ticketTypeModal" tabindex="-1" aria-labelledby="ticketTypeModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ticketTypeModalLabel">Add/Edit Ticket Type</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content modal-content">
+      <div class="modal-header modal-header">
+        <h5 class="modal-title modal-title" id="ticketTypeModalLabel">Add/Edit Ticket Type</h5>
+        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modal-body">
         <form id="ticket-type-form">
           <input type="hidden" id="tt-park-id">
           <input type="hidden" id="tt-id">
           <div class="mb-3">
-            <label for="tt-name" class="form-label">Ticket Type Name</label>
-            <input type="text" class="form-control" id="tt-name" required>
+            <label for="tt-name" class="form-label form-label">Ticket Type Name</label>
+            <input type="text" class="form-control form-control" id="tt-name" required>
           </div>
           <div class="mb-3">
-            <label for="tt-price" class="form-label">Price (RM)</label>
-            <input type="number" class="form-control" id="tt-price" step="0.01" min="0" required>
+            <label for="tt-price" class="form-label form-label">Price (RM)</label>
+            <input type="number" class="form-control form-control" id="tt-price" step="0.01" min="0" required>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="save-tt-changes-btn">Save changes</button>
+      <div class="modal-footer modal-footer">
+        <button type="button" class="btn btn-secondary btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-primary" id="save-tt-changes-btn">Save changes</button>
       </div>
     </div>
   </div>
@@ -122,38 +121,39 @@
 <!-- Modal for adding/editing merchandise -->
 <div class="modal fade" id="merchandiseModal" tabindex="-1" aria-labelledby="merchandiseModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="merchandiseModalLabel">Add/Edit Merchandise</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content modal-content">
+      <div class="modal-header modal-header">
+        <h5 class="modal-title modal-title" id="merchandiseModalLabel">Add/Edit Merchandise</h5>
+        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body modal-body">
         <form id="merchandise-form">
           <input type="hidden" id="merch-park-id">
           <input type="hidden" id="merch-id">
           <div class="mb-3">
-            <label for="merch-name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="merch-name" required>
+            <label for="merch-name" class="form-label form-label">Name</label>
+            <input type="text" class="form-control form-control" id="merch-name" required>
           </div>
           <div class="mb-3">
-            <label for="merch-description" class="form-label">Description</label>
-            <textarea class="form-control" id="merch-description" rows="2"></textarea>
+            <label for="merch-description" class="form-label form-label">Description</label>
+            <textarea class="form-control form-control" id="merch-description" rows="2"></textarea>
           </div>
           <div class="mb-3">
-            <label for="merch-price" class="form-label">Price (RM)</label>
-            <input type="number" class="form-control" id="merch-price" step="0.01" min="0" required>
+            <label for="merch-price" class="form-label form-label">Price (RM)</label>
+            <input type="number" class="form-control form-control" id="merch-price" step="0.01" min="0" required>
           </div>
           <div class="mb-3">
-            <label for="merch-stock" class="form-label">Stock</label>
-            <input type="number" class="form-control" id="merch-stock" min="0" required>
+            <label for="merch-stock" class="form-label form-label">Stock</label>
+            <input type="number" class="form-control form-control" id="merch-stock" min="0" required>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="save-merch-changes-btn">Save changes</button>
+      <div class="modal-footer modal-footer">
+        <button type="button" class="btn btn-secondary btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-primary" id="save-merch-changes-btn">Save changes</button>
       </div>
     </div>
   </div>
+</div>
 </div>
 {% endblock %}

@@ -1,12 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="alert-placeholder"></div>
-<div id="park-detail-container">
-    <p>Loading park details...</p>
+<div class="park-detail-wrapper">
+    <div id="alert-placeholder"></div>
+    <div id="park-detail-container" class="park-detail-container">
+        <p class="loading">Loading park details...</p>
+    </div>
+    
+    <div id="order-form-container" class="order-form-container mt-4">
+        <!-- Order form will be built here by JS -->
+    </div>
 </div>
 
-<div id="order-form-container" class="mt-4">
-    <!-- Order form will be built here by JS -->
+{% block modals %}
+<div class="modal fade" id="orderSummaryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Confirm Your Order</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="fw-bold" id="summary-park-name">Park Name</h6>
+        <hr>
+        <div id="summary-items-list">
+
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold">Total Amount:</span>
+            <span class="fs-4 fw-bold text-success" id="summary-total">RM 0.00</span>
+        </div>
+        <div class="alert alert-info mt-3 mb-0 py-2" style="font-size: 0.9rem;">
+            <i class="bi bi-info-circle"></i> Payment will be simulated immediately.
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <div class="col">
+            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Edit</button>
+        </div>
+        <div class="col">
+            <button type="button" class="btn btn-success w-100" id="btn-confirm-payment">
+                Confirm & Pay
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+{% endblock %}
 {% endblock %}

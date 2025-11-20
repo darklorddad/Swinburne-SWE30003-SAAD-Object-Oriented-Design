@@ -12,6 +12,9 @@ app = FastAPI(title="SWE30003 - Assignment 3")
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Mount assets folder for park images
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+
 # Setup templates
 templates = Jinja2Templates(directory="templates")
 

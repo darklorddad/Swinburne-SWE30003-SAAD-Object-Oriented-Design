@@ -8,6 +8,7 @@ from supabase import Client
 
 from app.models.merchandise import Merchandise
 from app.models.order import Order, OrderCreate, OrderItem
+from datetime import date
 
 
 async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> Order:
@@ -84,7 +85,7 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
         order_data = {
             "customer_id": str(customer_id),
             "total_amount": total_amount,
-            "status": "pending",
+            "status": "paid",
         }
         order_response = db.table("orders").insert(order_data).execute()
         created_order = order_response.data[0]
@@ -134,31 +135,33 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
 
 
 async def get_orders_for_customer(db: Client, customer_id: UUID) -> List[Order]:
-    """Fetches all orders for a specific customer."""
+    """Fetches all orders for a specific customer with full nested details."""
     response = (
         db.table("orders")
-        .select("*, order_items(*, ticket_types(name), merchandise(name))")
+        .select("*, order_items(*, ticket_types(*), merchandise(*))") 
         .eq("customer_id", str(customer_id))
         .order("created_at", desc=True)
         .execute()
     )
-    return [Order(**o) for o in response.data]
+    return [Order(**{**o, "items": o.get("order_items", [])}) for o in response.data]
 
 
 async def get_order_by_id(
     db: Client, order_id: UUID, customer_id: UUID
 ) -> Optional[Order]:
-    """Fetches a single order by its ID, ensuring it belongs to the customer."""
+    """Fetches a single order by its ID with full nested details."""
     response = (
         db.table("orders")
-        .select("*, order_items(*, ticket_types(name), merchandise(name))")
+        .select("*, order_items(*, ticket_types(*), merchandise(*))")
         .eq("id", str(order_id))
         .eq("customer_id", str(customer_id))
         .single()
         .execute()
     )
     if response.data:
-        return Order(**response.data)
+        data = response.data
+        data["items"] = data.get("order_items", [])
+        return Order(**data)
     return None
 
 
@@ -195,3 +198,70 @@ async def cancel_order(db: Client, order_id: UUID, customer_id: UUID) -> Order:
 
     order.status = response.data[0]["status"]
     return order
+
+
+async def reschedule_order(
+    db: Client, order_id: UUID, customer_id: UUID, new_date: date
+) -> Order:
+    """
+    Reschedules an order by updating the visit date of its items.
+
+    Raises:
+        ValueError: If order not found, belongs to another user, or is cancelled.
+    """
+    # 1. Verify the order exists and belongs to the user
+    order = await get_order_by_id(db, order_id, customer_id)
+    if not order:
+        raise ValueError("Order not found or you do not have permission to reschedule it")
+
+    # 2. Business Rule: Cannot reschedule cancelled orders
+    if order.status == "cancelled":
+        raise ValueError("Cannot reschedule a cancelled order")
+
+    # 3. Update the visit_date for all items in this order (only for tickets)
+    # Identify items that are tickets (have a ticket_type_id)
+    ticket_item_ids = [
+        str(item.id) 
+        for item in order.items 
+        if item.ticket_type_id is not None
+    ]
+    
+    if ticket_item_ids:
+        # Update the identified ticket items
+        db.table("order_items")\
+            .update({"visit_date": str(new_date)})\
+            .in_("id", ticket_item_ids)\
+            .execute()
+    
+    # 4. Return the updated order object
+    return await get_order_by_id(db, order_id, customer_id)
+
+
+async def process_refund(
+    db: Client, order_id: UUID, customer_id: UUID, reason: str
+) -> Order:
+    """
+    Processes a refund request: updates status to 'refunded' and saves the reason.
+    """
+    # 1. Verify order exists and belongs to user
+    order = await get_order_by_id(db, order_id, customer_id)
+    if not order:
+        raise ValueError("Order not found or permission denied")
+
+    # 2. Check if already refunded/cancelled
+    if order.status in ["cancelled", "refunded"]:
+        raise ValueError(f"Order is already {order.status}")
+
+    # 3. Update DB: Set status to 'refunded' and save reason
+    response = (
+        db.table("orders")
+        .update({
+            "status": "refunded",
+            "refund_reason": reason
+        })
+        .eq("id", str(order_id))
+        .execute()
+    )
+    
+    # 4. Return updated object
+    return await get_order_by_id(db, order_id, customer_id)

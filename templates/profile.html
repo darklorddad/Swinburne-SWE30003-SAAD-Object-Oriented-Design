@@ -1,27 +1,87 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>My Profile</h2>
+<div class="profile-wrapper">
+<h2 class="page-title">My Profile</h2>
 <div id="alert-placeholder"></div>
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">User Information</h5>
+<div class="card card mb-4">
+    <div class="card-header card-header">
+        <h5 class="mb-0">User Information</h5>
+    </div>
+    <div class="card-body card-body">
         <form id="profile-update-form">
             <div class="mb-3">
-                <label for="profile-full-name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="profile-full-name">
+                <label for="profile-full-name" class="form-label form-label">Full Name</label>
+                <input type="text" class="form-control form-control" id="profile-full-name">
             </div>
             <div class="mb-3">
-                <label for="profile-email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="profile-email" disabled>
+                <label for="profile-email" class="form-label form-label">Email</label>
+                <input type="email" class="form-control form-control" id="profile-email" disabled>
             </div>
-            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <button type="submit" class="btn btn-primary btn-primary">Update Profile</button>
         </form>
     </div>
 </div>
 
-<h3>My Orders</h3>
+<h3 class="section-title">My Orders</h3>
 <div id="orders-container">
-    <p>Loading orders...</p>
+    <div class="card card mb-4">
+        <div class="card-body card-body">
+            <p class="loading mb-0">Loading orders...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reschedule Booking</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reschedule-form">
+            <input type="hidden" id="reschedule-order-id">
+            <div class="mb-3">
+              <label for="new-visit-date" class="form-label">Select New Visit Date</label>
+              <input type="date" class="form-control" id="new-visit-date" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="confirm-reschedule-btn">Confirm Reschedule</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Request Refund</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Please tell us why you are requesting a refund (e.g., Weather, Change of plans).</p>
+        <form id="refund-form">
+          <input type="hidden" id="refund-order-id">
+          <div class="mb-3">
+            <label for="refund-reason" class="form-label">Reason</label>
+            <textarea class="form-control" id="refund-reason" rows="3" required></textarea>
+          </div>
+          <div id="refund-alert-placeholder"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" id="confirm-refund-btn">Confirm Refund</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 {% endblock %}

@@ -11,6 +11,7 @@ from app.api import deps
 from app.models.order import Order, OrderCreate
 from app.models.user import User
 from app.services import order_service
+from app.models.order import Order, OrderCreate, OrderReschedule, RefundRequest
 
 router = APIRouter()
 
@@ -83,6 +84,56 @@ async def cancel_user_order(
     try:
         order = await order_service.cancel_order(
             db, order_id=order_id, customer_id=current_user.id
+        )
+        return order
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.put("/{order_id}/reschedule", response_model=Order)
+async def reschedule_user_order(
+    order_id: UUID,
+    reschedule_in: OrderReschedule,
+    db: Client = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    """
+    Reschedule an existing order to a new date.
+    """
+    try:
+        order = await order_service.reschedule_order(
+            db, 
+            order_id=order_id, 
+            customer_id=current_user.id, 
+            new_date=reschedule_in.new_visit_date
+        )
+        return order
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.post("/{order_id}/refund", response_model=Order)
+async def refund_user_order(
+    order_id: UUID,
+    refund_in: RefundRequest,
+    db: Client = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+):
+    """
+    Request and process a refund for an order.
+    """
+    try:
+        order = await order_service.process_refund(
+            db, 
+            order_id=order_id, 
+            customer_id=current_user.id, 
+            reason=refund_in.reason
         )
         return order
     except ValueError as e:

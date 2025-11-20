@@ -190,6 +190,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target.id === "logout-btn") {
       handleLogout();
     }
+    if (event.target.id === "confirm-reschedule-btn") {
+      event.preventDefault(); // Prevent any default form submission
+      await handleRescheduleSubmit();
+    }
+    if (event.target.id === "confirm-refund-btn") {
+      event.preventDefault();
+      await handleRefundSubmit();
+    }
     if (event.target.classList.contains("cancel-order-btn")) {
       const orderId = event.target.dataset.orderId;
       if (confirm("Are you sure you want to cancel this order?")) {
@@ -219,6 +227,76 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  const rescheduleModal = document.getElementById("rescheduleModal");
+  if (rescheduleModal) {
+    rescheduleModal.addEventListener("show.bs.modal", (event) => {
+      const button = event.relatedTarget;
+      const orderId = button.getAttribute("data-order-id");
+      document.getElementById("reschedule-order-id").value = orderId;
+      
+      // Set min date to today
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("new-visit-date").min = today;
+      document.getElementById("new-visit-date").value = ""; 
+    });
+  }
+
+  const refundModal = document.getElementById("refundModal");
+  if (refundModal) {
+    refundModal.addEventListener("show.bs.modal", (event) => {
+      const button = event.relatedTarget;
+      const orderId = button.getAttribute("data-order-id");
+      document.getElementById("refund-order-id").value = orderId;
+      document.getElementById("refund-reason").value = ""; // Clear previous text
+      const alertPlaceholder = document.getElementById("refund-alert-placeholder");
+      if (alertPlaceholder) alertPlaceholder.innerHTML = "";
+    });
+  }
+
+    const btnPay = document.getElementById("btn-confirm-payment");
+    if(btnPay) {
+        btnPay.addEventListener("click", async () => {
+            if(!currentOrderPayload) return;
+            
+            const token = getToken();
+            // Disable button to prevent double click
+            btnPay.disabled = true; 
+            btnPay.innerText = "Processing...";
+
+            try {
+                const response = await fetch("/api/orders/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(currentOrderPayload),
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || "Failed.");
+
+                // Close Modal
+                const modalEl = document.getElementById('orderSummaryModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                  modal.hide();
+                }
+
+                showToast("✅ Payment Successful! Redirecting...", "success");
+                
+                setTimeout(() => {
+                    window.location.href = "/profile";
+                }, 1500);
+
+            } catch (error) {
+                showAlert(error.message, "danger");
+                btnPay.disabled = false;
+                btnPay.innerText = "Confirm & Pay";
+            }
+        });
+    }
 });
 
 function getToken() {
@@ -449,11 +527,11 @@ async function loadAdminParks() {
                     ? ""
                     : ' <span class="badge bg-secondary">Inactive</span>';
                   return `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item list-group-item d-flex justify-content-between align-items-center">
                     <span>${tt.name} - RM ${tt.price.toFixed(2)}${statusBadge}</span>
                     <div>
                         <button
-                            class="btn btn-outline-secondary btn-sm edit-tt-btn"
+                            class="btn btn-outline-secondary btn-sm btn-secondary edit-tt-btn"
                             data-bs-toggle="modal"
                             data-bs-target="#ticketTypeModal"
                             data-park-id="${park.id}"
@@ -464,7 +542,7 @@ async function loadAdminParks() {
                             Edit
                         </button>
                         <button
-                            class="btn btn-outline-danger btn-sm delete-tt-btn"
+                            class="btn btn-outline-danger btn-sm btn-danger delete-tt-btn"
                             data-park-id="${park.id}"
                             data-tt-id="${tt.id}"
                         >
@@ -475,7 +553,7 @@ async function loadAdminParks() {
             `;
                 })
                 .join("")
-            : '<li class="list-group-item">No ticket types found for this park.</li>';
+            : '<li class="list-group-item list-group-item">No ticket types found for this park.</li>';
 
         const merchandiseHtml =
           park.merchandise.length > 0
@@ -485,14 +563,14 @@ async function loadAdminParks() {
                     ? ""
                     : ' <span class="badge bg-secondary">Inactive</span>';
                   return `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         ${m.name} - RM ${m.price.toFixed(2)}${statusBadge}<br>
                         <small class="text-muted">Stock: ${m.stock}</small>
                     </div>
                     <div>
                         <button
-                            class="btn btn-outline-secondary btn-sm edit-merch-btn"
+                            class="btn btn-outline-secondary btn-sm btn-secondary edit-merch-btn"
                             data-bs-toggle="modal"
                             data-bs-target="#merchandiseModal"
                             data-park-id="${park.id}"
@@ -505,7 +583,7 @@ async function loadAdminParks() {
                             Edit
                         </button>
                         <button
-                            class="btn btn-outline-danger btn-sm delete-merch-btn"
+                            class="btn btn-outline-danger btn-sm btn-danger delete-merch-btn"
                             data-park-id="${park.id}"
                             data-merch-id="${m.id}"
                         >
@@ -516,12 +594,12 @@ async function loadAdminParks() {
             `;
                 })
                 .join("")
-            : '<li class="list-group-item">No merchandise found for this park.</li>';
+            : '<li class="list-group-item list-group-item">No merchandise found for this park.</li>';
 
         return `
-        <div class="accordion-item">
+        <div class="accordion-item accordion-item">
             <h2 class="accordion-header" id="heading-${park.id}">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
+                <button class="accordion-button collapsed accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
                   park.id
                 }" aria-expanded="false" aria-controls="collapse-${park.id}">
                     ${park.name}${statusBadge}
@@ -532,7 +610,7 @@ async function loadAdminParks() {
             }" class="accordion-collapse collapse" aria-labelledby="heading-${
           park.id
         }" data-bs-parent="#${accordionId}">
-                <div class="accordion-body">
+                <div class="accordion-body accordion-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <strong>Location:</strong> ${
@@ -544,7 +622,7 @@ async function loadAdminParks() {
                         </div>
                         <div>
                             <button
-                                class="btn btn-secondary btn-sm edit-park-btn"
+                                class="btn btn-secondary btn-sm btn-secondary edit-park-btn"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editParkModal"
                                 data-park-id="${park.id}"
@@ -554,7 +632,7 @@ async function loadAdminParks() {
                             >
                                 Edit Park
                             </button>
-                            <button class="btn btn-danger btn-sm delete-park-btn" data-park-id="${
+                            <button class="btn btn-danger btn-sm btn-danger delete-park-btn" data-park-id="${
                               park.id
                             }">Delete Park</button>
                         </div>
@@ -565,7 +643,7 @@ async function loadAdminParks() {
                         ${ticketTypesHtml}
                     </ul>
                     <button
-                        class="btn btn-primary btn-sm add-tt-btn"
+                        class="btn btn-primary btn-sm btn-primary add-tt-btn"
                         data-bs-toggle="modal"
                         data-bs-target="#ticketTypeModal"
                         data-park-id="${park.id}"
@@ -580,7 +658,7 @@ async function loadAdminParks() {
                         ${merchandiseHtml}
                     </ul>
                     <button
-                        class="btn btn-primary btn-sm add-merch-btn"
+                        class="btn btn-primary btn-sm btn-primary add-merch-btn"
                         data-bs-toggle="modal"
                         data-bs-target="#merchandiseModal"
                         data-park-id="${park.id}"
@@ -871,7 +949,7 @@ async function handleProfileUpdate(event) {
       throw new Error(data.detail || "Failed to update profile.");
     }
 
-    showAlert("Profile updated successfully.", "success");
+    showBottomRightNotification("Profile updated successfully.", "success");
     // Optionally, re-set the value in case the backend modifies it
     document.getElementById("profile-full-name").value = data.full_name || "";
   } catch (error) {
@@ -922,20 +1000,96 @@ function handleLogout() {
   window.location.href = "/login";
 }
 
-function showAlert(message, type = "info") {
-  const placeholder = document.getElementById("alert-placeholder");
-  if (!placeholder) return;
+/**
+ * NEW: Displays a floating Toast notification
+ * Replaces the old static alert system.
+ */
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) {
+    console.warn("Toast container not found. Alerting in console instead:", message);
+    return;
+  }
+  
+  let bgClass = "text-white bg-" + type;
+  if (type === 'warning') {
+    bgClass = "text-dark bg-warning"; // Use dark text for better contrast on yellow
+  }
+  let icon = "";
 
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible" role="alert">
-            <div>${message}</div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  // Add a little icon based on type for polish
+  if (type === "success") icon = "✅ ";
+  if (type === "danger") icon = "⚠️ ";
+  if (type === "warning") icon = "✋ ";
+  if (type === "info") icon = "ℹ️ ";
+
+  const toastHtml = `
+    <div class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" style="font-size: 1rem;">
+          ${icon}${message}
         </div>
-    `;
-  // Clear previous alerts
-  placeholder.innerHTML = "";
-  placeholder.append(wrapper);
+        <button type="button" class="btn-close ${type === 'warning' ? '' : 'btn-close-white'} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+
+  // Append to container
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = toastHtml;
+  const toastElement = wrapper.firstElementChild;
+  container.appendChild(toastElement);
+
+  // Initialize Bootstrap Toast
+  const toast = new bootstrap.Toast(toastElement, {
+    delay: 5000, // Disappear after 5 seconds
+    animation: true
+  });
+
+  toast.show();
+
+  // Cleanup DOM after it hides
+  toastElement.addEventListener('hidden.bs.toast', () => {
+    toastElement.remove();
+  });
+}
+
+/**
+ * OVERRIDE: Update the existing showAlert to use Toasts instead.
+ * This ensures all your previous code uses the new system automatically.
+ */
+function showAlert(message, type = "info") {
+    showToast(message, type);
+}
+
+function showBottomRightNotification(message, type = "success") {
+  let notificationContainer = document.getElementById("bottom-right-notifications");
+  if (!notificationContainer) {
+    notificationContainer = document.createElement("div");
+    notificationContainer.id = "bottom-right-notifications";
+    notificationContainer.style.cssText = "position: fixed; bottom: 20px; right: 20px; z-index: 9999; max-width: 450px;";
+    document.body.appendChild(notificationContainer);
+  }
+
+  const notificationId = "notification-" + Date.now();
+  const notification = document.createElement("div");
+  notification.id = notificationId;
+  notification.className = `alert alert-${type} alert-dismissible fade show`;
+  notification.style.cssText = "margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); padding: 1rem 1.5rem; font-size: 1rem; min-width: 300px; display: flex; align-items: center; justify-content: space-between; gap: 1rem;";
+  notification.innerHTML = `
+    <div style="flex: 1; word-wrap: break-word; margin: 0;">${message}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="flex-shrink: 0; margin: 0;"></button>
+  `;
+
+  notificationContainer.appendChild(notification);
+
+  setTimeout(() => {
+    const alertElement = document.getElementById(notificationId);
+    if (alertElement && alertElement.parentNode) {
+      const bsAlert = new bootstrap.Alert(alertElement);
+      bsAlert.close();
+    }
+  }, 5000);
 }
 
 async function loadProfileData() {
@@ -950,74 +1104,144 @@ async function loadProfileData() {
     const userResponse = await fetch("/api/users/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!userResponse.ok)
-      throw new Error("Failed to fetch user data. Please log in again.");
+    if (!userResponse.ok) throw new Error("Failed to fetch user data.");
     const userData = await userResponse.json();
-    document.getElementById("profile-full-name").value =
-      userData.full_name || "";
-    document.getElementById("profile-email").value = userData.email;
+    
+    // Update Profile inputs safely
+    const nameInput = document.getElementById("profile-full-name");
+    const emailInput = document.getElementById("profile-email");
+    if(nameInput) nameInput.value = userData.full_name || "";
+    if(emailInput) emailInput.value = userData.email;
 
     // Fetch orders
-    const ordersResponse = await fetch("/api/orders/", {
-      headers: { Authorization: `Bearer ${token}` },
+    const ordersResponse = await fetch(`/api/orders/?t=${new Date().getTime()}`, {
+      headers: { 
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache'
+      },
     });
     if (!ordersResponse.ok) throw new Error("Failed to fetch orders.");
     const ordersData = await ordersResponse.json();
+    console.log("FULL ORDERS DATA:", JSON.stringify(ordersData, null, 2)); // Debugging log
 
     const ordersContainer = document.getElementById("orders-container");
     if (ordersData.length === 0) {
-      ordersContainer.innerHTML = "<p>You have no orders.</p>";
+      ordersContainer.innerHTML = `<div class="card card mb-4"><div class="card-body"><p class="text-center text-muted">You have no orders.</p></div></div>`;
       return;
     }
 
-    const ordersHtml = ordersData
-      .map(
-        (order) => `
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between">
-                <span>Order ID: ${order.id}</span>
-                <span>Date: ${new Date(
-                  order.created_at
-                ).toLocaleDateString()}</span>
+    // 1. Generate HTML String
+    const ordersHtml = ordersData.map((order) => {
+        // Determine Badge Color
+        let badgeClass = "success";
+        if (order.status === "cancelled") badgeClass = "danger";
+        if (order.status === "refunded") badgeClass = "warning"; // Orange for refund
+
+        return `
+        <div class="card order-card mb-3">
+            <div class="card-header card-header d-flex justify-content-between align-items-center">
+                <span><strong>Order #${order.id.slice(0, 8)}</strong></span>
+                <span class="badge bg-${badgeClass}">${order.status.toUpperCase()}</span>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Status: <span class="badge bg-${
-                  order.status === "cancelled" ? "danger" : "success"
-                }">${order.status}</span></h5>
-                <p class="card-text">Total: RM ${order.total_amount.toFixed(
-                  2
-                )}</p>
-                <h6>Items:</h6>
-                <ul>
-                    ${order.items
-                      .map((item) => {
-                        if (item.ticket_type_id && item.ticket_types) {
-                          return `<li>${item.quantity} x ${
-                            item.ticket_types.name
-                          } (Visit: ${item.visit_date})</li>`;
-                        } else if (item.merchandise_id && item.merchandise) {
-                          return `<li>${item.quantity} x ${item.merchandise.name}</li>`;
+            <div class="card-body card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="mb-2"><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-GB')}</p>
+                        <p class="mb-3"><strong>Total:</strong> RM ${order.total_amount.toFixed(2)}</p>
+                        <h6 class="text-muted text-uppercase small fw-bold">Items</h6>
+                        <ul class="list-group list-group-flush mb-3">
+                            ${order.items.map((item) => {
+                                // Only show QR code placeholder if it is a TICKET (has ticket_type_id)
+                                // and the order is NOT cancelled/refunded
+                                let qrHtml = "";
+                                if (item.ticket_type_id) { 
+                                    // Generate placeholder
+                                    if(order.status !== 'cancelled' && order.status !== 'refunded') {
+                                        qrHtml = `<div class="mt-2 ms-3">
+                                                    <small class="text-muted" style="font-size: 0.7rem;">Scan for Entry:</small>
+                                                    <div id="qrcode-${item.id}" class="qr-placeholder"></div>
+                                                  </div>`;
+                                    }
+                                }
+                                
+                                let itemText = "Unknown Item";
+                                if (item.ticket_types) {
+                                  itemText = `${item.quantity} x ${item.ticket_types.name} <span class="text-muted">(Visit: ${item.visit_date})</span>`;
+                                } else if (item.merchandise) {
+                                  itemText = `${item.quantity} x ${item.merchandise.name}`;
+                                }
+
+                                return `<li class="list-group-item d-flex justify-content-between align-items-start flex-wrap">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">${itemText}</div>
+                                                ${qrHtml} 
+                                            </div>
+                                        </li>`;
+                            }).join("")}
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-4 d-flex flex-column justify-content-center align-items-end">
+                        ${
+                          order.status !== "cancelled" && order.status !== "refunded"
+                            ? `
+                              <button class="btn btn-primary btn-sm mb-2 w-100 reschedule-btn" 
+                                  data-order-id="${order.id}" 
+                                  data-bs-toggle="modal" 
+                                  data-bs-target="#rescheduleModal">
+                                  Reschedule
+                              </button>
+                              <button class="btn btn-danger btn-sm w-100 refund-btn" 
+                                  data-order-id="${order.id}"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#refundModal">
+                                  Request Refund
+                              </button>
+                              `
+                            : `<button class="btn btn-secondary btn-sm w-100" disabled>Action Unavailable</button>`
                         }
-                        return `<li>${item.quantity} x Unknown Item</li>`;
-                      })
-                      .join("")}
-                </ul>
-                ${
-                  order.status !== "cancelled"
-                    ? `<button class="btn btn-danger btn-sm cancel-order-btn" data-order-id="${order.id}">Cancel Order</button>`
-                    : ""
-                }
+                    </div>
+                </div>
             </div>
         </div>
-    `
-      )
-      .join("");
+    `}).join("");
 
+    // 2. Inject HTML
     ordersContainer.innerHTML = ordersHtml;
+
+    // 3. Render QR Codes (After HTML is injected)
+    // We loop through the data again to find items that need QR codes
+    ordersData.forEach(order => {
+        if (order.status !== 'cancelled' && order.status !== 'refunded') {
+            order.items.forEach(item => {
+                // Look for the container we created above
+                const qrContainer = document.getElementById(`qrcode-${item.id}`);
+                if (qrContainer) {
+                    // Clear previous content just in case
+                    qrContainer.innerHTML = ""; 
+                    
+                    // Generate QR Code
+                    new QRCode(qrContainer, {
+                        text: item.id, // The content of the QR code (Ticket UUID)
+                        width: 80,     // Width
+                        height: 80,    // Height
+                        colorDark : "#2d5016", // Dark green to match theme
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                }
+            });
+        }
+    });
+
   } catch (error) {
+    console.error(error);
     showAlert(error.message, "danger");
-    removeToken();
-    setTimeout(() => (window.location.href = "/login"), 2000);
+    // Handle token expiry if needed, or just let the user stay on the page
+    if(error.message.includes("401")) {
+        removeToken();
+        setTimeout(() => (window.location.href = "/login"), 2000);
+    }
   }
 }
 
@@ -1032,10 +1256,10 @@ async function cancelOrder(orderId) {
     if (!response.ok) {
       throw new Error(data.detail || "Failed to cancel order.");
     }
-    showAlert("Order cancelled successfully.", "success");
+    showBottomRightNotification("Order cancelled successfully.", "success");
     loadProfileData(); // Reload profile data to show updated status
   } catch (error) {
-    showAlert(error.message, "danger");
+    showBottomRightNotification(error.message, "danger");
   }
 }
 
@@ -1053,6 +1277,39 @@ async function loadParks() {
   }
 }
 
+// Mapping of park names to their images
+const parkImageMap = {
+  'bako': '/assets/bako.jpg',
+  'mulu': '/assets/mulu.jpg',
+  'niah': '/assets/niah.jpg'
+};
+
+// Fallback images for parks without specific images
+const fallbackImages = [
+  'https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=800', // Forest trail
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800', // Mountain landscape
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=800', // Forest canopy
+];
+
+// Function to get image for park based on name
+function getParkImage(parkName, index) {
+  if (!parkName) {
+    return fallbackImages[index % fallbackImages.length];
+  }
+  
+  const parkNameLower = parkName.toLowerCase();
+  
+  // Check if park name contains any of the mapped park names
+  for (const [key, imagePath] of Object.entries(parkImageMap)) {
+    if (parkNameLower.includes(key)) {
+      return imagePath;
+    }
+  }
+  
+  // Fallback to default images if no match found
+  return fallbackImages[index % fallbackImages.length];
+}
+
 function renderParks(parks) {
   const parksContainer = document.getElementById("parks-container");
   if (parks.length === 0) {
@@ -1062,9 +1319,10 @@ function renderParks(parks) {
 
   const parksHtml = parks
     .map(
-      (park) => `
+      (park, index) => `
       <div class="col-md-4 mb-4">
-          <div class="card">
+          <div class="card park-card">
+              <img src="${getParkImage(park.name, index)}" class="card-img-top" alt="${park.name}" loading="lazy">
               <div class="card-body">
                   <h5 class="card-title">${park.name}</h5>
                   <p class="card-text">${
@@ -1072,7 +1330,7 @@ function renderParks(parks) {
                   }</p>
                   <a href="/parks/${
                     park.id
-                  }" class="btn btn-primary">View Details</a>
+                  }" class="btn btn-primary btn-primary">View Details</a>
               </div>
           </div>
       </div>
@@ -1091,6 +1349,82 @@ function handleParkSearch(event) {
       (park.description && park.description.toLowerCase().includes(searchTerm))
   );
   renderParks(filteredParks);
+}
+
+let currentOrderPayload = null; // Store data temporarily
+
+async function handleOrderSubmit(event) {
+  event.preventDefault();
+  
+  // 1. Collect Data (Same as before)
+  const items = [];
+  let grandTotal = 0;
+  let summaryHtml = "";
+  
+  // Tickets
+  document.querySelectorAll(".ticket-quantity").forEach((input) => {
+    const qty = parseInt(input.value);
+    if (qty > 0) {
+      const name = input.closest(".ticket-section").querySelector("h5").innerText.split(" (")[0];
+      const priceText = input.closest(".ticket-section").querySelector("h5").innerText.split("RM ")[1];
+      const price = priceText ? parseFloat(priceText) : 0;
+      const total = qty * price;
+      grandTotal += total;
+      
+      const dateVal = document.getElementById(`visit-date-${input.dataset.ticketTypeId}`).value;
+      
+      items.push({
+        ticket_type_id: input.dataset.ticketTypeId,
+        quantity: qty,
+        visit_date: dateVal
+      });
+
+      summaryHtml += `
+        <div class="d-flex justify-content-between mb-2">
+            <span>${qty}x ${name} <small class="text-muted">(${dateVal})</small></span>
+            <span>RM ${total.toFixed(2)}</span>
+        </div>`;
+    }
+  });
+
+  // Merchandise (Same logic)
+  document.querySelectorAll(".merchandise-quantity").forEach((input) => {
+    const qty = parseInt(input.value);
+    if (qty > 0) {
+      const name = input.closest(".merchandise-section").querySelector("h5").innerText.split(" (")[0];
+      const priceText = input.closest(".merchandise-section").querySelector("h5").innerText.split("RM ")[1];
+      const price = priceText ? parseFloat(priceText) : 0;
+      const total = qty * price;
+      grandTotal += total;
+
+      items.push({
+        merchandise_id: input.dataset.merchandiseId,
+        quantity: qty
+      });
+
+      summaryHtml += `
+        <div class="d-flex justify-content-between mb-2">
+            <span>${qty}x ${name}</span>
+            <span>RM ${total.toFixed(2)}</span>
+        </div>`;
+    }
+  });
+
+  if (items.length === 0) {
+    showAlert("Please select at least one item.", "warning");
+    return;
+  }
+
+  // 2. Populate Modal
+  document.getElementById("summary-items-list").innerHTML = summaryHtml;
+  document.getElementById("summary-total").innerText = `RM ${grandTotal.toFixed(2)}`;
+  
+  // Store payload for the actual send
+  currentOrderPayload = { items: items };
+
+  // 3. Show Modal
+  const modal = new bootstrap.Modal(document.getElementById('orderSummaryModal'));
+  modal.show();
 }
 
 async function loadParkDetail() {
@@ -1119,9 +1453,9 @@ async function loadParkDetail() {
 
     // Render park details
     parkDetailContainer.innerHTML = `
-            <h2>${park.name}</h2>
-            <p><strong>Location:</strong> ${park.location || "N/A"}</p>
-            <p>${park.description || "No description available."}</p>
+            <h2 style="background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; margin-bottom: 1.5rem;">${park.name}</h2>
+            <p><strong style="color: #2d5016;">Location:</strong> ${park.location || "N/A"}</p>
+            <p style="line-height: 1.8; color: #666;">${park.description || "No description available."}</p>
         `;
 
     // Render order form if logged in
@@ -1134,30 +1468,30 @@ async function loadParkDetail() {
         const today = new Date().toISOString().split("T")[0];
         const ticketInputs =
           ticketTypes.length > 0
-            ? `<h3>Book Tickets</h3>` +
+            ? `<h3 class="section-title">Book Tickets</h3>` +
               ticketTypes
                 .map(
                   (tt) => `
-                    <div class="mb-3 border p-3 rounded">
-                        <h5>${tt.name} (RM ${tt.price.toFixed(2)})</h5>
+                    <div class="ticket-section mb-3">
+                        <h5 style="color: #2d5016; font-weight: 600;">${tt.name} (RM ${tt.price.toFixed(2)})</h5>
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="quantity-ticket-${
                                   tt.id
-                                }" class="form-label">Quantity</label>
+                                }" class="form-label form-label">Quantity</label>
                                 <input type="number" id="quantity-ticket-${
                                   tt.id
-                                }" class="form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
+                                }" class="form-control form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
                     tt.id
                   }">
                             </div>
                             <div class="col-md-6">
                                 <label for="visit-date-${
                                   tt.id
-                                }" class="form-label">Visit Date</label>
+                                }" class="form-label form-label">Visit Date</label>
                                 <input type="date" id="visit-date-${
                                   tt.id
-                                }" class="form-control visit-date" min="${today}">
+                                }" class="form-control form-control visit-date" min="${today}">
                             </div>
                         </div>
                     </div>
@@ -1168,21 +1502,21 @@ async function loadParkDetail() {
 
         const merchandiseInputs =
           merchandise.length > 0
-            ? `<h3>Purchase Merchandise</h3>` +
+            ? `<h3 class="section-title">Purchase Merchandise</h3>` +
               merchandise
                 .map(
                   (m) => `
-                    <div class="mb-3 border p-3 rounded">
-                        <h5>${m.name} (RM ${m.price.toFixed(2)})</h5>
+                    <div class="merchandise-section mb-3">
+                        <h5 style="color: #2d5016; font-weight: 600;">${m.name} (RM ${m.price.toFixed(2)})</h5>
                         <p class="mb-1">${m.description || ""}</p>
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="quantity-merch-${
                                   m.id
-                                }" class="form-label">Quantity</label>
+                                }" class="form-label form-label">Quantity</label>
                                 <input type="number" id="quantity-merch-${
                                   m.id
-                                }" class="form-control merchandise-quantity" min="0" value="0" data-merchandise-id="${
+                                }" class="form-control form-control merchandise-quantity" min="0" value="0" data-merchandise-id="${
                     m.id
                   }" max="${m.stock}">
                                 <small class="text-muted">Stock: ${
@@ -1200,7 +1534,7 @@ async function loadParkDetail() {
                     <form id="order-form">
                         ${ticketInputs}
                         ${merchandiseInputs}
-                        <button type="submit" class="btn btn-success mt-3">Place Order</button>
+                        <button type="submit" class="btn btn-success btn-success mt-3">Place Order</button>
                     </form>
                 `;
         document
@@ -1212,184 +1546,104 @@ async function loadParkDetail() {
         '<p><a href="/login">Log in</a> to book tickets.</p>';
     }
   } catch (error) {
-    parkDetailContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+    parkDetailContainer.innerHTML = `<div class="alert alert-danger alert">${error.message}</div>`;
   }
 }
 
-async function handleOrderSubmit(event) {
-  event.preventDefault();
+async function handleRescheduleSubmit() {
   const token = getToken();
-  if (!token) {
-    showAlert("You must be logged in to place an order.", "warning");
+  const orderId = document.getElementById("reschedule-order-id").value;
+  const newDate = document.getElementById("new-visit-date").value;
+
+  if (!newDate) {
+    showAlert("Please select a new date.", "warning");
     return;
   }
 
-  const items = [];
-  const ticketQuantityInputs = document.querySelectorAll(".ticket-quantity");
-  let validationFailed = false;
-
-  ticketQuantityInputs.forEach((input) => {
-    if (validationFailed) return;
-    const quantity = parseInt(input.value, 10);
-    if (quantity > 0) {
-      const ticketTypeId = input.dataset.ticketTypeId;
-      const visitDateInput = document.getElementById(
-        `visit-date-${ticketTypeId}`
-      );
-      const visitDate = visitDateInput.value;
-
-      if (!visitDate) {
-        const ticketName = input.closest(".border").querySelector("h5").textContent;
-        showAlert(`Please select a visit date for: ${ticketName}`, "warning");
-        validationFailed = true;
-        return;
-      }
-
-      items.push({
-        ticket_type_id: ticketTypeId,
-        quantity: quantity,
-        visit_date: visitDate,
-      });
-    }
-  });
-
-  if (validationFailed) return;
-
-  const merchandiseQuantityInputs = document.querySelectorAll(
-    ".merchandise-quantity"
-  );
-  merchandiseQuantityInputs.forEach((input) => {
-    if (validationFailed) return;
-    const quantity = parseInt(input.value, 10);
-    if (quantity > 0) {
-      const maxStock = parseInt(input.getAttribute("max"), 10);
-      if (quantity > maxStock) {
-        const merchName = input.closest(".border").querySelector("h5").textContent;
-        showAlert(
-          `Quantity for ${merchName} exceeds available stock (${maxStock}).`,
-          "warning"
-        );
-        validationFailed = true;
-        return;
-      }
-      const merchandiseId = input.dataset.merchandiseId;
-      items.push({
-        merchandise_id: merchandiseId,
-        quantity: quantity,
-      });
-    }
-  });
-
-  if (validationFailed) return;
-
-  if (items.length === 0) {
-    showAlert("Please select at least one item to order.", "warning");
-    return;
-  }
-
-  const orderData = { items: items };
+  const payload = {
+    new_visit_date: newDate
+  };
 
   try {
-    const response = await fetch("/api/orders/", {
+    const response = await fetch(`/api/orders/${orderId}/reschedule`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to reschedule order.");
+    }
+
+    showBottomRightNotification("Order rescheduled successfully.", "success");
+    
+    // Close Modal safely
+    const modalEl = document.getElementById("rescheduleModal");
+    const closeBtn = modalEl.querySelector(".btn-close");
+    if (closeBtn) {
+      closeBtn.click();
+    } else {
+      // Fallback if button is missing
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) modal.hide();
+    }
+
+    loadProfileData(); // Refresh list to show new date
+  } catch (error) {
+    showBottomRightNotification(error.message, "danger");
+  }
+}
+
+async function handleRefundSubmit() {
+  const token = getToken();
+  const orderId = document.getElementById("refund-order-id").value;
+  const reason = document.getElementById("refund-reason").value;
+
+  if (!reason) {
+    const alertPlaceholder = document.getElementById("refund-alert-placeholder");
+    if (alertPlaceholder) {
+      alertPlaceholder.innerHTML = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          Please provide a reason for the refund.
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+    } else {
+      showAlert("Please provide a reason for the refund.", "warning");
+    }
+    return;
+  }
+
+  const payload = { reason: reason };
+
+  try {
+    const response = await fetch(`/api/orders/${orderId}/refund`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(orderData),
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail || "Failed to place order.");
+      throw new Error(data.detail || "Failed to process refund.");
     }
 
-    showAlert(
-      "Order placed successfully! You will be redirected to your profile.",
-      "success"
-    );
-    setTimeout(() => {
-      window.location.href = "/profile";
-    }, 2000);
+    showBottomRightNotification("Refund processed successfully.", "success");
+    
+    // Close Modal
+    const modalEl = document.getElementById("refundModal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
+
+    loadProfileData(); // Refresh list to show "refunded" status
   } catch (error) {
-    showAlert(error.message, "danger");
-  }
-}
-
-async function loadAdminDashboard() {
-  const token = getToken();
-  if (!token) {
-    window.location.href = "/login";
-    return;
-  }
-
-  const statsContainer = document.getElementById("statistics-container");
-
-  try {
-    const response = await fetch("/api/admin/statistics/visitors/", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (response.status === 403) {
-      throw new Error("You do not have permission to view this page.");
-    }
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.detail || "Failed to fetch visitor statistics.");
-    }
-
-    const stats = await response.json();
-
-    if (stats.revenue_by_park.length === 0) {
-      statsContainer.innerHTML = `
-        <h5>Overall Summary</h5>
-        <p><strong>Total Revenue:</strong> RM 0.00</p>
-        <p><strong>Total Tickets Sold:</strong> 0</p>
-        <p><strong>Total Merchandise Sold:</strong> 0</p>
-        <hr>
-        <p>No park data available to generate statistics.</p>
-      `;
-      return;
-    }
-
-    const parkStatsHtml = stats.revenue_by_park
-      .map(
-        (p) => `
-        <tr>
-            <td>${p.park_name}</td>
-            <td>${p.tickets_sold}</td>
-            <td>${p.merchandise_items_sold}</td>
-            <td>RM ${p.total_revenue.toFixed(2)}</td>
-        </tr>
-    `
-      )
-      .join("");
-
-    statsContainer.innerHTML = `
-        <h5>Overall Summary</h5>
-        <p><strong>Total Revenue:</strong> RM ${stats.total_revenue.toFixed(2)}</p>
-        <p><strong>Total Tickets Sold:</strong> ${stats.total_tickets_sold}</p>
-        <p><strong>Total Merchandise Sold:</strong> ${
-          stats.total_merchandise_items_sold
-        }</p>
-        <hr>
-        <h5>Revenue by Park</h5>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Park</th>
-                    <th>Tickets Sold</th>
-                    <th>Merchandise Sold</th>
-                    <th>Total Revenue</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${parkStatsHtml}
-            </tbody>
-        </table>
-    `;
-  } catch (error) {
-    statsContainer.innerHTML = ""; // Clear the "Loading..." message
-    showAlert(error.message, "danger");
+    showBottomRightNotification(error.message, "danger");
   }
 }
