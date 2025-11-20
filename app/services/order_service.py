@@ -135,31 +135,33 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
 
 
 async def get_orders_for_customer(db: Client, customer_id: UUID) -> List[Order]:
-    """Fetches all orders for a specific customer."""
+    """Fetches all orders for a specific customer with full nested details."""
     response = (
         db.table("orders")
-        .select("*, order_items(*, ticket_types(name), merchandise(name))")
+        .select("*, order_items(*, ticket_types(*), merchandise(*))") 
         .eq("customer_id", str(customer_id))
         .order("created_at", desc=True)
         .execute()
     )
-    return [Order(**o) for o in response.data]
+    return [Order(**{**o, "items": o.get("order_items", [])}) for o in response.data]
 
 
 async def get_order_by_id(
     db: Client, order_id: UUID, customer_id: UUID
 ) -> Optional[Order]:
-    """Fetches a single order by its ID, ensuring it belongs to the customer."""
+    """Fetches a single order by its ID with full nested details."""
     response = (
         db.table("orders")
-        .select("*, order_items(*, ticket_types(name), merchandise(name))")
+        .select("*, order_items(*, ticket_types(*), merchandise(*))")
         .eq("id", str(order_id))
         .eq("customer_id", str(customer_id))
         .single()
         .execute()
     )
     if response.data:
-        return Order(**response.data)
+        data = response.data
+        data["items"] = data.get("order_items", [])
+        return Order(**data)
     return None
 
 

@@ -2053,3 +2053,16 @@ body:not(:has(.hero)) .navbar {
 .modal-dialog {
     z-index: 10060 !important;
 }
+
+.qr-placeholder {
+    margin-top: 5px;
+    padding: 5px;
+    background: white;
+    border: 1px dashed #2d5016;
+    display: inline-block;
+    border-radius: 5px;
+}
+
+.qr-placeholder img {
+    display: block; 
+}

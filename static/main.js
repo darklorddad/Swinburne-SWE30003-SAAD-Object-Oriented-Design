@@ -1013,100 +1013,144 @@ async function loadProfileData() {
     const userResponse = await fetch("/api/users/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!userResponse.ok)
-      throw new Error("Failed to fetch user data. Please log in again.");
+    if (!userResponse.ok) throw new Error("Failed to fetch user data.");
     const userData = await userResponse.json();
-    document.getElementById("profile-full-name").value =
-      userData.full_name || "";
-    document.getElementById("profile-email").value = userData.email;
+    
+    // Update Profile inputs safely
+    const nameInput = document.getElementById("profile-full-name");
+    const emailInput = document.getElementById("profile-email");
+    if(nameInput) nameInput.value = userData.full_name || "";
+    if(emailInput) emailInput.value = userData.email;
 
     // Fetch orders
     const ordersResponse = await fetch(`/api/orders/?t=${new Date().getTime()}`, {
       headers: { 
-        Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache'
       },
     });
     if (!ordersResponse.ok) throw new Error("Failed to fetch orders.");
     const ordersData = await ordersResponse.json();
-    console.log("Orders Data:", ordersData); // Debugging log
+    console.log("FULL ORDERS DATA:", JSON.stringify(ordersData, null, 2)); // Debugging log
 
     const ordersContainer = document.getElementById("orders-container");
     if (ordersData.length === 0) {
-      ordersContainer.innerHTML = `
-        <div class="card card mb-4">
-            <div class="card-body card-body">
-                <p class="mb-0" style="color: #666; text-align: center; padding: 2rem;">You have no orders.</p>
-            </div>
-        </div>
-      `;
+      ordersContainer.innerHTML = `<div class="card card mb-4"><div class="card-body"><p class="text-center text-muted">You have no orders.</p></div></div>`;
       return;
     }
 
-    const ordersHtml = ordersData
-      .map(
-        (order) => `
+    // 1. Generate HTML String
+    const ordersHtml = ordersData.map((order) => {
+        // Determine Badge Color
+        let badgeClass = "success";
+        if (order.status === "cancelled") badgeClass = "danger";
+        if (order.status === "refunded") badgeClass = "warning"; // Orange for refund
+
+        return `
         <div class="card order-card mb-3">
-            <div class="card-header card-header d-flex justify-content-between">
-                <span>Order ID: ${order.id}</span>
-                <span>Date: ${new Date(
-                  order.created_at
-                ).toLocaleDateString('en-GB')}</span>
+            <div class="card-header card-header d-flex justify-content-between align-items-center">
+                <span><strong>Order #${order.id.slice(0, 8)}</strong></span>
+                <span class="badge bg-${badgeClass}">${order.status.toUpperCase()}</span>
             </div>
             <div class="card-body card-body">
-                <h5 class="card-title card-title">Status: <span class="badge badge bg-${
-                  order.status === "cancelled" ? "danger" : "success"
-                }">${order.status}</span></h5>
-                <p class="card-text">Total: RM ${order.total_amount.toFixed(
-                  2
-                )}</p>
-                <h6>Items:</h6>
-                <ul>
-                    ${order.items
-                      .map((item) => {
-                        if (item.ticket_type_id && item.ticket_types) {
-                          return `<li>${item.quantity} x ${
-                            item.ticket_types.name
-                          } (Visit: ${item.visit_date})</li>`;
-                        } else if (item.merchandise_id && item.merchandise) {
-                          return `<li>${item.quantity} x ${item.merchandise.name}</li>`;
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="mb-2"><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-GB')}</p>
+                        <p class="mb-3"><strong>Total:</strong> RM ${order.total_amount.toFixed(2)}</p>
+                        <h6 class="text-muted text-uppercase small fw-bold">Items</h6>
+                        <ul class="list-group list-group-flush mb-3">
+                            ${order.items.map((item) => {
+                                // Only show QR code placeholder if it is a TICKET (has ticket_type_id)
+                                // and the order is NOT cancelled/refunded
+                                let qrHtml = "";
+                                if (item.ticket_type_id) { 
+                                    // Generate placeholder
+                                    if(order.status !== 'cancelled' && order.status !== 'refunded') {
+                                        qrHtml = `<div class="mt-2 ms-3">
+                                                    <small class="text-muted" style="font-size: 0.7rem;">Scan for Entry:</small>
+                                                    <div id="qrcode-${item.id}" class="qr-placeholder"></div>
+                                                  </div>`;
+                                    }
+                                }
+                                
+                                let itemText = "Unknown Item";
+                                if (item.ticket_types) {
+                                  itemText = `${item.quantity} x ${item.ticket_types.name} <span class="text-muted">(Visit: ${item.visit_date})</span>`;
+                                } else if (item.merchandise) {
+                                  itemText = `${item.quantity} x ${item.merchandise.name}`;
+                                }
+
+                                return `<li class="list-group-item d-flex justify-content-between align-items-start flex-wrap">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">${itemText}</div>
+                                                ${qrHtml} 
+                                            </div>
+                                        </li>`;
+                            }).join("")}
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-4 d-flex flex-column justify-content-center align-items-end">
+                        ${
+                          order.status !== "cancelled" && order.status !== "refunded"
+                            ? `
+                              <button class="btn btn-primary btn-sm mb-2 w-100 reschedule-btn" 
+                                  data-order-id="${order.id}" 
+                                  data-bs-toggle="modal" 
+                                  data-bs-target="#rescheduleModal">
+                                  Reschedule
+                              </button>
+                              <button class="btn btn-danger btn-sm w-100 refund-btn" 
+                                  data-order-id="${order.id}"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#refundModal">
+                                  Request Refund
+                              </button>
+                              `
+                            : `<button class="btn btn-secondary btn-sm w-100" disabled>Action Unavailable</button>`
                         }
-                        return `<li>${item.quantity} x Unknown Item</li>`;
-                      })
-                      .join("")}
-                </ul>
-                ${
-                  order.status !== "cancelled" && order.status !== "refunded"
-                    ? `
-                      <div class="mt-3">
-                          <button class="btn btn-primary btn-sm me-2 reschedule-btn" 
-                              data-order-id="${order.id}" 
-                              data-bs-toggle="modal" 
-                              data-bs-target="#rescheduleModal">
-                              Reschedule
-                          </button>
-                          <!-- CHANGED BUTTON -->
-                          <button class="btn btn-danger btn-sm refund-btn" 
-                              data-order-id="${order.id}"
-                              data-bs-toggle="modal"
-                              data-bs-target="#refundModal">
-                              Request Refund
-                          </button>
-                      </div>
-                      `
-                    : ""
-                }
+                    </div>
+                </div>
             </div>
         </div>
-    `
-      )
-      .join("");
+    `}).join("");
 
+    // 2. Inject HTML
     ordersContainer.innerHTML = ordersHtml;
+
+    // 3. Render QR Codes (After HTML is injected)
+    // We loop through the data again to find items that need QR codes
+    ordersData.forEach(order => {
+        if (order.status !== 'cancelled' && order.status !== 'refunded') {
+            order.items.forEach(item => {
+                // Look for the container we created above
+                const qrContainer = document.getElementById(`qrcode-${item.id}`);
+                if (qrContainer) {
+                    // Clear previous content just in case
+                    qrContainer.innerHTML = ""; 
+                    
+                    // Generate QR Code
+                    new QRCode(qrContainer, {
+                        text: item.id, // The content of the QR code (Ticket UUID)
+                        width: 80,     // Width
+                        height: 80,    // Height
+                        colorDark : "#2d5016", // Dark green to match theme
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                }
+            });
+        }
+    });
+
   } catch (error) {
+    console.error(error);
     showAlert(error.message, "danger");
-    removeToken();
-    setTimeout(() => (window.location.href = "/login"), 2000);
+    // Handle token expiry if needed, or just let the user stay on the page
+    if(error.message.includes("401")) {
+        removeToken();
+        setTimeout(() => (window.location.href = "/login"), 2000);
+    }
   }
 }
 
