@@ -1104,7 +1104,7 @@ function initHomeAnimations() {
                 revealElements.forEach((el, index) => {
                     setTimeout(() => {
                         el.classList.add('active');
-                    }, index * 200);
+                    }, index * 300);
                 });
             }
         });
