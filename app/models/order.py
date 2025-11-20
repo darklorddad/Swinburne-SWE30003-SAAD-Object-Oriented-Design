@@ -6,6 +6,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
+from datetime import date
 
 
 class OrderItemCreate(BaseModel):
@@ -79,3 +80,9 @@ class Order(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class OrderReschedule(BaseModel):
+    """Model for rescheduling an order."""
+    new_visit_date: date
+

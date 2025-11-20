@@ -190,6 +190,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target.id === "logout-btn") {
       handleLogout();
     }
+    if (event.target.id === "confirm-reschedule-btn") {
+      event.preventDefault(); // Prevent any default form submission
+      await handleRescheduleSubmit();
+    }
     if (event.target.classList.contains("cancel-order-btn")) {
       const orderId = event.target.dataset.orderId;
       if (confirm("Are you sure you want to cancel this order?")) {
@@ -219,6 +223,20 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  const rescheduleModal = document.getElementById("rescheduleModal");
+  if (rescheduleModal) {
+    rescheduleModal.addEventListener("show.bs.modal", (event) => {
+      const button = event.relatedTarget;
+      const orderId = button.getAttribute("data-order-id");
+      document.getElementById("reschedule-order-id").value = orderId;
+      
+      // Set min date to today
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("new-visit-date").min = today;
+      document.getElementById("new-visit-date").value = ""; 
+    });
+  }
 });
 
 function getToken() {
@@ -987,11 +1005,15 @@ async function loadProfileData() {
     document.getElementById("profile-email").value = userData.email;
 
     // Fetch orders
-    const ordersResponse = await fetch("/api/orders/", {
-      headers: { Authorization: `Bearer ${token}` },
+    const ordersResponse = await fetch(`/api/orders/?t=${new Date().getTime()}`, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      },
     });
     if (!ordersResponse.ok) throw new Error("Failed to fetch orders.");
     const ordersData = await ordersResponse.json();
+    console.log("Orders Data:", ordersData); // Debugging log
 
     const ordersContainer = document.getElementById("orders-container");
     if (ordersData.length === 0) {
@@ -1013,7 +1035,7 @@ async function loadProfileData() {
                 <span>Order ID: ${order.id}</span>
                 <span>Date: ${new Date(
                   order.created_at
-                ).toLocaleDateString()}</span>
+                ).toLocaleDateString('en-GB')}</span>
             </div>
             <div class="card-body card-body">
                 <h5 class="card-title card-title">Status: <span class="badge badge bg-${
@@ -1039,7 +1061,20 @@ async function loadProfileData() {
                 </ul>
                 ${
                   order.status !== "cancelled"
-                    ? `<button class="btn btn-danger btn-sm btn-danger cancel-order-btn" data-order-id="${order.id}">Cancel Order</button>`
+                    ? `
+                    <div class="mt-3">
+                        <button class="btn btn-primary btn-sm me-2 reschedule-btn" 
+                            data-order-id="${order.id}" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#rescheduleModal">
+                            Reschedule
+                        </button>
+                        <button class="btn btn-danger btn-sm cancel-order-btn" 
+                            data-order-id="${order.id}">
+                            Cancel Order
+                        </button>
+                    </div>
+                    `
                     : ""
                 }
             </div>
@@ -1067,10 +1102,10 @@ async function cancelOrder(orderId) {
     if (!response.ok) {
       throw new Error(data.detail || "Failed to cancel order.");
     }
-    showAlert("Order cancelled successfully.", "success");
+    showBottomRightNotification("Order cancelled successfully.", "success");
     loadProfileData(); // Reload profile data to show updated status
   } catch (error) {
-    showAlert(error.message, "danger");
+    showBottomRightNotification(error.message, "danger");
   }
 }
 
@@ -1460,5 +1495,53 @@ async function loadAdminDashboard() {
   } catch (error) {
     statsContainer.innerHTML = ""; // Clear the "Loading..." message
     showAlert(error.message, "danger");
+  }
+}
+
+async function handleRescheduleSubmit() {
+  const token = getToken();
+  const orderId = document.getElementById("reschedule-order-id").value;
+  const newDate = document.getElementById("new-visit-date").value;
+
+  if (!newDate) {
+    showAlert("Please select a new date.", "warning");
+    return;
+  }
+
+  const payload = {
+    new_visit_date: newDate
+  };
+
+  try {
+    const response = await fetch(`/api/orders/${orderId}/reschedule`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to reschedule order.");
+    }
+
+    showBottomRightNotification("Order rescheduled successfully.", "success");
+    
+    // Close Modal safely
+    const modalEl = document.getElementById("rescheduleModal");
+    const closeBtn = modalEl.querySelector(".btn-close");
+    if (closeBtn) {
+      closeBtn.click();
+    } else {
+      // Fallback if button is missing
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) modal.hide();
+    }
+
+    loadProfileData(); // Refresh list to show new date
+  } catch (error) {
+    showBottomRightNotification(error.message, "danger");
   }
 }

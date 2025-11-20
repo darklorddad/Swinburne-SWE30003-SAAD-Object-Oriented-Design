@@ -8,6 +8,7 @@ from supabase import Client
 
 from app.models.merchandise import Merchandise
 from app.models.order import Order, OrderCreate, OrderItem
+from datetime import date
 
 
 async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> Order:
@@ -195,3 +196,40 @@ async def cancel_order(db: Client, order_id: UUID, customer_id: UUID) -> Order:
 
     order.status = response.data[0]["status"]
     return order
+
+
+async def reschedule_order(
+    db: Client, order_id: UUID, customer_id: UUID, new_date: date
+) -> Order:
+    """
+    Reschedules an order by updating the visit date of its items.
+
+    Raises:
+        ValueError: If order not found, belongs to another user, or is cancelled.
+    """
+    # 1. Verify the order exists and belongs to the user
+    order = await get_order_by_id(db, order_id, customer_id)
+    if not order:
+        raise ValueError("Order not found or you do not have permission to reschedule it")
+
+    # 2. Business Rule: Cannot reschedule cancelled orders
+    if order.status == "cancelled":
+        raise ValueError("Cannot reschedule a cancelled order")
+
+    # 3. Update the visit_date for all items in this order (only for tickets)
+    # Identify items that are tickets (have a ticket_type_id)
+    ticket_item_ids = [
+        str(item.id) 
+        for item in order.items 
+        if item.ticket_type_id is not None
+    ]
+    
+    if ticket_item_ids:
+        # Update the identified ticket items
+        db.table("order_items")\
+            .update({"visit_date": str(new_date)})\
+            .in_("id", ticket_item_ids)\
+            .execute()
+    
+    # 4. Return the updated order object
+    return await get_order_by_id(db, order_id, customer_id)

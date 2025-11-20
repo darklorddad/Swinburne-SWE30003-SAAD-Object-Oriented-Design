@@ -2043,3 +2043,13 @@ body:not(:has(.hero)) .navbar {
         gap: 1rem;
     }
 }
+
+.modal {
+    z-index: 10055 !important;
+}
+.modal-backdrop {
+    z-index: 10050 !important;
+}
+.modal-dialog {
+    z-index: 10060 !important;
+}
