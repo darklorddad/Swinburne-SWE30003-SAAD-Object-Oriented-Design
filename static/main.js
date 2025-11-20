@@ -174,6 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
       searchInput.addEventListener("keyup", handleParkSearch);
     }
+
+    // Initialize Home Page Animations
+    initHomeAnimations();
   }
 
   if (window.location.pathname === "/admin") {
@@ -312,39 +315,64 @@ function removeToken() {
 }
 
 function updateNav() {
+  // Handle Bootstrap Nav (Legacy/Other Pages)
   const navItems = document.getElementById("nav-items");
   const token = getToken();
   const userStr = localStorage.getItem("user");
+  const user = token && userStr ? JSON.parse(userStr) : null;
 
-  if (token && userStr) {
-    const user = JSON.parse(userStr);
-    const adminLink = user.is_admin
-      ? `<li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>`
-      : "";
+  if (navItems) {
+      if (user) {
+        const adminLink = user.is_admin
+          ? `<li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>`
+          : "";
 
-    navItems.innerHTML = `
-            <li class="nav-item">
-                <span class="navbar-text me-3">Hello, ${
-                  user.full_name || user.email
-                }</span>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/profile">Profile</a>
-            </li>
+        navItems.innerHTML = `
+                <li class="nav-item">
+                    <span class="navbar-text me-3">Hello, ${
+                      user.full_name || user.email
+                    }</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                ${adminLink}
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="logout-btn">Logout</a>
+                </li>
+            `;
+      } else {
+        navItems.innerHTML = `
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register">Register</a>
+                </li>
+            `;
+      }
+  }
+
+  // Handle Tailwind Nav (Home Page)
+  const authLinksContainer = document.getElementById("auth-links");
+  if (authLinksContainer) {
+      if (user) {
+          const adminLink = user.is_admin 
+            ? `<a href="/admin" class="hover:text-white transition-colors no-underline">Admin</a>` 
+            : "";
+          
+          authLinksContainer.innerHTML = `
+            <span class="text-gray-400">Hi, ${user.full_name || 'User'}</span>
+            <a href="/profile" class="hover:text-white transition-colors no-underline">Profile</a>
             ${adminLink}
-            <li class="nav-item">
-                <a class="nav-link" href="#" id="logout-btn">Logout</a>
-            </li>
-        `;
-  } else {
-    navItems.innerHTML = `
-            <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/register">Register</a>
-            </li>
-        `;
+            <a href="#" id="logout-btn" class="hover:text-white transition-colors no-underline">Logout</a>
+          `;
+      } else {
+          authLinksContainer.innerHTML = `
+            <a href="/login" class="hover:text-white transition-colors no-underline">Login</a>
+            <a href="/register" class="hover:text-white transition-colors border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 no-underline">Register</a>
+          `;
+      }
   }
 }
 
@@ -1062,6 +1090,62 @@ function showAlert(message, type = "info") {
     showToast(message, type);
 }
 
+function initHomeAnimations() {
+    // 1. Observer for Reveal Animations
+    const observerOptions = {
+        root: document.getElementById('scroller'), // Use the scroll container
+        threshold: 0.2,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const revealElements = entry.target.querySelectorAll('.reveal-text');
+                revealElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('active');
+                    }, index * 100);
+                });
+            }
+        });
+    }, observerOptions);
+
+    const sections = document.querySelectorAll('.snap-section');
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+    // 2. Navigation Dot Highlighter
+    const dotObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                document.querySelectorAll('.dot').forEach(dot => {
+                    dot.classList.remove('opacity-100', 'scale-125');
+                    dot.classList.add('opacity-40');
+                });
+                const activeDot = document.querySelector(`.dot[data-target="${id}"]`);
+                if(activeDot) {
+                    activeDot.classList.remove('opacity-40');
+                    activeDot.classList.add('opacity-100', 'scale-125');
+                }
+            }
+        });
+    }, { root: document.getElementById('scroller'), threshold: 0.5 });
+
+    sections.forEach(section => {
+        dotObserver.observe(section);
+    });
+
+    // 3. Click functionality for dots
+    document.querySelectorAll('.dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+            const targetId = dot.getAttribute('data-target');
+            document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
+
 function showBottomRightNotification(message, type = "success") {
   let notificationContainer = document.getElementById("bottom-right-notifications");
   if (!notificationContainer) {
@@ -1313,25 +1397,25 @@ function getParkImage(parkName, index) {
 function renderParks(parks) {
   const parksContainer = document.getElementById("parks-container");
   if (parks.length === 0) {
-    parksContainer.innerHTML = "<p>No parks match your search.</p>";
+    parksContainer.innerHTML = "<p class='text-white'>No parks match your search.</p>";
     return;
   }
 
   const parksHtml = parks
     .map(
       (park, index) => `
-      <div class="col-md-4 mb-4">
-          <div class="card park-card">
-              <img src="${getParkImage(park.name, index)}" class="card-img-top" alt="${park.name}" loading="lazy">
-              <div class="card-body">
-                  <h5 class="card-title">${park.name}</h5>
-                  <p class="card-text">${
-                    park.description || "No description available."
-                  }</p>
-                  <a href="/parks/${
-                    park.id
-                  }" class="btn btn-primary btn-primary">View Details</a>
-              </div>
+      <div class="glass-panel rounded-xl overflow-hidden hover:bg-white/5 transition duration-300 flex flex-col h-full">
+          <div class="h-48 overflow-hidden">
+            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition duration-500 hover:scale-110" alt="${park.name}" loading="lazy">
+          </div>
+          <div class="p-6 flex flex-col flex-grow">
+              <h5 class="font-serif text-xl font-bold text-white mb-2">${park.name}</h5>
+              <p class="font-sans text-sm text-gray-300 mb-4 flex-grow line-clamp-3">${
+                park.description || "No description available."
+              }</p>
+              <a href="/parks/${
+                park.id
+              }" class="inline-block text-center border border-white/30 rounded-full py-2 px-4 text-sm uppercase tracking-widest text-white hover:bg-white hover:text-black transition duration-300">View Details</a>
           </div>
       </div>
   `
