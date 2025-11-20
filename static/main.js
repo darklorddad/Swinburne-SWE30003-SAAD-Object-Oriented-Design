@@ -1404,7 +1404,7 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <div class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-green-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-green-900/10">
+      <div class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-black/50">
           <div class="relative h-64 overflow-hidden">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80"></div>
@@ -1417,7 +1417,7 @@ function renderParks(parks) {
               }</p>
               <a href="/parks/${
                 park.id
-              }" class="mt-auto inline-flex items-center justify-center px-6 py-3 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all duration-300 group-hover:border-white">
+              }" class="mt-auto inline-flex items-center justify-center px-6 py-3 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:!text-black transition-all duration-300 group-hover:border-white">
                   Discover
               </a>
           </div>
