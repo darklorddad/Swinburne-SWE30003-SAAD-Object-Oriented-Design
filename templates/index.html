@@ -25,7 +25,7 @@
 </script>
 {% endblock %}
 
-{% block body_class %}bg-black text-white antialiased overflow-hidden{% endblock %}
+{% block body_class %}bg-black text-white antialiased{% endblock %}
 
 {% block navbar %}
 <!-- Navigation -->
@@ -206,7 +206,7 @@
     </section>
 
     <!-- Section 5: All Parks Grid -->
-    <section id="parks-grid" class="snap-section flex flex-col bg-zinc-900 relative overflow-hidden">
+    <section id="parks-grid" class="snap-section flex flex-col bg-zinc-900 relative">
          <div class="absolute inset-0 z-0 opacity-20">
             <img src="https://images.unsplash.com/photo-1519681393784-d8e5b56524dd?q=80&w=2600&auto=format&fit=crop" 
                  class="w-full h-full object-cover grayscale" alt="Stars">
@@ -223,7 +223,7 @@
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto custom-scrollbar pb-12">
+            <div class="pb-12">
                 <div id="parks-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Parks loaded via JS -->
                     <p class="text-white">Loading parks...</p>

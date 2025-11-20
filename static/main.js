@@ -1093,7 +1093,7 @@ function showAlert(message, type = "info") {
 function initHomeAnimations() {
     // 1. Observer for Reveal Animations
     const observerOptions = {
-        root: document.getElementById('scroller'), // Use the scroll container
+        root: null, // Use viewport
         threshold: 0.2,
     };
 
@@ -1131,7 +1131,7 @@ function initHomeAnimations() {
                 }
             }
         });
-    }, { root: document.getElementById('scroller'), threshold: 0.5 });
+    }, { root: null, threshold: 0.5 });
 
     sections.forEach(section => {
         dotObserver.observe(section);

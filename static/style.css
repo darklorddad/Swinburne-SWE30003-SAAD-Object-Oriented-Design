@@ -132,26 +132,15 @@ main.container {
     padding-top: 0 !important;
 }
 
-/* Scroll Snap Configuration */
+/* Scroll Configuration */
 .snap-container {
-    height: 100vh;
     width: 100%;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
-    /* Hide scrollbar */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.snap-container::-webkit-scrollbar {
-    display: none;
+    position: relative;
 }
 
 .snap-section {
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
-    scroll-snap-align: start;
     position: relative;
     overflow: hidden;
 }
