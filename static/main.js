@@ -370,7 +370,7 @@ function updateNav() {
       } else {
           authLinksContainer.innerHTML = `
             <a href="/login" class="hover:text-white transition-colors no-underline">Login</a>
-            <a href="/register" class="hover:text-white transition-colors border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 no-underline">Register</a>
+            <a href="/register" class="transition-colors border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 no-underline">Register</a>
           `;
       }
   }

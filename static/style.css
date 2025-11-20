@@ -161,6 +161,10 @@ main.container {
     transform-origin: left;
 }
 
+.explore-btn:hover {
+    color: black !important;
+}
+
 /* Navbar Styling (Legacy/Bootstrap override if needed) */
 .navbar {
     background: transparent !important;
