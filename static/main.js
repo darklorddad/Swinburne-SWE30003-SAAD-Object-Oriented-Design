@@ -1404,20 +1404,21 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <div class="group relative bg-zinc-800/50 border border-white/10 rounded-2xl overflow-hidden hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-black/50 flex flex-col h-full">
-          <div class="h-64 overflow-hidden relative">
-            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
-            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
+      <div class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-green-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-green-900/10">
+          <div class="relative h-64 overflow-hidden">
+            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80"></div>
           </div>
-          <div class="p-8 flex flex-col flex-grow relative">
-              <h5 class="font-serif text-2xl font-bold text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
+          <div class="p-6 flex flex-col flex-grow relative">
+              <h5 class="font-serif text-2xl text-white mb-2 group-hover:text-green-400 transition-colors">${park.name}</h5>
+              <div class="h-px w-12 bg-green-500/50 mb-4 group-hover:w-24 transition-all duration-500"></div>
               <p class="font-sans text-sm text-gray-400 mb-6 flex-grow line-clamp-3 leading-relaxed">${
                 park.description || "No description available."
               }</p>
               <a href="/parks/${
                 park.id
-              }" class="inline-block text-center bg-white text-black font-bold rounded-full py-3 px-6 text-xs uppercase tracking-widest hover:bg-green-500 hover:text-white transition-all duration-300 transform group-hover:translate-y-[-2px]">
-                  Explore Park
+              }" class="mt-auto inline-flex items-center justify-center px-6 py-3 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all duration-300 group-hover:border-white">
+                  Discover
               </a>
           </div>
       </div>
