@@ -1404,7 +1404,7 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <div class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-black/50">
+      <a href="/parks/${park.id}" class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-black/50 hover:border-green-500/30 no-underline">
           <div class="relative h-64 overflow-hidden">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80"></div>
@@ -1415,13 +1415,11 @@ function renderParks(parks) {
               <p class="font-sans text-sm text-gray-400 mb-6 flex-grow line-clamp-3 leading-relaxed">${
                 park.description || "No description available."
               }</p>
-              <a href="/parks/${
-                park.id
-              }" class="mt-auto inline-flex items-center justify-center px-6 py-3 border border-white/50 text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:!text-black transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                  Discover
-              </a>
+              <div class="mt-auto text-xs font-sans text-gray-500 uppercase tracking-widest group-hover:text-green-400 transition-colors flex items-center">
+                  Click card to view details <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"></i>
+              </div>
           </div>
-      </div>
+      </a>
   `
     )
     .join("");
