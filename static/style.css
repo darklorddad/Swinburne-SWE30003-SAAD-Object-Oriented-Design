@@ -118,6 +118,7 @@ main.container {
     opacity: 0;
     transform: translateY(80px);
     transition: opacity 2.5s cubic-bezier(0.19, 1, 0.22, 1), transform 2.5s cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: opacity, transform;
 }
 
 .reveal-text.active {
