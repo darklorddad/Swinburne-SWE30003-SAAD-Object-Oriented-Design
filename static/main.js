@@ -1415,7 +1415,7 @@ function renderParks(parks) {
                 park.description || "No description available."
               }</p>
               <div class="mt-auto text-xs font-sans text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors flex items-center">
-                  Discover <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"></i>
+                  <i class="fas fa-arrow-right opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"></i>
               </div>
           </div>
       </a>
