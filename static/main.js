@@ -1406,7 +1406,7 @@ function renderParks(parks) {
       (park, index) => `
       <a href="/parks/${park.id}" class="group flex flex-col h-full glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
           <div class="relative h-48 overflow-hidden">
-            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
+            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
           </div>
           <div class="p-8 flex flex-col flex-grow">
