@@ -1404,7 +1404,14 @@ function getParkImage(parkName, index) {
   }
   
   // Fallback to default images if no match found
-  return fallbackImages[index % fallbackImages.length];
+  // Use a simple hash of the name to pick a stable fallback image
+  let hash = 0;
+  for (let i = 0; i < parkName.length; i++) {
+    hash = parkName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const positiveHash = Math.abs(hash);
+  
+  return fallbackImages[positiveHash % fallbackImages.length];
 }
 
 function renderParks(parks) {
@@ -1417,8 +1424,8 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <a href="/parks/${park.id}" class="group flex flex-col h-full glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
-          <div class="relative h-48 overflow-hidden">
+      <a href="/parks/${park.id}" class="group flex flex-col h-full min-h-[450px] glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
+          <div class="relative h-48 overflow-hidden shrink-0">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
           </div>
