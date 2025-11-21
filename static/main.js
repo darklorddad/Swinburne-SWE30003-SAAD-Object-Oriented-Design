@@ -1404,19 +1404,18 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <a href="/parks/${park.id}" class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-black/50 hover:border-green-500/30 no-underline">
-          <div class="relative h-64 overflow-hidden">
+      <a href="/parks/${park.id}" class="group flex flex-col h-full glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
+          <div class="relative h-48 overflow-hidden">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
-            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80"></div>
+            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
           </div>
-          <div class="p-6 flex flex-col flex-grow relative">
-              <h5 class="font-serif text-2xl text-white mb-2 group-hover:text-green-400 transition-colors">${park.name}</h5>
-              <div class="h-px w-12 bg-green-500/50 mb-4 group-hover:w-24 transition-all duration-500"></div>
-              <p class="font-sans text-sm text-gray-400 mb-6 flex-grow line-clamp-3 leading-relaxed">${
+          <div class="p-8 flex flex-col flex-grow">
+              <h5 class="font-serif text-2xl text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
+              <p class="font-sans text-sm text-gray-300 mb-6 flex-grow line-clamp-3 leading-relaxed">${
                 park.description || "No description available."
               }</p>
-              <div class="mt-auto text-xs font-sans text-gray-500 uppercase tracking-widest group-hover:text-green-400 transition-colors flex items-center">
-                  Click card to view details <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"></i>
+              <div class="mt-auto text-xs font-sans text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors flex items-center">
+                  Discover <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"></i>
               </div>
           </div>
       </a>
