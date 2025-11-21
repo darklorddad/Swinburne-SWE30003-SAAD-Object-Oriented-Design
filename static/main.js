@@ -169,11 +169,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (window.location.pathname === "/") {
-    loadParks();
     const searchInput = document.getElementById("search-input");
     if (searchInput) {
       searchInput.addEventListener("keyup", handleParkSearch);
     }
+
+    loadParks().then(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const query = urlParams.get("q");
+      if (query && searchInput) {
+        searchInput.value = query;
+        searchInput.dispatchEvent(new Event("keyup"));
+
+        if (window.location.hash === "#parks-grid") {
+          const grid = document.getElementById("parks-grid");
+          if (grid) grid.scrollIntoView();
+        }
+      }
+    });
 
     // Initialize Home Page Animations
     initHomeAnimations();
