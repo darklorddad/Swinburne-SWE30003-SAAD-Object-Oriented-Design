@@ -1424,7 +1424,7 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <a href="/parks/${park.id}" class="group flex flex-col h-full min-h-[400px] glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
+      <div class="group flex flex-col h-full min-h-[400px] glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left">
           <div class="relative h-48 overflow-hidden shrink-0">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
@@ -1434,11 +1434,13 @@ function renderParks(parks) {
               <p class="font-sans text-sm text-gray-300 mb-6 flex-grow line-clamp-3 leading-relaxed">${
                 park.description || "No description available."
               }</p>
-              <div class="mt-auto text-xs font-sans text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors flex items-center">
-                  <i class="fas fa-arrow-right opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0"></i>
+              <div class="mt-auto text-center">
+                  <a href="/parks/${park.id}" class="inline-block bg-white/10 backdrop-blur-sm border border-white/50 px-6 py-3 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:!text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] no-underline rounded-full w-full">
+                      Buy Tickets Now
+                  </a>
               </div>
           </div>
-      </a>
+      </div>
   `
     )
     .join("");
