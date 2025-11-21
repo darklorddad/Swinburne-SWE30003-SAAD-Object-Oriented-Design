@@ -183,7 +183,7 @@ main.container {
 }
 
 /* Fallback for pages without hero section */
-body:not(:has(.hero)) .navbar {
+body:not(:has(.hero)):not(.has-full-bg) .navbar {
     position: relative;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%) !important;
     box-shadow: 0 4px 20px rgba(45, 80, 22, 0.4);
@@ -191,14 +191,14 @@ body:not(:has(.hero)) .navbar {
 }
 
 /* Alternative for browsers without :has() support */
-.no-hero-page .navbar {
+.no-hero-page:not(.has-full-bg) .navbar {
     position: relative;
     background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%) !important;
     box-shadow: 0 4px 20px rgba(45, 80, 22, 0.4);
     border-bottom: 3px solid rgba(255, 255, 255, 0.2);
 }
 
-.no-hero-page .brand {
+.no-hero-page:not(.has-full-bg) .brand {
     background: linear-gradient(45deg, #fff, #f0f0f0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1043,7 +1043,7 @@ body:not(:has(.hero)) .navbar {
     background-attachment: fixed;
     background-blend-mode: overlay;
     min-height: calc(100vh - 200px);
-    padding: 2rem 0;
+    padding: 8rem 0 2rem;
     margin: -1.5rem calc(-50vw + 50%) 0 calc(-50vw + 50%);
     padding-left: calc(50vw - 50%);
     padding-right: calc(50vw - 50%);
@@ -2078,3 +2078,164 @@ body:not(:has(.hero)) .navbar {
     color: #2d5016 !important;
     text-shadow: none !important;
 }
+
+/* Glassmorphism Styles for Profile Page */
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    overflow: hidden;
+    color: white;
+}
+
+.glass-card .card-header {
+    background: rgba(255, 255, 255, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 1.5rem;
+}
+
+.glass-card .card-body {
+    background: transparent;
+    color: white;
+}
+
+.glass-input {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    border-radius: 10px;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: #4ade80 !important; /* Green-400 */
+    box-shadow: 0 0 0 0.25rem rgba(74, 222, 128, 0.25) !important;
+    color: white !important;
+}
+
+.glass-input:disabled {
+    background: rgba(255, 255, 255, 0.02) !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.glass-header {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: white !important;
+    text-shadow: none !important;
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+/* Override for order cards on profile page */
+.profile-wrapper .order-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.profile-wrapper .order-card .card-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.profile-wrapper .order-card .list-group-item {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.profile-wrapper .order-card strong {
+    color: #4ade80; /* Green-400 */
+}
+
+.profile-wrapper .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Custom Reschedule Modal Styling */
+.reschedule-modal .modal-content {
+    background-color: #212529; /* Dark Body */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    color: white;
+}
+
+.reschedule-modal .modal-header {
+    background-color: #2d5016; /* Dark Green */
+    color: white;
+    border-bottom: none;
+    font-family: 'Playfair Display', serif;
+    border-radius: 15px 15px 0 0;
+}
+
+.reschedule-modal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.reschedule-modal .form-label {
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.5px;
+}
+
+.reschedule-modal .form-control {
+    background-color: #343a40 !important;
+    border: 1px solid #495057 !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+.reschedule-modal .form-control::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+}
+
+.reschedule-modal .modal-footer {
+    background-color: #343a40;
+    border-top: 1px solid #495057;
+    border-radius: 0 0 15px 15px;
+}
+
+.reschedule-modal .btn-close-modal {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.reschedule-modal .btn-close-modal:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.reschedule-modal .btn-confirm-reschedule {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.reschedule-modal .btn-confirm-reschedule:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
