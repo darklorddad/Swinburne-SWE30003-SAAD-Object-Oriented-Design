@@ -117,7 +117,7 @@ main.container {
 .reveal-text {
     opacity: 0;
     transform: translateY(80px);
-    transition: all 2.5s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: opacity 2.5s cubic-bezier(0.19, 1, 0.22, 1), transform 2.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .reveal-text.active {
