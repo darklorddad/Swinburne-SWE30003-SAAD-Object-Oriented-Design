@@ -1404,7 +1404,7 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <a href="/parks/${park.id}" class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-black/50 hover:border-green-500/30 no-underline">
+      <a href="/parks/${park.id}" class="group flex flex-col h-full bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-black/50 hover:border-green-500/30 no-underline">
           <div class="relative h-64 overflow-hidden">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80"></div>
