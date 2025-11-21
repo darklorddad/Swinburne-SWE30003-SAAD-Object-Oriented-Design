@@ -1424,12 +1424,12 @@ function renderParks(parks) {
   const parksHtml = parks
     .map(
       (park, index) => `
-      <a href="/parks/${park.id}" class="group flex flex-col h-full min-h-[450px] glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
+      <a href="/parks/${park.id}" class="group flex flex-col h-full min-h-[400px] glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left no-underline">
           <div class="relative h-48 overflow-hidden shrink-0">
             <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
             <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
           </div>
-          <div class="p-8 flex flex-col flex-grow">
+          <div class="p-6 flex flex-col flex-grow">
               <h5 class="font-serif text-2xl text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
               <p class="font-sans text-sm text-gray-300 mb-6 flex-grow line-clamp-3 leading-relaxed">${
                 park.description || "No description available."
