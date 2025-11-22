@@ -1,52 +1,105 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="park-detail-wrapper">
-    <div id="alert-placeholder"></div>
-    <div id="park-detail-container" class="park-detail-container">
-        <p class="loading">Loading park details...</p>
-    </div>
+{% block head_extra %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    serif: ['"Playfair Display"', 'serif'],
+                    sans: ['"Montserrat"', 'sans-serif'],
+                },
+                letterSpacing: {
+                    'widest-xl': '0.25em',
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}
+
+{% block body_class %}has-full-bg{% endblock %}
+
+{% block navbar %}
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-50 glass-nav px-8 py-6 flex justify-between items-center">
+    <a href="/" class="text-2xl font-serif font-bold tracking-widest text-white cursor-pointer no-underline">
+        SARAWAK<span class="text-green-500">.</span>
+    </a>
     
-    <div id="order-form-container" class="order-form-container mt-4">
-        <!-- Order form will be built here by JS -->
+    <div class="hidden md:flex space-x-8 text-sm font-sans tracking-widest uppercase text-gray-300 items-center">
+        <a href="/" class="hover:text-white transition-colors no-underline">Home</a>
+        <a href="/#parks-grid" class="hover:text-white transition-colors no-underline">All Parks</a>
+        
+        <!-- Auth Links will be injected here by main.js -->
+        <div id="auth-links" class="flex items-center space-x-6 border-l border-gray-500 pl-6">
+            <!-- JS will populate this -->
+        </div>
+    </div>
+
+    <!-- Mobile Menu Icon -->
+    <div class="md:hidden text-white text-xl cursor-pointer">
+        <i class="fas fa-bars"></i>
+    </div>
+</nav>
+{% endblock %}
+
+{% block main_class %}p-0 m-0 w-full{% endblock %}
+
+{% block content %}
+<div class="park-detail-wrapper flex items-center justify-center py-24">
+    <div class="container mx-auto px-4 md:px-8 max-w-5xl">
+        <div id="alert-placeholder"></div>
+        
+        <!-- Park Info Card -->
+        <div class="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-xl mb-8 p-8">
+            <div id="park-detail-container" class="park-detail-container">
+                <p class="loading text-gray-700">Loading park details...</p>
+            </div>
+        </div>
+        
+        <!-- Order Form Card -->
+        <div class="bg-white/90 backdrop-blur-md border border-white/40 rounded-2xl shadow-xl p-8">
+             <div id="order-form-container" class="order-form-container">
+                <!-- Order form will be built here by JS -->
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
 
 {% block modals %}
 <div class="modal fade" id="orderSummaryModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">Confirm Your Order</h5>
+    <div class="modal-content bg-zinc-900 text-white border border-zinc-700">
+      <div class="modal-header border-zinc-700 bg-green-900/50">
+        <h5 class="modal-title font-serif">Confirm Your Order</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <h6 class="fw-bold" id="summary-park-name">Park Name</h6>
-        <hr>
-        <div id="summary-items-list">
-
+        <h6 class="fw-bold font-serif text-xl mb-3" id="summary-park-name">Park Name</h6>
+        <hr class="border-zinc-700 my-3">
+        <div id="summary-items-list" class="space-y-2">
+            <!-- JS will inject items here -->
         </div>
-        <hr>
+        <hr class="border-zinc-700 my-3">
         <div class="d-flex justify-content-between align-items-center">
             <span class="fw-bold">Total Amount:</span>
-            <span class="fs-4 fw-bold text-success" id="summary-total">RM 0.00</span>
+            <span class="fs-4 fw-bold text-green-400" id="summary-total">RM 0.00</span>
         </div>
-        <div class="alert alert-info mt-3 mb-0 py-2" style="font-size: 0.9rem;">
-            <i class="bi bi-info-circle"></i> Payment will be simulated immediately.
+        <div class="alert alert-info mt-3 mb-0 py-2 bg-blue-900/30 border-blue-800 text-blue-200" style="font-size: 0.9rem;">
+            <i class="bi bi-info-circle me-2"></i> Payment will be simulated immediately.
         </div>
       </div>
-      <div class="modal-footer d-flex justify-content-center">
-        <div class="col">
-            <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Edit</button>
-        </div>
-        <div class="col">
-            <button type="button" class="btn btn-success w-100" id="btn-confirm-payment">
-                Confirm & Pay
-            </button>
-        </div>
+      <div class="modal-footer border-zinc-700 flex gap-3">
+          <button type="button" class="btn btn-secondary w-1/2 m-0" data-bs-dismiss="modal">Edit</button>
+          <button type="button" class="btn btn-success w-1/2 m-0" id="btn-confirm-payment">
+              Confirm & Pay
+          </button>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
-{% endblock %}
+

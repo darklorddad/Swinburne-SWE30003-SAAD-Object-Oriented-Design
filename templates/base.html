@@ -13,27 +13,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                preflight: false, // Important to prevent conflicts with Bootstrap
+            },
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Montserrat"', 'sans-serif'],
+                    },
+                    letterSpacing: {
+                        'widest-xl': '0.25em',
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="/static/style.css?v=1.0.3">
     {% block head_extra %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
     {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar">
-        <div class="container-fluid">
-            <a class="navbar-brand brand" href="/">National Parks</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto" id="nav-items">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/register">Register</a>
-                    </li>
-                </ul>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-nav px-8 py-6 flex justify-between items-center">
+        <a href="/" class="text-2xl font-serif font-bold tracking-widest text-white cursor-pointer no-underline">
+            SARAWAK<span class="text-green-500">.</span>
+        </a>
+        
+        <div class="hidden md:flex space-x-8 text-sm font-sans tracking-widest uppercase text-gray-300 items-center">
+            <a href="/" class="hover:text-white transition-colors no-underline">Home</a>
+            <a href="/#parks-grid" class="hover:text-white transition-colors no-underline">All Parks</a>
+            
+            <!-- Auth Links will be injected here by main.js -->
+            <div id="auth-links" class="flex items-center space-x-6 border-l border-gray-500 pl-6">
+                <!-- JS will populate this -->
             </div>
+        </div>
+
+        <!-- Mobile Menu Icon (functionality to be added if needed) -->
+        <div class="md:hidden text-white text-xl cursor-pointer">
+            <i class="fas fa-bars"></i>
         </div>
     </nav>
     {% endblock %}

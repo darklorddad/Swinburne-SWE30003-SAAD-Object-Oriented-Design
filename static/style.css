@@ -1007,11 +1007,9 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
     background-repeat: no-repeat, no-repeat;
     background-attachment: fixed;
     background-blend-mode: overlay;
-    min-height: calc(100vh - 200px);
-    padding: 2rem 0;
-    margin: -1.5rem calc(-50vw + 50%) 0 calc(-50vw + 50%);
-    padding-left: calc(50vw - 50%);
-    padding-right: calc(50vw - 50%);
+    min-height: 100vh;
+    padding: 8rem 0 2rem;
+    margin: 0;
     width: 100vw;
     position: relative;
 }
@@ -2049,11 +2047,9 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-blend-mode: overlay;
-    min-height: calc(100vh - 200px);
-    padding: 2rem 0;
-    margin: -1.5rem calc(-50vw + 50%) 0 calc(-50vw + 50%);
-    padding-left: calc(50vw - 50%);
-    padding-right: calc(50vw - 50%);
+    min-height: 100vh;
+    padding: 8rem 0 2rem;
+    margin: 0;
     width: 100vw;
     position: relative;
 }
@@ -2237,5 +2233,28 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
 .reschedule-modal .btn-confirm-reschedule:hover {
     background-color: #218838;
     border-color: #1e7e34;
+}
+
+/* Fix for blue links in Tailwind navbar due to Bootstrap conflict */
+nav.glass-nav a {
+    color: #d1d5db; /* gray-300 */
+    text-decoration: none !important;
+}
+nav.glass-nav a:hover {
+    color: white !important;
+}
+
+/* Background for pages with full background class */
+body.has-full-bg {
+    background-image: 
+        url('https://images.unsplash.com/photo-1473773508845-188df298d2d1?q=80&w=2070&auto=format&fit=crop'),
+        linear-gradient(135deg, rgba(26, 46, 13, 0.8) 0%, rgba(45, 80, 22, 0.7) 100%);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+    min-height: 100vh;
+    margin: 0;
 }
 
