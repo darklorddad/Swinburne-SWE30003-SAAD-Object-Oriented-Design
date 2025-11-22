@@ -1266,9 +1266,9 @@ async function loadProfileData() {
                                 if (item.ticket_type_id) { 
                                     // Generate placeholder
                                     if(order.status !== 'cancelled' && order.status !== 'refunded') {
-                                        qrHtml = `<div class="mt-2 ms-3">
-                                                    <small class="text-muted" style="font-size: 0.7rem;">Scan for Entry:</small>
-                                                    <div id="qrcode-${item.id}" class="qr-placeholder"></div>
+                                        qrHtml = `<div class="mt-4 flex flex-col items-center gap-2 w-full sm:w-auto">
+                                                    <small class="text-gray-400 text-xs uppercase tracking-wider font-bold">Scan for Entry</small>
+                                                    <div id="qrcode-${item.id}" class="p-2 bg-white rounded-lg shadow-md"></div>
                                                   </div>`;
                                     }
                                 }
@@ -1280,11 +1280,11 @@ async function loadProfileData() {
                                   itemText = `${item.quantity} x ${item.merchandise.name}`;
                                 }
 
-                                return `<li class="list-group-item d-flex justify-content-between align-items-start flex-wrap">
-                                            <div class="ms-2 me-auto">
-                                                <div class="fw-bold">${itemText}</div>
-                                                ${qrHtml} 
+                                return `<li class="list-group-item d-flex flex-column sm:flex-row justify-content-between align-items-center sm:align-items-start p-4 bg-transparent border-b border-white/10">
+                                            <div class="mb-3 sm:mb-0">
+                                                <div class="fw-bold text-white text-lg mb-1">${itemText}</div>
                                             </div>
+                                            ${qrHtml}
                                         </li>`;
                             }).join("")}
                         </ul>
