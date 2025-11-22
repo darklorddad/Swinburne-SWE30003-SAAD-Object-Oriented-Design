@@ -34,7 +34,7 @@
         <a href="/#parks-grid" class="hover:text-white transition-colors no-underline">All Parks</a>
         
         <!-- Auth Links will be injected here by main.js -->
-        <div id="auth-links" class="flex items-center space-x-6 border-l border-gray-500 pl-6">
+        <div id="auth-links" class="flex items-center space-x-6 border-l border-solid border-gray-500 pl-6">
             <!-- JS will populate this -->
         </div>
     </div>
@@ -50,37 +50,41 @@
 {% block main_class %}p-0 m-0 w-full{% endblock %}
 
 {% block content %}
-<div class="profile-wrapper">
-<h2 class="glass-header mb-4 text-center" style="font-size: 2.5rem;">My Profile</h2>
-<div class="container mx-auto px-4 md:px-8">
-    <div class="max-w-5xl mx-auto">
+<div class="profile-wrapper flex flex-col items-center justify-center pt-32 pb-24 min-h-screen">
+    <div class="container mx-auto px-4 md:px-8 max-w-5xl">
+        <h2 class="glass-header mb-12 text-center text-5xl font-serif font-bold">My Profile</h2>
         <div id="alert-placeholder"></div>
-        <div class="glass-card mb-5">
-            <div class="card-header border-0">
-                <h5 class="mb-0">User Information</h5>
+        
+        <!-- User Info Card -->
+        <div class="glass-card p-8 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl mb-8 mt-4">
+            <div class="border-b border-white/10 pb-4 mb-6">
+                <h5 class="text-2xl font-serif text-white font-bold">User Information</h5>
             </div>
-            <div class="card-body p-6">
-                <form id="profile-update-form">
-                    <div class="mb-4">
-                        <label for="profile-full-name" class="glass-label mb-2">Full Name</label>
-                        <input type="text" class="form-control glass-input" id="profile-full-name">
+            <div>
+                <form id="profile-update-form" class="space-y-6">
+                    <div>
+                        <label for="profile-full-name" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Full Name</label>
+                        <input type="text" id="profile-full-name" class="appearance-none block w-full px-4 py-3 border border-white/20 placeholder-gray-500 text-white rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:text-sm transition-all duration-300 glass-input">
                     </div>
-                    <div class="mb-5">
-                        <label for="profile-email" class="glass-label mb-2">Email</label>
-                        <input type="email" class="form-control glass-input" id="profile-email" disabled>
+                    <div>
+                        <label for="profile-email" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Email</label>
+                        <input type="email" id="profile-email" disabled class="appearance-none block w-full px-4 py-3 border border-white/10 text-gray-400 rounded-lg bg-white/5 sm:text-sm glass-input opacity-75 cursor-not-allowed">
                     </div>
-                    <div class="flex justify-center">
-                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-sans font-bold uppercase tracking-widest py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-green-500/50">Update Profile</button>
+                    <div class="flex justify-center pt-2">
+                        <button type="submit" class="bg-green-600 hover:bg-green-500 text-white font-bold uppercase tracking-widest py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-green-500/30 transform hover:-translate-y-1">Update Profile</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <h3 class="glass-header mb-4 text-2xl">My Orders</h3>
-        <div id="orders-container">
-            <div class="glass-card mb-4">
-                <div class="card-body text-center p-8">
-                    <p class="text-white mb-0">Loading orders...</p>
+        <!-- Orders Card -->
+        <div class="glass-card p-8 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl">
+            <div class="border-b border-white/10 pb-4 mb-6">
+                <h3 class="text-2xl font-serif text-white font-bold">My Orders</h3>
+            </div>
+            <div id="orders-container" class="space-y-4">
+                <div class="text-center p-8">
+                    <p class="text-gray-300 mb-0">Loading orders...</p>
                 </div>
             </div>
         </div>
@@ -89,25 +93,25 @@
 {% endblock %}
 
 {% block modals %}
-<div class="modal fade reschedule-modal" id="rescheduleModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Reschedule Booking</h5>
+      <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+        <div class="modal-header border-zinc-700 bg-green-900/30">
+          <h5 class="modal-title font-serif text-xl">Reschedule Booking</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body p-6">
           <form id="reschedule-form">
             <input type="hidden" id="reschedule-order-id">
             <div class="mb-3">
-              <label for="new-visit-date" class="form-label">Select New Visit Date</label>
-              <input type="date" class="form-control" id="new-visit-date" required placeholder="dd/mm/yyyy">
+              <label for="new-visit-date" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Select New Visit Date</label>
+              <input type="date" class="form-control glass-input bg-white/10 border-white/20 text-white rounded-lg" id="new-visit-date" required>
             </div>
           </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-close-modal rounded-pill" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-success btn-confirm-reschedule rounded-pill" id="confirm-reschedule-btn">Confirm Reschedule</button>
+        <div class="modal-footer border-zinc-700 p-4">
+          <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success rounded-full px-6 bg-green-600 hover:bg-green-500 border-none" id="confirm-reschedule-btn">Confirm Reschedule</button>
         </div>
       </div>
     </div>
@@ -115,25 +119,25 @@
 
 <div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-zinc-800 text-white">
-      <div class="modal-header border-zinc-700">
-        <h5 class="modal-title font-serif">Request Refund</h5>
+    <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+      <div class="modal-header border-zinc-700 bg-green-900/30">
+        <h5 class="modal-title font-serif text-xl">Request Refund</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p class="text-gray-400">Please tell us why you are requesting a refund (e.g., Weather, Change of plans).</p>
+      <div class="modal-body p-6">
+        <p class="text-gray-400 mb-4 text-sm">Please tell us why you are requesting a refund (e.g., Weather, Change of plans).</p>
         <form id="refund-form">
           <input type="hidden" id="refund-order-id">
           <div class="mb-3">
-            <label for="refund-reason" class="form-label glass-label">Reason</label>
-            <textarea class="form-control glass-input" id="refund-reason" rows="3" required></textarea>
+            <label for="refund-reason" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Reason</label>
+            <textarea class="form-control glass-input bg-white/10 border-white/20 text-white rounded-lg" id="refund-reason" rows="3" required></textarea>
           </div>
           <div id="refund-alert-placeholder"></div>
         </form>
       </div>
-      <div class="modal-footer border-zinc-700">
-        <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-danger rounded-pill" id="confirm-refund-btn">Confirm Refund</button>
+      <div class="modal-footer border-zinc-700 p-4">
+        <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger rounded-full px-6" id="confirm-refund-btn">Confirm Refund</button>
       </div>
     </div>
   </div>
