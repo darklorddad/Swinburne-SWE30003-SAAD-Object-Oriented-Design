@@ -1,55 +1,85 @@
 {% extends "base.html" %}
 
+{% block head_extra %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    serif: ['"Playfair Display"', 'serif'],
+                    sans: ['"Montserrat"', 'sans-serif'],
+                },
+                letterSpacing: {
+                    'widest-xl': '0.25em',
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}
+
+{% block body_class %}has-full-bg{% endblock %}
+
+{% block main_class %}p-0 m-0 w-full{% endblock %}
+
 {% block content %}
-<div class="admin-wrapper">
-<h2 class="page-title">Admin Dashboard</h2>
-<div id="alert-placeholder"></div>
+<div class="admin-wrapper flex flex-col items-center py-24 min-h-screen">
+    <div class="container mx-auto px-4 md:px-8 max-w-7xl">
+        <h2 class="glass-header text-center text-5xl mb-12 font-serif font-bold">Admin Dashboard</h2>
+        <div id="alert-placeholder"></div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card admin-card">
-            <div class="card-header card-header">
-                Visitor Statistics
-            </div>
-            <div class="card-body card-body" id="statistics-container">
-                <p class="loading">Loading statistics...</p>
+        <!-- Stats Section -->
+        <div class="row mb-8">
+            <div class="col-md-12">
+                <div class="glass-card p-8 bg-black/40">
+                    <div class="card-header border-b border-white/10 bg-transparent p-0 mb-6">
+                        <h5 class="text-2xl font-serif text-white mb-4">Visitor Statistics</h5>
+                    </div>
+                    <div class="card-body p-0" id="statistics-container">
+                        <p class="loading text-gray-300">Loading statistics...</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-8">
-        <div class="card admin-card">
-            <div class="card-header card-header">
-                Manage Parks
-            </div>
-            <div class="card-body card-body" id="parks-management-container">
-                <p class="loading">Loading parks...</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card admin-card">
-            <div class="card-header card-header">
-                Add New Park
-            </div>
-            <div class="card-body card-body">
-                <form id="create-park-form">
-                    <div class="mb-3">
-                        <label for="park-name" class="form-label form-label">Park Name</label>
-                        <input type="text" class="form-control form-control" id="park-name" required>
+        <div class="row g-8">
+            <!-- Manage Parks Section -->
+            <div class="col-md-8">
+                <div class="glass-card p-8 bg-black/40 h-full">
+                    <div class="card-header border-b border-white/10 bg-transparent p-0 mb-6">
+                        <h5 class="text-2xl font-serif text-white mb-4">Manage Parks</h5>
                     </div>
-                    <div class="mb-3">
-                        <label for="park-location" class="form-label form-label">Location</label>
-                        <input type="text" class="form-control form-control" id="park-location">
+                    <div class="card-body p-0" id="parks-management-container">
+                        <p class="loading text-gray-300">Loading parks...</p>
                     </div>
-                    <div class="mb-3">
-                        <label for="park-description" class="form-label form-label">Description</label>
-                        <textarea class="form-control form-control" id="park-description" rows="3"></textarea>
+                </div>
+            </div>
+
+            <!-- Add New Park Section -->
+            <div class="col-md-4">
+                <div class="glass-card p-8 bg-black/40 h-full">
+                    <div class="card-header border-b border-white/10 bg-transparent p-0 mb-6">
+                        <h5 class="text-2xl font-serif text-white mb-4">Add New Park</h5>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-primary w-100">Create Park</button>
-                </form>
+                    <div class="card-body p-0">
+                        <form id="create-park-form" class="space-y-4">
+                            <div>
+                                <label for="park-name" class="glass-label mb-2 block">Park Name</label>
+                                <input type="text" class="form-control glass-input w-full" id="park-name" required>
+                            </div>
+                            <div>
+                                <label for="park-location" class="glass-label mb-2 block">Location</label>
+                                <input type="text" class="form-control glass-input w-full" id="park-location">
+                            </div>
+                            <div>
+                                <label for="park-description" class="glass-label mb-2 block">Description</label>
+                                <textarea class="form-control glass-input w-full" id="park-description" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-lg uppercase tracking-widest text-sm mt-2">Create Park</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -57,32 +87,32 @@
 
 <!-- Modal for editing a park -->
 <div class="modal fade" id="editParkModal" tabindex="-1" aria-labelledby="editParkModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content modal-content">
-      <div class="modal-header modal-header">
-        <h5 class="modal-title modal-title" id="editParkModalLabel">Edit Park</h5>
-        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+      <div class="modal-header border-zinc-700 bg-green-900/30">
+        <h5 class="modal-title font-serif text-xl" id="editParkModalLabel">Edit Park</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body modal-body">
-        <form id="edit-park-form">
+      <div class="modal-body p-6">
+        <form id="edit-park-form" class="space-y-4">
           <input type="hidden" id="edit-park-id">
-          <div class="mb-3">
-            <label for="edit-park-name" class="form-label form-label">Park Name</label>
-            <input type="text" class="form-control form-control" id="edit-park-name" required>
+          <div>
+            <label for="edit-park-name" class="glass-label mb-2 block">Park Name</label>
+            <input type="text" class="form-control glass-input" id="edit-park-name" required>
           </div>
-          <div class="mb-3">
-            <label for="edit-park-location" class="form-label form-label">Location</label>
-            <input type="text" class="form-control form-control" id="edit-park-location">
+          <div>
+            <label for="edit-park-location" class="glass-label mb-2 block">Location</label>
+            <input type="text" class="form-control glass-input" id="edit-park-location">
           </div>
-          <div class="mb-3">
-            <label for="edit-park-description" class="form-label form-label">Description</label>
-            <textarea class="form-control form-control" id="edit-park-description" rows="3"></textarea>
+          <div>
+            <label for="edit-park-description" class="glass-label mb-2 block">Description</label>
+            <textarea class="form-control glass-input" id="edit-park-description" rows="3"></textarea>
           </div>
         </form>
       </div>
-      <div class="modal-footer modal-footer">
-        <button type="button" class="btn btn-secondary btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary btn-primary" id="save-park-changes-btn">Save changes</button>
+      <div class="modal-footer border-zinc-700 p-4">
+        <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success rounded-full px-6 bg-green-600 hover:bg-green-500 border-none" id="save-park-changes-btn">Save changes</button>
       </div>
     </div>
   </div>
@@ -90,29 +120,29 @@
 
 <!-- Modal for adding/editing a ticket type -->
 <div class="modal fade" id="ticketTypeModal" tabindex="-1" aria-labelledby="ticketTypeModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content modal-content">
-      <div class="modal-header modal-header">
-        <h5 class="modal-title modal-title" id="ticketTypeModalLabel">Add/Edit Ticket Type</h5>
-        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+      <div class="modal-header border-zinc-700 bg-green-900/30">
+        <h5 class="modal-title font-serif text-xl" id="ticketTypeModalLabel">Add/Edit Ticket Type</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body modal-body">
-        <form id="ticket-type-form">
+      <div class="modal-body p-6">
+        <form id="ticket-type-form" class="space-y-4">
           <input type="hidden" id="tt-park-id">
           <input type="hidden" id="tt-id">
-          <div class="mb-3">
-            <label for="tt-name" class="form-label form-label">Ticket Type Name</label>
-            <input type="text" class="form-control form-control" id="tt-name" required>
+          <div>
+            <label for="tt-name" class="glass-label mb-2 block">Ticket Type Name</label>
+            <input type="text" class="form-control glass-input" id="tt-name" required>
           </div>
-          <div class="mb-3">
-            <label for="tt-price" class="form-label form-label">Price (RM)</label>
-            <input type="number" class="form-control form-control" id="tt-price" step="0.01" min="0" required>
+          <div>
+            <label for="tt-price" class="glass-label mb-2 block">Price (RM)</label>
+            <input type="number" class="form-control glass-input" id="tt-price" step="0.01" min="0" required>
           </div>
         </form>
       </div>
-      <div class="modal-footer modal-footer">
-        <button type="button" class="btn btn-secondary btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary btn-primary" id="save-tt-changes-btn">Save changes</button>
+      <div class="modal-footer border-zinc-700 p-4">
+        <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success rounded-full px-6 bg-green-600 hover:bg-green-500 border-none" id="save-tt-changes-btn">Save changes</button>
       </div>
     </div>
   </div>
@@ -120,40 +150,39 @@
 
 <!-- Modal for adding/editing merchandise -->
 <div class="modal fade" id="merchandiseModal" tabindex="-1" aria-labelledby="merchandiseModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content modal-content">
-      <div class="modal-header modal-header">
-        <h5 class="modal-title modal-title" id="merchandiseModalLabel">Add/Edit Merchandise</h5>
-        <button type="button" class="btn-close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+      <div class="modal-header border-zinc-700 bg-green-900/30">
+        <h5 class="modal-title font-serif text-xl" id="merchandiseModalLabel">Add/Edit Merchandise</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body modal-body">
-        <form id="merchandise-form">
+      <div class="modal-body p-6">
+        <form id="merchandise-form" class="space-y-4">
           <input type="hidden" id="merch-park-id">
           <input type="hidden" id="merch-id">
-          <div class="mb-3">
-            <label for="merch-name" class="form-label form-label">Name</label>
-            <input type="text" class="form-control form-control" id="merch-name" required>
+          <div>
+            <label for="merch-name" class="glass-label mb-2 block">Name</label>
+            <input type="text" class="form-control glass-input" id="merch-name" required>
           </div>
-          <div class="mb-3">
-            <label for="merch-description" class="form-label form-label">Description</label>
-            <textarea class="form-control form-control" id="merch-description" rows="2"></textarea>
+          <div>
+            <label for="merch-description" class="glass-label mb-2 block">Description</label>
+            <textarea class="form-control glass-input" id="merch-description" rows="2"></textarea>
           </div>
-          <div class="mb-3">
-            <label for="merch-price" class="form-label form-label">Price (RM)</label>
-            <input type="number" class="form-control form-control" id="merch-price" step="0.01" min="0" required>
+          <div>
+            <label for="merch-price" class="glass-label mb-2 block">Price (RM)</label>
+            <input type="number" class="form-control glass-input" id="merch-price" step="0.01" min="0" required>
           </div>
-          <div class="mb-3">
-            <label for="merch-stock" class="form-label form-label">Stock</label>
-            <input type="number" class="form-control form-control" id="merch-stock" min="0" required>
+          <div>
+            <label for="merch-stock" class="glass-label mb-2 block">Stock</label>
+            <input type="number" class="form-control glass-input" id="merch-stock" min="0" required>
           </div>
         </form>
       </div>
-      <div class="modal-footer modal-footer">
-        <button type="button" class="btn btn-secondary btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary btn-primary" id="save-merch-changes-btn">Save changes</button>
+      <div class="modal-footer border-zinc-700 p-4">
+        <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success rounded-full px-6 bg-green-600 hover:bg-green-500 border-none" id="save-merch-changes-btn">Save changes</button>
       </div>
     </div>
   </div>
-</div>
 </div>
 {% endblock %}

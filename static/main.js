@@ -203,8 +203,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Event delegation for dynamically added buttons
   document.body.addEventListener("click", async (event) => {
-    if (event.target.id === "logout-btn") {
+    const logoutBtn = event.target.closest("#logout-btn");
+    if (logoutBtn) {
+      event.preventDefault();
       handleLogout();
+      return;
     }
     if (event.target.id === "confirm-reschedule-btn") {
       event.preventDefault(); // Prevent any default form submission
@@ -354,6 +357,16 @@ function updateNav() {
                     <a class="nav-link" href="#" id="logout-btn">Logout</a>
                 </li>
             `;
+        
+        // Attach listener directly
+        const logoutBtn = navItems.querySelector("#logout-btn");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+        }
+
       } else {
         navItems.innerHTML = `
                 <li class="nav-item">
@@ -380,10 +393,20 @@ function updateNav() {
             ${adminLink}
             <a href="#" id="logout-btn" class="hover:text-white transition-colors no-underline">Logout</a>
           `;
+
+          // Attach listener directly
+          const logoutBtn = authLinksContainer.querySelector("#logout-btn");
+          if (logoutBtn) {
+              logoutBtn.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  handleLogout();
+              });
+          }
+
       } else {
           authLinksContainer.innerHTML = `
             <a href="/login" class="hover:text-white transition-colors no-underline">Login</a>
-            <a href="/register" class="transition-colors border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 no-underline">Register</a>
+            <a href="/register" class="hover:text-white transition-colors no-underline">Register</a>
           `;
       }
   }
@@ -528,7 +551,7 @@ async function loadAdminParks() {
 
     const parks = await parksResponse.json();
     if (parks.length === 0) {
-      container.innerHTML = "<p>No parks have been created yet.</p>";
+      container.innerHTML = "<p class='text-gray-400 p-4'>No parks have been created yet.</p>";
       return;
     }
 
@@ -554,25 +577,25 @@ async function loadAdminParks() {
 
     const parksWithDetails = await Promise.all(parksWithDetailsPromises);
 
-    const accordionId = "parks-accordion";
     const parksHtml = parksWithDetails
       .map((park) => {
         const statusBadge = park.is_active
           ? ""
-          : ' <span class="badge bg-secondary">Inactive</span>';
+          : ' <span class="inline-block px-2 py-1 text-xs font-bold text-white bg-gray-600 rounded-full ml-2">Inactive</span>';
+        
         const ticketTypesHtml =
           park.ticketTypes.length > 0
             ? park.ticketTypes
                 .map((tt) => {
-                  const statusBadge = tt.is_active
+                  const ttBadge = tt.is_active
                     ? ""
-                    : ' <span class="badge bg-secondary">Inactive</span>';
+                    : ' <span class="text-xs text-gray-500 ml-2">(Inactive)</span>';
                   return `
-                <li class="list-group-item list-group-item d-flex justify-content-between align-items-center">
-                    <span>${tt.name} - RM ${tt.price.toFixed(2)}${statusBadge}</span>
-                    <div>
+                <li class="flex justify-between items-center p-3 border-b border-white/10 last:border-0 text-gray-300 hover:bg-white/5 transition-colors">
+                    <span>${tt.name} - RM ${tt.price.toFixed(2)}${ttBadge}</span>
+                    <div class="flex gap-2">
                         <button
-                            class="btn btn-outline-secondary btn-sm btn-secondary edit-tt-btn"
+                            class="px-3 py-1 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-tt-btn"
                             data-bs-toggle="modal"
                             data-bs-target="#ticketTypeModal"
                             data-park-id="${park.id}"
@@ -583,7 +606,7 @@ async function loadAdminParks() {
                             Edit
                         </button>
                         <button
-                            class="btn btn-outline-danger btn-sm btn-danger delete-tt-btn"
+                            class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-tt-btn"
                             data-park-id="${park.id}"
                             data-tt-id="${tt.id}"
                         >
@@ -594,24 +617,24 @@ async function loadAdminParks() {
             `;
                 })
                 .join("")
-            : '<li class="list-group-item list-group-item">No ticket types found for this park.</li>';
+            : '<li class="p-3 text-gray-500 italic text-sm">No ticket types found.</li>';
 
         const merchandiseHtml =
           park.merchandise.length > 0
             ? park.merchandise
                 .map((m) => {
-                  const statusBadge = m.is_active
+                  const mBadge = m.is_active
                     ? ""
-                    : ' <span class="badge bg-secondary">Inactive</span>';
+                    : ' <span class="text-xs text-gray-500 ml-2">(Inactive)</span>';
                   return `
-                <li class="list-group-item list-group-item d-flex justify-content-between align-items-center">
+                <li class="flex justify-between items-center p-3 border-b border-white/10 last:border-0 text-gray-300 hover:bg-white/5 transition-colors">
                     <div>
-                        ${m.name} - RM ${m.price.toFixed(2)}${statusBadge}<br>
-                        <small class="text-muted">Stock: ${m.stock}</small>
+                        <span class="block">${m.name} - RM ${m.price.toFixed(2)}${mBadge}</span>
+                        <small class="text-gray-500 text-xs">Stock: ${m.stock}</small>
                     </div>
-                    <div>
+                    <div class="flex gap-2">
                         <button
-                            class="btn btn-outline-secondary btn-sm btn-secondary edit-merch-btn"
+                            class="px-3 py-1 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-merch-btn"
                             data-bs-toggle="modal"
                             data-bs-target="#merchandiseModal"
                             data-park-id="${park.id}"
@@ -624,7 +647,7 @@ async function loadAdminParks() {
                             Edit
                         </button>
                         <button
-                            class="btn btn-outline-danger btn-sm btn-danger delete-merch-btn"
+                            class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-merch-btn"
                             data-park-id="${park.id}"
                             data-merch-id="${m.id}"
                         >
@@ -635,35 +658,24 @@ async function loadAdminParks() {
             `;
                 })
                 .join("")
-            : '<li class="list-group-item list-group-item">No merchandise found for this park.</li>';
+            : '<li class="p-3 text-gray-500 italic text-sm">No merchandise found.</li>';
 
         return `
-        <div class="accordion-item accordion-item">
-            <h2 class="accordion-header" id="heading-${park.id}">
-                <button class="accordion-button collapsed accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${
-                  park.id
-                }" aria-expanded="false" aria-controls="collapse-${park.id}">
-                    ${park.name}${statusBadge}
-                </button>
-            </h2>
-            <div id="collapse-${
-              park.id
-            }" class="accordion-collapse collapse" aria-labelledby="heading-${
-          park.id
-        }" data-bs-parent="#${accordionId}">
-                <div class="accordion-body accordion-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <strong>Location:</strong> ${
-                              park.location || "N/A"
-                            }<br>
-                            <strong>Description:</strong> ${
-                              park.description || "N/A"
-                            }
+        <div class="glass-card mb-4 bg-black/20 overflow-hidden rounded-lg border border-white/10">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors" data-bs-toggle="collapse" data-bs-target="#collapse-${park.id}">
+                <span class="text-lg font-serif text-white font-bold tracking-wide">${park.name}${statusBadge}</span>
+                <i class="fas fa-chevron-down text-white/50 transform transition-transform duration-300"></i>
+            </div>
+            <div id="collapse-${park.id}" class="collapse">
+                <div class="p-6 bg-black/20">
+                    <div class="flex justify-between items-start mb-6 pb-6 border-b border-white/10">
+                        <div class="text-gray-300 text-sm">
+                            <p class="mb-1"><strong class="text-white">Location:</strong> ${park.location || "N/A"}</p>
+                            <p><strong class="text-white">Description:</strong> ${park.description || "N/A"}</p>
                         </div>
-                        <div>
+                        <div class="flex gap-2">
                             <button
-                                class="btn btn-secondary btn-sm btn-secondary edit-park-btn"
+                                class="px-4 py-2 text-sm border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-park-btn"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editParkModal"
                                 data-park-id="${park.id}"
@@ -673,39 +685,39 @@ async function loadAdminParks() {
                             >
                                 Edit Park
                             </button>
-                            <button class="btn btn-danger btn-sm btn-danger delete-park-btn" data-park-id="${
-                              park.id
-                            }">Delete Park</button>
+                            <button class="px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-btn" data-park-id="${park.id}">Delete Park</button>
                         </div>
                     </div>
                     
-                    <h6>Ticket Types</h6>
-                    <ul class="list-group mb-3">
-                        ${ticketTypesHtml}
-                    </ul>
-                    <button
-                        class="btn btn-primary btn-sm btn-primary add-tt-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#ticketTypeModal"
-                        data-park-id="${park.id}"
-                    >
-                        Add Ticket Type
-                    </button>
+                    <div class="mb-6">
+                        <h6 class="text-green-400 font-bold uppercase text-xs tracking-widest mb-3">Ticket Types</h6>
+                        <ul class="rounded-lg border border-white/10 overflow-hidden">
+                            ${ticketTypesHtml}
+                        </ul>
+                        <button
+                            class="mt-3 px-4 py-2 text-xs bg-green-700 hover:bg-green-600 text-white rounded-full transition-colors add-tt-btn uppercase tracking-wider font-bold"
+                            data-bs-toggle="modal"
+                            data-bs-target="#ticketTypeModal"
+                            data-park-id="${park.id}"
+                        >
+                            + Add Ticket Type
+                        </button>
+                    </div>
 
-                    <hr class="my-3">
-
-                    <h6>Merchandise</h6>
-                    <ul class="list-group mb-3">
-                        ${merchandiseHtml}
-                    </ul>
-                    <button
-                        class="btn btn-primary btn-sm btn-primary add-merch-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#merchandiseModal"
-                        data-park-id="${park.id}"
-                    >
-                        Add Merchandise
-                    </button>
+                    <div>
+                        <h6 class="text-green-400 font-bold uppercase text-xs tracking-widest mb-3">Merchandise</h6>
+                        <ul class="rounded-lg border border-white/10 overflow-hidden">
+                            ${merchandiseHtml}
+                        </ul>
+                        <button
+                            class="mt-3 px-4 py-2 text-xs bg-green-700 hover:bg-green-600 text-white rounded-full transition-colors add-merch-btn uppercase tracking-wider font-bold"
+                            data-bs-toggle="modal"
+                            data-bs-target="#merchandiseModal"
+                            data-park-id="${park.id}"
+                        >
+                            + Add Merchandise
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -713,9 +725,9 @@ async function loadAdminParks() {
       })
       .join("");
 
-    container.innerHTML = `<div class="accordion" id="${accordionId}">${parksHtml}</div>`;
+    container.innerHTML = `<div class="space-y-4">${parksHtml}</div>`;
   } catch (error) {
-    container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+    container.innerHTML = `<div class="alert alert-danger bg-red-900/50 text-red-200 border-red-800">${error.message}</div>`;
   }
 }
 
@@ -1558,11 +1570,11 @@ async function loadParkDetail() {
     if (!merchandiseResponse.ok) throw new Error("Failed to fetch merchandise.");
     const merchandise = await merchandiseResponse.json();
 
-    // Render park details
+    // Render park details (Dark Text for Light Background)
     parkDetailContainer.innerHTML = `
-            <h2 style="background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; margin-bottom: 1.5rem;">${park.name}</h2>
-            <p><strong style="color: #2d5016;">Location:</strong> ${park.location || "N/A"}</p>
-            <p style="line-height: 1.8; color: #666;">${park.description || "No description available."}</p>
+            <h2 class="text-4xl md:text-5xl mb-6 font-serif font-bold text-green-900">${park.name}</h2>
+            <p class="text-lg text-gray-800 mb-4"><strong class="text-green-700">Location:</strong> ${park.location || "N/A"}</p>
+            <p class="text-gray-700 leading-relaxed text-lg">${park.description || "No description available."}</p>
         `;
 
     // Render order form if logged in
@@ -1570,35 +1582,25 @@ async function loadParkDetail() {
     if (token) {
       if (ticketTypes.length === 0 && merchandise.length === 0) {
         orderFormContainer.innerHTML =
-          "<p>No tickets or merchandise available for this park at the moment.</p>";
+          "<p class='text-gray-700'>No tickets or merchandise available for this park at the moment.</p>";
       } else {
         const today = new Date().toISOString().split("T")[0];
         const ticketInputs =
           ticketTypes.length > 0
-            ? `<h3 class="section-title">Book Tickets</h3>` +
+            ? `<h3 class="text-2xl mb-6 border-b border-gray-300 pb-2 text-green-900 font-serif">Book Tickets</h3>` +
               ticketTypes
                 .map(
                   (tt) => `
-                    <div class="ticket-section mb-3">
-                        <h5 style="color: #2d5016; font-weight: 600;">${tt.name} (RM ${tt.price.toFixed(2)})</h5>
-                        <div class="row">
+                    <div class="ticket-section mb-6 p-4 rounded-lg bg-white/50 border border-gray-200 hover:bg-white/80 transition-colors">
+                        <h5 class="text-xl font-bold text-green-800 mb-4">${tt.name} <span class="text-gray-600 text-base font-normal">(RM ${tt.price.toFixed(2)})</span></h5>
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="quantity-ticket-${
-                                  tt.id
-                                }" class="form-label form-label">Quantity</label>
-                                <input type="number" id="quantity-ticket-${
-                                  tt.id
-                                }" class="form-control form-control ticket-quantity" min="0" value="0" data-ticket-type-id="${
-                    tt.id
-                  }">
+                                <label for="quantity-ticket-${tt.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
+                                <input type="number" id="quantity-ticket-${tt.id}" class="form-control bg-white border-gray-300 text-gray-900 ticket-quantity" min="0" value="0" data-ticket-type-id="${tt.id}">
                             </div>
                             <div class="col-md-6">
-                                <label for="visit-date-${
-                                  tt.id
-                                }" class="form-label form-label">Visit Date</label>
-                                <input type="date" id="visit-date-${
-                                  tt.id
-                                }" class="form-control form-control visit-date" min="${today}">
+                                <label for="visit-date-${tt.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Visit Date</label>
+                                <input type="date" id="visit-date-${tt.id}" class="form-control bg-white border-gray-300 text-gray-900 visit-date" min="${today}">
                             </div>
                         </div>
                     </div>
@@ -1609,26 +1611,18 @@ async function loadParkDetail() {
 
         const merchandiseInputs =
           merchandise.length > 0
-            ? `<h3 class="section-title">Purchase Merchandise</h3>` +
+            ? `<h3 class="text-2xl mb-6 border-b border-gray-300 pb-2 mt-8 text-green-900 font-serif">Purchase Merchandise</h3>` +
               merchandise
                 .map(
                   (m) => `
-                    <div class="merchandise-section mb-3">
-                        <h5 style="color: #2d5016; font-weight: 600;">${m.name} (RM ${m.price.toFixed(2)})</h5>
-                        <p class="mb-1">${m.description || ""}</p>
-                        <div class="row">
+                    <div class="merchandise-section mb-6 p-4 rounded-lg bg-white/50 border border-gray-200 hover:bg-white/80 transition-colors">
+                        <h5 class="text-xl font-bold text-green-800 mb-2">${m.name} <span class="text-gray-600 text-base font-normal">(RM ${m.price.toFixed(2)})</span></h5>
+                        <p class="mb-4 text-gray-600 text-sm">${m.description || ""}</p>
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="quantity-merch-${
-                                  m.id
-                                }" class="form-label form-label">Quantity</label>
-                                <input type="number" id="quantity-merch-${
-                                  m.id
-                                }" class="form-control form-control merchandise-quantity" min="0" value="0" data-merchandise-id="${
-                    m.id
-                  }" max="${m.stock}">
-                                <small class="text-muted">Stock: ${
-                                  m.stock
-                                }</small>
+                                <label for="quantity-merch-${m.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
+                                <input type="number" id="quantity-merch-${m.id}" class="form-control bg-white border-gray-300 text-gray-900 merchandise-quantity" min="0" value="0" data-merchandise-id="${m.id}" max="${m.stock}">
+                                <small class="text-gray-500 block mt-1">Stock: ${m.stock}</small>
                             </div>
                         </div>
                     </div>
@@ -1641,7 +1635,7 @@ async function loadParkDetail() {
                     <form id="order-form">
                         ${ticketInputs}
                         ${merchandiseInputs}
-                        <button type="submit" class="btn btn-success btn-success mt-3">Place Order</button>
+                        <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 mt-6 shadow-lg shadow-green-900/20 uppercase tracking-widest text-sm">Place Order</button>
                     </form>
                 `;
         document
@@ -1650,7 +1644,7 @@ async function loadParkDetail() {
       }
     } else {
       orderFormContainer.innerHTML =
-        '<p><a href="/login">Log in</a> to book tickets.</p>';
+        '<div class="text-center p-8"><p class="text-gray-700 mb-4">Please log in to book tickets.</p><a href="/login" class="inline-block border border-green-700 text-green-700 px-6 py-2 rounded-full hover:bg-green-700 hover:text-white transition-colors no-underline">Log In</a></div>';
     }
   } catch (error) {
     parkDetailContainer.innerHTML = `<div class="alert alert-danger alert">${error.message}</div>`;
