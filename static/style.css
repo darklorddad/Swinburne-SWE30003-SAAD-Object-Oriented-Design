@@ -2258,3 +2258,28 @@ body.has-full-bg {
     margin: 0;
 }
 
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #111; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4ade80; 
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #22c55e; 
+}
+
+/* Firefox */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #4ade80 #111;
+}
+
