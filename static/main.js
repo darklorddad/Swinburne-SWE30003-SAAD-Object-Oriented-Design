@@ -761,8 +761,8 @@ async function loadAdminParks() {
                 <span class="text-lg font-serif text-white font-bold tracking-wide">${park.name}${statusBadge}</span>
                 <i class="fas fa-chevron-down text-white/50 transform transition-transform duration-300"></i>
             </div>
-            <div id="collapse-${park.id}" class="collapse">
-                <div class="p-6 bg-black/20" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; position: relative; z-index: 1;">
+            <div id="collapse-${park.id}" class="collapse" style="position: relative; z-index: 10;">
+                <div class="p-6 bg-black/20" style="border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
                     <div class="flex justify-between items-start mb-6 pb-6 border-b border-white/10">
                         <div class="text-gray-300 text-sm">
                             <p class="mb-1"><strong class="text-white">Location:</strong> ${park.location || "N/A"}</p>
