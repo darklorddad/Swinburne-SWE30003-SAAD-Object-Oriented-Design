@@ -8,10 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
 from app.api import deps
-from app.models.order import Order, OrderCreate
+from app.models.order import Order, OrderCreate, OrderReschedule, RefundRequest
 from app.models.user import User
 from app.services import order_service
-from app.models.order import Order, OrderCreate, OrderReschedule, RefundRequest
 
 router = APIRouter()
 
@@ -103,14 +102,31 @@ async def reschedule_user_order(
     """
     Reschedule an existing order to a new date.
     """
-    try:
-        order = await order_service.reschedule_order(
-            db, 
-            order_id=order_id, 
-            customer_id=current_user.id, 
-            new_date=reschedule_in.new_visit_date
+    # First, get the order to check its status
+    order = await order_service.get_order_by_id(
+        db, order_id=order_id, customer_id=current_user.id
+    )
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
         )
-        return order
+
+    # Only allow rescheduling for "paid" orders
+    if order.status != "paid":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot reschedule an order with status '{order.status}'",
+        )
+
+    try:
+        updated_order = await order_service.reschedule_order(
+            db,
+            order_id=order_id,
+            customer_id=current_user.id,
+            new_date=reschedule_in.new_visit_date,
+        )
+        return updated_order
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

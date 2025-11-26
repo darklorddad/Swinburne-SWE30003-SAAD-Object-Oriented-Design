@@ -209,6 +209,9 @@ async def reschedule_order(
     Raises:
         ValueError: If order not found, belongs to another user, or is cancelled.
     """
+    if new_date < date.today():
+        raise ValueError("Cannot reschedule to a past date")
+
     # 1. Verify the order exists and belongs to the user
     order = await get_order_by_id(db, order_id, customer_id)
     if not order:
@@ -252,7 +255,15 @@ async def process_refund(
     if order.status in ["cancelled", "refunded"]:
         raise ValueError(f"Order is already {order.status}")
 
-    # 3. Update DB: Set status to 'refunded' and save reason
+    # 3. Restore stock for any merchandise items in the order
+    for item in order.items:
+        if item.merchandise_id:
+            db.rpc(
+                "increment_stock",
+                {"merch_id": str(item.merchandise_id), "increment_by": item.quantity},
+            ).execute()
+
+    # 4. Update DB: Set status to 'refunded' and save reason
     response = (
         db.table("orders")
         .update({

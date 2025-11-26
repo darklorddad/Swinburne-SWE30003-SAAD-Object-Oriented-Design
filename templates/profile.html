@@ -52,7 +52,7 @@
 {% block content %}
 <div class="profile-wrapper flex flex-col items-center justify-center pt-32 pb-24 min-h-screen">
     <div class="container mx-auto px-4 md:px-8 max-w-5xl">
-        <h2 class="glass-header mb-12 text-center text-5xl font-serif font-bold">My Profile</h2>
+        <h2 class="glass-header mb-12 text-center text-5xl font-serif font-bold pb-2 leading-normal">My Profile</h2>
         <div id="alert-placeholder"></div>
         
         <!-- User Info Card -->
@@ -125,15 +125,28 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-6">
-        <p class="text-gray-400 mb-4 text-sm">Please tell us why you are requesting a refund (e.g., Weather, Change of plans).</p>
-        <form id="refund-form">
-          <input type="hidden" id="refund-order-id">
-          <div class="mb-3">
-            <label for="refund-reason" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Reason</label>
-            <textarea class="form-control glass-input bg-white/10 border-white/20 text-white rounded-lg" id="refund-reason" rows="3" required></textarea>
-          </div>
-          <div id="refund-alert-placeholder"></div>
-        </form>
+          <form id="refund-form">
+            <input type="hidden" id="refund-order-id">
+
+            <div class="mb-3">
+              <label for="refund-reason-select" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Reason for Refund</label>
+              <select class="form-select glass-input bg-white/10 border-white/20 text-white rounded-lg w-full p-2" id="refund-reason-select" required>
+                <option value="" selected disabled>Select a reason...</option>
+                <option value="Weather Conditions">Weather Conditions</option>
+                <option value="Medical Emergency">Medical Emergency</option>
+                <option value="Change of Plans">Change of Plans</option>
+                <option value="Accidental Purchase">Accidental Purchase</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="mb-3 hidden" id="refund-custom-reason-container">
+              <label for="refund-reason" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Please specify</label>
+              <textarea class="form-control glass-input bg-white/10 border-white/20 text-white rounded-lg" id="refund-reason" rows="3"></textarea>
+            </div>
+
+            <div id="refund-alert-placeholder"></div>
+          </form>
       </div>
       <div class="modal-footer border-zinc-700 p-4">
         <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
