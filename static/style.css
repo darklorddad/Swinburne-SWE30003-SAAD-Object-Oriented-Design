@@ -1268,7 +1268,7 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
     border: none;
     border-radius: 15px !important;
     margin-bottom: 1rem;
-    overflow: hidden;
+    overflow: unset;
     box-shadow: 0 4px 15px rgba(45, 80, 22, 0.1);
     background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
 }

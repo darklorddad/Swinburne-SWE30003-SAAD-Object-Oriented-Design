@@ -247,6 +247,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  const refundSelect = document.getElementById("refund-reason-select");
+  if (refundSelect) {
+    refundSelect.addEventListener("change", (e) => {
+      const customContainer = document.getElementById("refund-custom-reason-container");
+      if (e.target.value === "Other") {
+        customContainer.classList.remove("hidden");
+        document.getElementById("refund-reason").required = true;
+      } else {
+        customContainer.classList.add("hidden");
+        document.getElementById("refund-reason").required = false;
+      }
+    });
+  }
+
   const rescheduleModal = document.getElementById("rescheduleModal");
   if (rescheduleModal) {
     rescheduleModal.addEventListener("show.bs.modal", (event) => {
@@ -508,11 +522,35 @@ async function handleCreatePark(event) {
   const parkName = document.getElementById("park-name").value;
   const parkLocation = document.getElementById("park-location").value;
   const parkDescription = document.getElementById("park-description").value;
+  const fileInput = document.getElementById("park-image");
+  const file = fileInput.files[0];
+
+  let imageUrl = null;
+
+  if (file) {
+    try {
+      const { data, error } = await supabase.storage
+        .from("park-images")
+        .upload(`public/${Date.now()}_${file.name}`, file);
+
+      if (error) {
+        throw error;
+      }
+
+      // Construct the public URL
+      const { publicUrl } = supabase.storage.from('park-images').getPublicUrl(data.path);
+      imageUrl = publicUrl;
+    } catch (error) {
+      showAlert(`Failed to upload image: ${error.message}`, "danger");
+      return;
+    }
+  }
 
   const parkData = {
     name: parkName,
     location: parkLocation,
     description: parkDescription,
+    image_url: imageUrl,
   };
 
   try {
@@ -535,6 +573,63 @@ async function handleCreatePark(event) {
     loadAdminParks(); // Refresh the list of parks
   } catch (error) {
     showAlert(error.message, "danger");
+  }
+}
+
+async function loadAdminDashboard() {
+  const token = getToken();
+  if (!token) return;
+
+  const container = document.getElementById("statistics-container");
+
+  try {
+    const response = await fetch("/api/admin/statistics/visitors/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error("Failed to load statistics.");
+
+    const stats = await response.json();
+
+    const revenueByParkHtml = stats.revenue_by_park.map(park => `
+        <div class="flex justify-between items-center py-3 border-b border-white/10 last:border-0">
+            <span class="text-gray-300 font-serif">${park.park_name}</span>
+            <div class="text-right">
+                <div class="text-green-400 font-bold">RM ${park.total_revenue.toFixed(2)}</div>
+                <div class="text-xs text-gray-500">${park.tickets_sold} Tickets | ${park.merchandise_items_sold} Merch</div>
+            </div>
+        </div>
+    `).join("");
+
+    container.innerHTML = `
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white/5 p-4 rounded-lg text-center border border-white/10">
+                    <h6 class="text-gray-400 text-xs uppercase tracking-widest mb-2">Total Revenue</h6>
+                    <p class="text-3xl font-serif text-green-400 font-bold">RM ${stats.total_revenue.toFixed(2)}</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg text-center border border-white/10">
+                    <h6 class="text-gray-400 text-xs uppercase tracking-widest mb-2">Tickets Sold</h6>
+                    <p class="text-3xl font-serif text-white font-bold">${stats.total_tickets_sold}</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-lg text-center border border-white/10">
+                    <h6 class="text-gray-400 text-xs uppercase tracking-widest mb-2">Merchandise Sold</h6>
+                    <p class="text-3xl font-serif text-white font-bold">${stats.total_merchandise_items_sold}</p>
+                </div>
+            </div>
+
+            <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+                <h6 class="text-gray-400 text-xs uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Revenue Breakdown by Park</h6>
+                <div class="space-y-1">
+                    ${revenueByParkHtml || '<p class="text-gray-500 italic text-sm">No data available.</p>'}
+                </div>
+            </div>
+        </div>
+    `;
+
+  } catch (error) {
+    console.error("Dashboard Error:", error); // Added logging
+    container.innerHTML = `<div class="p-6 text-red-400">Error loading statistics: ${error.message}</div>`;
   }
 }
 
@@ -727,6 +822,7 @@ async function loadAdminParks() {
 
     container.innerHTML = `<div class="space-y-4">${parksHtml}</div>`;
   } catch (error) {
+    console.error("Parks Loading Error:", error); // Added logging
     container.innerHTML = `<div class="alert alert-danger bg-red-900/50 text-red-200 border-red-800">${error.message}</div>`;
   }
 }
@@ -1401,73 +1497,113 @@ const fallbackImages = [
 ];
 
 // Function to get image for park based on name
-function getParkImage(parkName, index) {
-  if (!parkName) {
+function getParkImage(park, index) {
+  if (park.image_url) {
+    return park.image_url;
+  }
+  if (!park.name) {
     return fallbackImages[index % fallbackImages.length];
   }
-  
-  const parkNameLower = parkName.toLowerCase();
-  
+
+  const parkNameLower = park.name.toLowerCase();
+
   // Check if park name contains any of the mapped park names
   for (const [key, imagePath] of Object.entries(parkImageMap)) {
     if (parkNameLower.includes(key)) {
       return imagePath;
     }
   }
-  
+
   // Fallback to default images if no match found
   // Use a simple hash of the name to pick a stable fallback image
   let hash = 0;
-  for (let i = 0; i < parkName.length; i++) {
-    hash = parkName.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < park.name.length; i++) {
+    hash = park.name.charCodeAt(i) + ((hash << 5) - hash);
   }
   const positiveHash = Math.abs(hash);
-  
+
   return fallbackImages[positiveHash % fallbackImages.length];
 }
 
-function renderParks(parks) {
+function renderParks(parks, skipClear = false) {
   const parksContainer = document.getElementById("parks-container");
+
+  if (!skipClear) {
+    while (parksContainer.firstChild) {
+      parksContainer.removeChild(parksContainer.firstChild);
+    }
+  }
+
   if (parks.length === 0) {
     parksContainer.innerHTML = "<p class='text-white'>No parks match your search.</p>";
     return;
   }
 
-  const parksHtml = parks
-    .map(
-      (park, index) => `
-      <div class="group flex flex-col h-full min-h-[400px] glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left">
-          <div class="relative h-48 overflow-hidden shrink-0">
-            <img src="${getParkImage(park.name, index)}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
-            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
-          </div>
-          <div class="p-6 flex flex-col flex-grow">
-              <h5 class="font-serif text-2xl text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
-              <p class="font-sans text-sm text-gray-300 mb-6 flex-grow line-clamp-3 leading-relaxed">${
-                park.description || "No description available."
-              }</p>
-              <div class="mt-auto text-center">
-                  <a href="/parks/${park.id}" class="inline-block bg-white/10 backdrop-blur-sm border border-white/50 px-6 py-3 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:!text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] no-underline rounded-full w-full">
-                      Buy Tickets Now
-                  </a>
-              </div>
-          </div>
-      </div>
-  `
-    )
-    .join("");
+  const fragment = document.createDocumentFragment();
 
-  parksContainer.innerHTML = parksHtml;
+  parks.forEach((park, index) => {
+    // Create the main card element
+    const parkCard = document.createElement('div');
+    // The parent grid now has a fixed row height, so the card just needs to fill it.
+    parkCard.className = 'group relative glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left h-full';
+
+
+    // Get image and description
+    const image = getParkImage(park, index);
+    const description = park.description || "No description available.";
+
+    // Use innerHTML for the static structure
+    parkCard.innerHTML = `
+      <div class="h-48">
+          <img src="${image}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
+          <div class="absolute top-0 left-0 right-0 h-48 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
+      </div>
+      <div class="p-6">
+          <h5 class="font-serif text-2xl text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
+          <p class="font-sans text-sm text-gray-300 mb-6 line-clamp-3 leading-relaxed">${description}</p>
+      </div>
+      <div class="absolute bottom-6 left-6 right-6 text-center">
+          <a href="/parks/${park.id}" class="inline-block bg-white/10 backdrop-blur-sm border border-white/50 px-6 py-3 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:!text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] no-underline rounded-full w-full">
+              Buy Tickets Now
+          </a>
+      </div>
+    `;
+
+    // Append the fully constructed card to the fragment
+    fragment.appendChild(parkCard);
+  });
+
+  // Append the fragment to the DOM in a single operation
+  parksContainer.appendChild(fragment);
 }
 
 function handleParkSearch(event) {
+  const parksContainer = document.getElementById("parks-container");
   const searchTerm = event.target.value.toLowerCase();
+
   const filteredParks = allParks.filter(
     (park) =>
       park.name.toLowerCase().includes(searchTerm) ||
       (park.description && park.description.toLowerCase().includes(searchTerm))
   );
-  renderParks(filteredParks);
+
+  // Force the browser to calculate layout before we change anything.
+  const containerHeight = parksContainer.offsetHeight;
+  parksContainer.style.height = `${containerHeight}px`;
+
+  // Frame 1: Clear the container. This gives the browser a full frame to process the removal.
+  requestAnimationFrame(() => {
+    while (parksContainer.firstChild) {
+        parksContainer.removeChild(parksContainer.firstChild);
+    }
+
+    // Frame 2: Render the new content. This happens on the *next* frame.
+    requestAnimationFrame(() => {
+        // Release the fixed height before adding new content
+        parksContainer.style.height = '';
+        renderParks(filteredParks, true); // Pass a flag to skip clearing
+    });
+  });
 }
 
 let currentOrderPayload = null; // Store data temporarily
@@ -1702,20 +1838,16 @@ async function handleRescheduleSubmit() {
 async function handleRefundSubmit() {
   const token = getToken();
   const orderId = document.getElementById("refund-order-id").value;
-  const reason = document.getElementById("refund-reason").value;
+  const selectVal = document.getElementById("refund-reason-select").value;
+  let reason = selectVal;
+
+  // If "Other" is selected, use the text area value
+  if (selectVal === "Other") {
+    reason = document.getElementById("refund-reason").value;
+  }
 
   if (!reason) {
-    const alertPlaceholder = document.getElementById("refund-alert-placeholder");
-    if (alertPlaceholder) {
-      alertPlaceholder.innerHTML = `
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          Please provide a reason for the refund.
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      `;
-    } else {
-      showAlert("Please provide a reason for the refund.", "warning");
-    }
+    showAlert("Please provide a reason for the refund.", "warning");
     return;
   }
 
@@ -1737,7 +1869,7 @@ async function handleRefundSubmit() {
     }
 
     showBottomRightNotification("Refund processed successfully.", "success");
-    
+
     // Close Modal
     const modalEl = document.getElementById("refundModal");
     const modal = bootstrap.Modal.getInstance(modalEl);
