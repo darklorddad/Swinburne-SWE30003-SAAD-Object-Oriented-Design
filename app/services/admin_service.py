@@ -37,11 +37,12 @@ async def create_park(
 
         # Upload to Supabase Storage using the client library
         client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        storage_client = client.storage
         if token:
             # Ensure the storage client uses the user's auth token
-            client.storage.session.headers["Authorization"] = f"Bearer {token}"
+            storage_client.session.headers["Authorization"] = f"Bearer {token}"
 
-        client.storage.from_("park-images").upload(
+        storage_client.from_("park-images").upload(
             file_name,
             file_content,
             {"content-type": image.content_type or "application/octet-stream"},
