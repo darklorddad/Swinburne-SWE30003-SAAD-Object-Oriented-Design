@@ -1831,7 +1831,7 @@ async function loadParkDetail() {
     if (token) {
       if (ticketTypes.length === 0 && merchandise.length === 0) {
         orderFormContainer.innerHTML =
-          "<p class='text-gray-300'>No tickets or merchandise available for this park at the moment.</p>";
+          '<div class="bg-white/5 p-8 md:p-12 border-t border-white/10 backdrop-blur-sm text-center"><p class="text-gray-300 mb-0">No tickets or merchandise available for this park at the moment.</p></div>';
       } else {
         const today = new Date().toISOString().split("T")[0];
         const ticketInputs =
