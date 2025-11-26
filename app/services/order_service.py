@@ -145,7 +145,7 @@ async def get_orders_for_customer(
         .eq("customer_id", str(customer_id))
         .execute()
     )
-    total = count_response.count
+    total = count_response.count or 0
 
     # Get paginated data
     response = (
