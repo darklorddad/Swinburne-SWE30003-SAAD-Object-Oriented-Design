@@ -1439,7 +1439,13 @@ async function loadProfileData(page = 1) {
                                 
                                 if (item.ticket_types) {
                                   itemTitle = item.ticket_types.name;
-                                  itemMeta = `<div class="text-xs text-gray-400 mt-1">Visit Date: <span class="text-gray-300">${item.visit_date}</span></div>`;
+                                  // Format YYYY-MM-DD to DD/MM/YYYY manually to avoid timezone shifts
+                                  let formattedDate = item.visit_date;
+                                  if (item.visit_date && item.visit_date.includes('-')) {
+                                      const [y, m, d] = item.visit_date.split('-');
+                                      formattedDate = `${d}/${m}/${y}`;
+                                  }
+                                  itemMeta = `<div class="text-xs text-gray-400 mt-1">Visit Date: <span class="text-gray-300">${formattedDate}</span></div>`;
                                 } else if (item.merchandise) {
                                   itemTitle = item.merchandise.name;
                                   itemMeta = `<div class="text-xs text-gray-400 mt-1">Merchandise</div>`;
