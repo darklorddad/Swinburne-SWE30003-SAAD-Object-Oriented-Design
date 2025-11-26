@@ -1411,10 +1411,12 @@ async function loadProfileData(page = 1) {
             <div class="card-body card-body">
                 <div class="row">
                     <div class="col-md-8">
-                        <p class="mb-2"><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-GB')}</p>
-                        <p class="mb-3"><strong>Total:</strong> RM ${order.total_amount.toFixed(2)}</p>
-                        <h6 class="text-muted text-uppercase small fw-bold">Items</h6>
-                        <ul class="list-group list-group-flush mb-3">
+                        <div class="d-flex justify-content-between mb-2 text-sm">
+                            <span><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-GB')}</span>
+                            <span><strong>Total:</strong> RM ${order.total_amount.toFixed(2)}</span>
+                        </div>
+                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Items</h6>
+                        <ul class="list-group list-group-flush mb-2">
                             ${order.items.map((item) => {
                                 // Only show QR code placeholder if it is a TICKET (has ticket_type_id)
                                 // and the order is NOT cancelled/refunded
@@ -1422,23 +1424,23 @@ async function loadProfileData(page = 1) {
                                 if (item.ticket_type_id) { 
                                     // Generate placeholder
                                     if(order.status !== 'cancelled' && order.status !== 'refunded') {
-                                        qrHtml = `<div class="mt-4 flex flex-col items-center gap-2 w-full sm:w-auto">
-                                                    <small class="text-gray-400 text-xs uppercase tracking-wider font-bold">Scan for Entry</small>
-                                                    <div id="qrcode-${item.id}" class="p-2 bg-white rounded-lg shadow-md"></div>
+                                        qrHtml = `<div class="mt-2 flex flex-col items-center gap-1 w-full sm:w-auto">
+                                                    <small class="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Scan for Entry</small>
+                                                    <div id="qrcode-${item.id}" class="p-1 bg-white rounded shadow-sm"></div>
                                                   </div>`;
                                     }
                                 }
                                 
                                 let itemText = "Unknown Item";
                                 if (item.ticket_types) {
-                                  itemText = `${item.quantity} x ${item.ticket_types.name} <span class="text-muted">(Visit: ${item.visit_date})</span>`;
+                                  itemText = `${item.quantity} x ${item.ticket_types.name} <span class="text-muted text-xs">(Visit: ${item.visit_date})</span>`;
                                 } else if (item.merchandise) {
                                   itemText = `${item.quantity} x ${item.merchandise.name}`;
                                 }
 
-                                return `<li class="list-group-item d-flex flex-column sm:flex-row justify-content-between align-items-center sm:align-items-start p-4 bg-transparent border-b border-white/10">
-                                            <div class="mb-3 sm:mb-0">
-                                                <div class="fw-bold text-white text-lg mb-1">${itemText}</div>
+                                return `<li class="list-group-item d-flex flex-column sm:flex-row justify-content-between align-items-center sm:align-items-start p-3 bg-transparent border-b border-white/10">
+                                            <div class="mb-2 sm:mb-0">
+                                                <div class="fw-bold text-white text-sm mb-0">${itemText}</div>
                                             </div>
                                             ${qrHtml}
                                         </li>`;
@@ -1488,8 +1490,8 @@ async function loadProfileData(page = 1) {
                     // Generate QR Code
                     new QRCode(qrContainer, {
                         text: item.id, // The content of the QR code (Ticket UUID)
-                        width: 80,     // Width
-                        height: 80,    // Height
+                        width: 60,     // Width
+                        height: 60,    // Height
                         colorDark : "#2d5016", // Dark green to match theme
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.H
