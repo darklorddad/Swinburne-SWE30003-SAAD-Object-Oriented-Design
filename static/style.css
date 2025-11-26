@@ -1347,17 +1347,11 @@ body.modal-open .navbar {
 }
 
 .ticket-section, .merchandise-section {
-    background: white;
+    /* Styles handled by Tailwind classes in JS for glassmorphism */
     border-radius: 15px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    border: 2px solid #e0e0e0;
     transition: all 0.3s ease;
-}
-
-.ticket-section:hover, .merchandise-section:hover {
-    border-color: #2d5016;
-    box-shadow: 0 8px 25px rgba(45, 80, 22, 0.15);
 }
 
 /* Alert Styling */

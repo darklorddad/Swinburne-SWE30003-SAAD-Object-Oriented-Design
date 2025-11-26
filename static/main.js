@@ -1819,11 +1819,11 @@ async function loadParkDetail() {
     if (!merchandiseResponse.ok) throw new Error("Failed to fetch merchandise.");
     const merchandise = await merchandiseResponse.json();
 
-    // Render park details (Dark Text for Light Background)
+    // Render park details (Light Text for Dark Background)
     parkDetailContainer.innerHTML = `
-            <h2 class="text-4xl md:text-5xl mb-6 font-serif font-bold text-green-900">${park.name}</h2>
-            <p class="text-lg text-gray-800 mb-4"><strong>Location:</strong> ${park.location || "N/A"}</p>
-            <p class="text-gray-700 leading-relaxed text-lg">${park.description || "No description available."}</p>
+            <h2 class="text-4xl md:text-5xl mb-6 font-serif font-bold text-white">${park.name}</h2>
+            <p class="text-lg text-gray-300 mb-4"><strong class="text-white">Location:</strong> ${park.location || "N/A"}</p>
+            <p class="text-gray-300 leading-relaxed text-lg">${park.description || "No description available."}</p>
         `;
 
     // Render order form if logged in
@@ -1831,25 +1831,25 @@ async function loadParkDetail() {
     if (token) {
       if (ticketTypes.length === 0 && merchandise.length === 0) {
         orderFormContainer.innerHTML =
-          "<p class='text-gray-700'>No tickets or merchandise available for this park at the moment.</p>";
+          "<p class='text-gray-300'>No tickets or merchandise available for this park at the moment.</p>";
       } else {
         const today = new Date().toISOString().split("T")[0];
         const ticketInputs =
           ticketTypes.length > 0
-            ? `<h3 class="text-2xl mb-6 border-b border-gray-300 pb-2 text-green-900 font-serif">Book Tickets</h3>` +
+            ? `<h3 class="text-2xl mb-6 border-b border-white/10 pb-2 text-white font-serif">Book Tickets</h3>` +
               ticketTypes
                 .map(
                   (tt) => `
-                    <div class="ticket-section p-6 rounded-xl border border-gray-200 hover:border-green-500 hover:shadow-lg transition-all duration-300 mb-4">
-                        <h5 class="text-xl font-bold text-green-800 mb-4">${tt.name} <span class="text-gray-600 text-base font-normal">(RM ${tt.price.toFixed(2)})</span></h5>
+                    <div class="ticket-section p-6 rounded-xl border border-white/10 bg-white/5 hover:border-green-500/50 hover:bg-white/10 transition-all duration-300 mb-4">
+                        <h5 class="text-xl font-bold text-green-400 mb-4">${tt.name} <span class="text-gray-400 text-base font-normal">(RM ${tt.price.toFixed(2)})</span></h5>
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="quantity-ticket-${tt.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
-                                <input type="number" id="quantity-ticket-${tt.id}" class="form-control bg-white border-gray-300 text-gray-900 ticket-quantity" min="0" value="0" data-ticket-type-id="${tt.id}">
+                                <label for="quantity-ticket-${tt.id}" class="form-label text-gray-300 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
+                                <input type="number" id="quantity-ticket-${tt.id}" class="form-control glass-input bg-white/10 border-white/20 text-white ticket-quantity" min="0" value="0" data-ticket-type-id="${tt.id}">
                             </div>
                             <div class="col-md-6">
-                                <label for="visit-date-${tt.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Visit Date</label>
-                                <input type="date" id="visit-date-${tt.id}" class="form-control bg-white border-gray-300 text-gray-900 visit-date" min="${today}">
+                                <label for="visit-date-${tt.id}" class="form-label text-gray-300 uppercase tracking-wider text-xs font-bold mb-2">Visit Date</label>
+                                <input type="date" id="visit-date-${tt.id}" class="form-control glass-input bg-white/10 border-white/20 text-white visit-date" min="${today}">
                             </div>
                         </div>
                     </div>
@@ -1860,18 +1860,18 @@ async function loadParkDetail() {
 
         const merchandiseInputs =
           merchandise.length > 0
-            ? `<h3 class="text-2xl mb-6 border-b border-gray-300 pb-2 mt-8 text-green-900 font-serif">Purchase Merchandise</h3>` +
+            ? `<h3 class="text-2xl mb-6 border-b border-white/10 pb-2 mt-8 text-white font-serif">Purchase Merchandise</h3>` +
               merchandise
                 .map(
                   (m) => `
-                    <div class="merchandise-section p-6 rounded-xl border border-gray-200 hover:border-green-500 hover:shadow-lg transition-all duration-300 mb-4">
-                        <h5 class="text-xl font-bold text-green-800 mb-2">${m.name} <span class="text-gray-600 text-base font-normal">(RM ${m.price.toFixed(2)})</span></h5>
-                        <p class="mb-4 text-gray-600 text-sm">${m.description || ""}</p>
+                    <div class="merchandise-section p-6 rounded-xl border border-white/10 bg-white/5 hover:border-green-500/50 hover:bg-white/10 transition-all duration-300 mb-4">
+                        <h5 class="text-xl font-bold text-green-400 mb-2">${m.name} <span class="text-gray-400 text-base font-normal">(RM ${m.price.toFixed(2)})</span></h5>
+                        <p class="mb-4 text-gray-300 text-sm">${m.description || ""}</p>
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="quantity-merch-${m.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
-                                <input type="number" id="quantity-merch-${m.id}" class="form-control bg-white border-gray-300 text-gray-900 merchandise-quantity" min="0" value="0" data-merchandise-id="${m.id}" max="${m.stock}">
-                                <small class="text-gray-500 block mt-1">Stock: ${m.stock}</small>
+                                <label for="quantity-merch-${m.id}" class="form-label text-gray-300 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
+                                <input type="number" id="quantity-merch-${m.id}" class="form-control glass-input bg-white/10 border-white/20 text-white merchandise-quantity" min="0" value="0" data-merchandise-id="${m.id}" max="${m.stock}">
+                                <small class="text-gray-400 block mt-1">Stock: ${m.stock}</small>
                             </div>
                         </div>
                     </div>
@@ -1884,7 +1884,7 @@ async function loadParkDetail() {
                     <form id="order-form">
                         ${ticketInputs}
                         ${merchandiseInputs}
-                        <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 mt-6 shadow-lg shadow-green-900/20 uppercase tracking-widest text-sm">Place Order</button>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 mt-6 shadow-lg shadow-green-500/30 uppercase tracking-widest text-sm">Place Order</button>
                     </form>
                 `;
         document
@@ -1893,7 +1893,7 @@ async function loadParkDetail() {
       }
     } else {
       orderFormContainer.innerHTML =
-        '<div class="text-center p-8"><p class="text-gray-700 mb-4">Please log in to book tickets.</p><a href="/login" class="inline-block border border-green-700 text-green-700 px-6 py-2 rounded-full hover:bg-green-700 hover:text-white transition-colors no-underline">Log In</a></div>';
+        '<div class="text-center p-8"><p class="text-gray-300 mb-4">Please log in to book tickets.</p><a href="/login" class="inline-block border border-green-500 text-green-400 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white hover:border-green-600 transition-colors no-underline">Log In</a></div>';
     }
   } catch (error) {
     parkDetailContainer.innerHTML = `<div class="alert alert-danger alert">${error.message}</div>`;
