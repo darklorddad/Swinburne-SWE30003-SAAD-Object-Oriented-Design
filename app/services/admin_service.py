@@ -41,13 +41,16 @@ async def create_park(
 
         headers = {
             "apikey": settings.SUPABASE_KEY,
-            "Content-Type": image.content_type or "application/octet-stream",
         }
         if token:
             headers["Authorization"] = f"Bearer {token}"
 
         async with httpx.AsyncClient() as client:
-            r = await client.post(upload_url, content=file_content, headers=headers)
+            r = await client.post(
+                upload_url,
+                files={"file": (file_name.split("/")[-1], file_content, image.content_type or "application/octet-stream")},
+                headers=headers,
+            )
             r.raise_for_status()
 
         # Get public URL
