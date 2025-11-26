@@ -42,37 +42,24 @@ async def create_park(
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
         # Upload to Supabase Storage using the client library
-        # Try to use Service Role Key to bypass RLS for admin uploads
-        service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or getattr(
-            settings, "SUPABASE_SERVICE_ROLE_KEY", None
+        # Prioritise Service Role Key, fallback to SUPABASE_KEY
+        key_to_use = (
+            os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+            or getattr(settings, "SUPABASE_SERVICE_ROLE_KEY", None)
+            or settings.SUPABASE_KEY
         )
 
-        if service_key:
-            # Explicitly set headers to ensure Storage API uses the service key
-            client = create_client(
-                settings.SUPABASE_URL,
-                service_key,
-                options=ClientOptions(
-                    headers={
-                        "Authorization": f"Bearer {service_key}",
-                        "apikey": service_key,
-                    }
-                ),
-            )
-        elif token:
-            print("WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Upload may fail due to RLS.")
-            client = create_client(
-                settings.SUPABASE_URL,
-                settings.SUPABASE_KEY,
-                options=ClientOptions(
-                    headers={
-                        "Authorization": f"Bearer {token}",
-                        "apikey": settings.SUPABASE_KEY,
-                    }
-                ),
-            )
-        else:
-            client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        # Attempt upload with the selected key
+        client = create_client(
+            settings.SUPABASE_URL,
+            key_to_use,
+            options=ClientOptions(
+                headers={
+                    "Authorization": f"Bearer {key_to_use}",
+                    "apikey": key_to_use,
+                }
+            ),
+        )
 
         try:
             client.storage.from_("park-images").upload(
@@ -81,9 +68,25 @@ async def create_park(
                 {"content-type": image.content_type or "application/octet-stream"},
             )
         except Exception as e:
-            if "new row violates row-level security policy" in str(e) and not service_key:
-                print("CRITICAL: Supabase Storage RLS violation. You MUST add SUPABASE_SERVICE_ROLE_KEY to your .env file.")
-            raise e
+            # If RLS fails and we have a user token, try as the authenticated user
+            if "new row violates row-level security policy" in str(e) and token:
+                client = create_client(
+                    settings.SUPABASE_URL,
+                    settings.SUPABASE_KEY,
+                    options=ClientOptions(
+                        headers={
+                            "Authorization": f"Bearer {token}",
+                            "apikey": settings.SUPABASE_KEY,
+                        }
+                    ),
+                )
+                client.storage.from_("park-images").upload(
+                    file_name,
+                    file_content,
+                    {"content-type": image.content_type or "application/octet-stream"},
+                )
+            else:
+                raise e
 
         # Get public URL
         image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/park-images/{file_name}"
