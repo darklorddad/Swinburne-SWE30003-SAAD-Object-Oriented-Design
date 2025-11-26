@@ -143,12 +143,12 @@
             <div class="mb-3">
               <label for="refund-reason-select" class="glass-label block mb-2 text-xs font-bold text-gray-300 uppercase tracking-widest">Reason for Refund</label>
               <select class="form-select glass-input bg-white/10 border-white/20 text-white rounded-lg w-full p-2" id="refund-reason-select" required>
-                <option value="" selected disabled>Select a reason...</option>
-                <option value="Weather Conditions">Weather Conditions</option>
-                <option value="Medical Emergency">Medical Emergency</option>
-                <option value="Change of Plans">Change of Plans</option>
-                <option value="Accidental Purchase">Accidental Purchase</option>
-                <option value="Other">Other</option>
+                <option value="" selected disabled class="text-black">Select a reason...</option>
+                <option value="Weather Conditions" class="text-black">Weather Conditions</option>
+                <option value="Medical Emergency" class="text-black">Medical Emergency</option>
+                <option value="Change of Plans" class="text-black">Change of Plans</option>
+                <option value="Accidental Purchase" class="text-black">Accidental Purchase</option>
+                <option value="Other" class="text-black">Other</option>
               </select>
             </div>
 
@@ -162,7 +162,7 @@
       </div>
       <div class="modal-footer border-zinc-700 p-4">
         <button type="button" class="btn btn-secondary rounded-full px-6" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-danger rounded-full px-6" id="confirm-refund-btn">Confirm Refund</button>
+        <button type="button" class="btn btn-danger rounded-full px-6 bg-red-600 hover:bg-red-500 border-none" id="confirm-refund-btn">Confirm Refund</button>
       </div>
     </div>
   </div>
