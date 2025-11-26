@@ -42,51 +42,45 @@ async def create_park(
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
         # Upload to Supabase Storage using the client library
-        # Prioritise Service Role Key, fallback to SUPABASE_KEY
-        key_to_use = (
-            os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-            or getattr(settings, "SUPABASE_SERVICE_ROLE_KEY", None)
-            or settings.SUPABASE_KEY
+        # Determine the best authentication method:
+        # 1. Service Role Key (Bypasses RLS) - Best for admin operations
+        # 2. User Token (Subject to RLS) - Good if user has permission
+        # 3. Anon Key (Public) - Least privileged, likely to fail uploads
+
+        service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or getattr(
+            settings, "SUPABASE_SERVICE_ROLE_KEY", None
         )
 
-        # Attempt upload with the selected key
-        client = create_client(
-            settings.SUPABASE_URL,
-            key_to_use,
-            options=ClientOptions(
-                headers={
-                    "Authorization": f"Bearer {key_to_use}",
-                    "apikey": key_to_use,
-                }
-            ),
-        )
-
-        try:
-            client.storage.from_("park-images").upload(
-                file_name,
-                file_content,
-                {"content-type": image.content_type or "application/octet-stream"},
+        if service_key:
+            client = create_client(
+                settings.SUPABASE_URL,
+                service_key,
+                options=ClientOptions(
+                    headers={
+                        "Authorization": f"Bearer {service_key}",
+                        "apikey": service_key,
+                    }
+                ),
             )
-        except Exception as e:
-            # If RLS fails and we have a user token, try as the authenticated user
-            if "new row violates row-level security policy" in str(e) and token:
-                client = create_client(
-                    settings.SUPABASE_URL,
-                    settings.SUPABASE_KEY,
-                    options=ClientOptions(
-                        headers={
-                            "Authorization": f"Bearer {token}",
-                            "apikey": settings.SUPABASE_KEY,
-                        }
-                    ),
-                )
-                client.storage.from_("park-images").upload(
-                    file_name,
-                    file_content,
-                    {"content-type": image.content_type or "application/octet-stream"},
-                )
-            else:
-                raise e
+        elif token:
+            client = create_client(
+                settings.SUPABASE_URL,
+                settings.SUPABASE_KEY,
+                options=ClientOptions(
+                    headers={
+                        "Authorization": f"Bearer {token}",
+                        "apikey": settings.SUPABASE_KEY,
+                    }
+                ),
+            )
+        else:
+            client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+
+        client.storage.from_("park-images").upload(
+            file_name,
+            file_content,
+            {"content-type": image.content_type or "application/octet-stream"},
+        )
 
         # Get public URL
         image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/park-images/{file_name}"
