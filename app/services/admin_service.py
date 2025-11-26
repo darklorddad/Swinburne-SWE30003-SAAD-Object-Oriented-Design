@@ -7,6 +7,7 @@ from collections import defaultdict
 from typing import List, Optional
 from uuid import UUID
 
+from dotenv import load_dotenv
 from fastapi import UploadFile
 from supabase import Client, create_client, ClientOptions
 
@@ -27,6 +28,7 @@ async def create_park(
     token: Optional[str] = None,
 ) -> Park:
     """Creates a new park in the database, handling image upload."""
+    load_dotenv()
     settings = get_settings()
 
     image_url = None
@@ -55,6 +57,7 @@ async def create_park(
                 ),
             )
         elif token:
+            print("WARNING: SUPABASE_SERVICE_ROLE_KEY not found. Upload may fail due to RLS.")
             client = create_client(
                 settings.SUPABASE_URL,
                 settings.SUPABASE_KEY,
