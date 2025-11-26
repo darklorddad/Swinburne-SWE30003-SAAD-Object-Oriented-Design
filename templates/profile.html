@@ -17,6 +17,13 @@
         }
     }
 </script>
+<style>
+    /* Prevent scrollbar from disappearing when modal opens */
+    body.modal-open {
+        overflow: auto !important;
+        padding-right: 0 !important;
+    }
+</style>
 {% endblock %}
 
 
@@ -99,7 +106,7 @@
 {% block modals %}
 <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+      <div class="modal-content bg-zinc-900 text-white border-0 shadow-2xl rounded-xl">
         <div class="modal-header border-zinc-700 bg-green-900/30">
           <h5 class="modal-title font-serif text-xl">Reschedule Booking</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -123,7 +130,7 @@
 
 <div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-zinc-900 text-white border border-zinc-700 shadow-2xl rounded-xl">
+    <div class="modal-content bg-zinc-900 text-white border-0 shadow-2xl rounded-xl">
       <div class="modal-header border-zinc-700 bg-green-900/30">
         <h5 class="modal-title font-serif text-xl">Request Refund</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
