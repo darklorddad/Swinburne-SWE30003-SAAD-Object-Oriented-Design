@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (event.target.classList.contains("delete-park-permanent-btn")) {
       const parkId = event.target.dataset.parkId;
-      if (confirm("⚠️ DANGER: Are you sure you want to PERMANENTLY delete this park? This cannot be undone and will delete all associated tickets and merchandise.")) {
+      if (confirm("DANGER: Are you sure you want to PERMANENTLY delete this park? This cannot be undone and will delete all associated tickets and merchandise.")) {
         await handleDeletePark(parkId, true);
       }
     }
@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   modal.hide();
                 }
 
-                showToast("✅ Payment Successful! Redirecting...", "success");
+                showToast("Payment Successful! Redirecting...", "success");
                 
                 setTimeout(() => {
                     window.location.href = "/profile";
@@ -1225,12 +1225,6 @@ function showToast(message, type = "info") {
     bgClass = "text-dark bg-warning"; // Use dark text for better contrast on yellow
   }
   let icon = "";
-
-  // Add a little icon based on type for polish
-  if (type === "success") icon = "✅ ";
-  if (type === "danger") icon = "⚠️ ";
-  if (type === "warning") icon = "✋ ";
-  if (type === "info") icon = "ℹ️ ";
 
   const toastHtml = `
     <div class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
