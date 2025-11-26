@@ -1605,7 +1605,7 @@ function renderParks(parks, skipClear = false) {
     // Create the main card element
     const parkCard = document.createElement('div');
     // The parent grid now has a fixed row height, so the card just needs to fill it.
-    parkCard.className = 'group relative glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left flex flex-col';
+    parkCard.className = 'group relative glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left h-auto min-h-full flex flex-col';
 
 
     // Get image and description
