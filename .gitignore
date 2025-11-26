@@ -3,6 +3,7 @@ dld*
 *.sql
 supabase/
 Documents/
+.claude/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

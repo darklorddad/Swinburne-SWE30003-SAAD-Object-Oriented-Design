@@ -13,6 +13,7 @@ class ParkBase(BaseModel):
     name: str
     location: Optional[str] = None
     description: Optional[str] = None
+    image_url: Optional[str] = None  # Add this line
 
 
 class ParkCreate(ParkBase):

@@ -6,8 +6,8 @@ from typing import List, Optional, Dict, Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
+from app.models.merchandise import Merchandise
 from app.models.ticket import TicketType
-from datetime import date
 
 
 class OrderItemCreate(BaseModel):
@@ -63,7 +63,7 @@ class OrderItem(BaseModel):
     visit_date: Optional[date] = None
     price_at_purchase: float
     ticket_types: Optional[TicketType] = None
-    merchandise: Optional[Dict[str, Any]] = None
+    merchandise: Optional[Merchandise] = None
 
     class Config:
         from_attributes = True
