@@ -2084,7 +2084,11 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
     border-radius: 20px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     color: white;
-    isolation: isolate;
+    overflow: visible !important;
+}
+
+.glass-card .collapse {
+    transform: translateZ(0);
 }
 
 .glass-card .card-header {
