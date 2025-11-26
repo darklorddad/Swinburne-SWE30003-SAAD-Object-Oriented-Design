@@ -1399,7 +1399,7 @@ async function loadProfileData(page = 1) {
 
     const ordersContainer = document.getElementById("orders-container");
     if (ordersData.length === 0) {
-      ordersContainer.innerHTML = `<div class="text-center p-8 border border-white/10 rounded-xl bg-white/5"><p class="text-gray-400 mb-0">You have no orders yet.</p></div>`;
+      ordersContainer.innerHTML = `<div class="text-center p-8 border border-white/10 rounded-xl bg-black/20"><p class="text-gray-300 mb-0">You have no orders yet.</p></div>`;
       renderPagination(1, 0);
       return;
     }
