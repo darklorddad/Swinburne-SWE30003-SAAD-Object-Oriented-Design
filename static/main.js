@@ -1620,7 +1620,7 @@ function renderParks(parks, skipClear = false) {
       </div>
       <div class="p-6 flex-grow flex flex-col">
           <h5 class="font-serif text-2xl text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
-          <p class="font-sans text-sm text-gray-300 mb-4 line-clamp-3 leading-relaxed">${description}</p>
+          <p class="font-sans text-sm text-gray-300 mb-0 line-clamp-3 leading-relaxed">${description}</p>
       </div>
       <div class="p-6 pt-0 text-center mt-auto">
           <a href="/parks/${park.id}" class="inline-block bg-white/10 backdrop-blur-sm border border-white/50 px-6 py-3 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:!text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] no-underline w-full">
