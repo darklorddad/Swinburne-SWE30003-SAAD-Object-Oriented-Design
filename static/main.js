@@ -1220,20 +1220,47 @@ function showToast(message, type = "info") {
     console.warn("Toast container not found. Alerting in console instead:", message);
     return;
   }
-  
-  let bgClass = "text-white bg-" + type;
-  if (type === 'warning') {
-    bgClass = "text-dark bg-warning"; // Use dark text for better contrast on yellow
-  }
-  let icon = "";
+
+  // Standardised Toast Configuration
+  const config = {
+    success: {
+      icon: '<i class="fas fa-check-circle text-green-400 text-xl"></i>',
+      border: 'border-green-500/30',
+      bg: 'bg-zinc-900/95',
+      shadow: 'shadow-green-900/20'
+    },
+    danger: {
+      icon: '<i class="fas fa-exclamation-circle text-red-400 text-xl"></i>',
+      border: 'border-red-500/30',
+      bg: 'bg-zinc-900/95',
+      shadow: 'shadow-red-900/20'
+    },
+    warning: {
+      icon: '<i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>',
+      border: 'border-yellow-500/30',
+      bg: 'bg-zinc-900/95',
+      shadow: 'shadow-yellow-900/20'
+    },
+    info: {
+      icon: '<i class="fas fa-info-circle text-blue-400 text-xl"></i>',
+      border: 'border-blue-500/30',
+      bg: 'bg-zinc-900/95',
+      shadow: 'shadow-blue-900/20'
+    }
+  };
+
+  const style = config[type] || config.info;
 
   const toastHtml = `
-    <div class="toast align-items-center ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" style="font-size: 1rem;">
-          ${icon}${message}
+    <div class="toast align-items-center ${style.bg} text-white border ${style.border} shadow-lg ${style.shadow} backdrop-blur-md rounded-xl overflow-hidden mb-3" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 320px;">
+      <div class="d-flex p-4 align-items-center gap-3">
+        <div class="shrink-0">
+          ${style.icon}
         </div>
-        <button type="button" class="btn-close ${type === 'warning' ? '' : 'btn-close-white'} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="toast-body p-0 font-sans text-sm font-medium flex-grow leading-relaxed">
+          ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto shrink-0" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
     </div>
   `;
@@ -1323,33 +1350,8 @@ function initHomeAnimations() {
 }
 
 function showBottomRightNotification(message, type = "success") {
-  let notificationContainer = document.getElementById("bottom-right-notifications");
-  if (!notificationContainer) {
-    notificationContainer = document.createElement("div");
-    notificationContainer.id = "bottom-right-notifications";
-    notificationContainer.style.cssText = "position: fixed; bottom: 20px; right: 20px; z-index: 9999; max-width: 450px;";
-    document.body.appendChild(notificationContainer);
-  }
-
-  const notificationId = "notification-" + Date.now();
-  const notification = document.createElement("div");
-  notification.id = notificationId;
-  notification.className = `alert alert-${type} alert-dismissible fade show`;
-  notification.style.cssText = "margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); padding: 1rem 1.5rem; font-size: 1rem; min-width: 300px; display: flex; align-items: center; justify-content: space-between; gap: 1rem;";
-  notification.innerHTML = `
-    <div style="flex: 1; word-wrap: break-word; margin: 0;">${message}</div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="flex-shrink: 0; margin: 0;"></button>
-  `;
-
-  notificationContainer.appendChild(notification);
-
-  setTimeout(() => {
-    const alertElement = document.getElementById(notificationId);
-    if (alertElement && alertElement.parentNode) {
-      const bsAlert = new bootstrap.Alert(alertElement);
-      bsAlert.close();
-    }
-  }, 5000);
+  // Redirect legacy calls to the new standardised toast system
+  showToast(message, type);
 }
 
 async function loadProfileData(page = 1) {
