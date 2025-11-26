@@ -1,6 +1,7 @@
 """
 Service layer for administrator-specific logic.
 """
+import os
 import time
 from collections import defaultdict
 from typing import List, Optional
@@ -36,7 +37,12 @@ async def create_park(
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
         # Upload to Supabase Storage using the client library
-        if token:
+        # Try to use Service Role Key to bypass RLS for admin uploads
+        service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+        if service_key:
+            client = create_client(settings.SUPABASE_URL, service_key)
+        elif token:
             client = create_client(
                 settings.SUPABASE_URL,
                 settings.SUPABASE_KEY,
