@@ -6,7 +6,6 @@ from collections import defaultdict
 from typing import List, Optional
 from uuid import UUID
 
-import httpx
 from fastapi import UploadFile
 from supabase import Client, create_client
 
@@ -36,23 +35,17 @@ async def create_park(
         file_ext = image.filename.split(".")[-1] if "." in image.filename else "jpg"
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
-        # Upload to Supabase Storage via HTTPX to ensure Auth headers are correct
-        upload_url = f"{settings.SUPABASE_URL}/storage/v1/object/park-images/{file_name}"
-
-        headers = {
-            "apikey": settings.SUPABASE_KEY,
-            "Content-Type": image.content_type or "application/octet-stream",
-        }
+        # Upload to Supabase Storage using the client library
+        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
         if token:
-            headers["Authorization"] = f"Bearer {token}"
+            # Ensure the storage client uses the user's auth token
+            client.storage.session.headers["Authorization"] = f"Bearer {token}"
 
-        async with httpx.AsyncClient() as client:
-            r = await client.post(
-                upload_url,
-                content=file_content,
-                headers=headers,
-            )
-            r.raise_for_status()
+        client.storage.from_("park-images").upload(
+            file_name,
+            file_content,
+            {"content-type": image.content_type or "application/octet-stream"},
+        )
 
         # Get public URL
         image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/park-images/{file_name}"
