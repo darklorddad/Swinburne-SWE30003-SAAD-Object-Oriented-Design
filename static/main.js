@@ -1411,6 +1411,9 @@ async function loadProfileData(page = 1) {
         if (order.status === "cancelled") badgeTailwind = "bg-red-600 text-white";
         if (order.status === "refunded") badgeTailwind = "bg-yellow-500 text-black";
 
+        // Check if order has tickets
+        const hasTickets = order.items.some(item => item.ticket_type_id);
+
         return `
         <div class="bg-black/20 border border-white/10 rounded-xl overflow-hidden mb-4 transition-all duration-300 hover:bg-black/40 hover:shadow-lg hover:shadow-green-900/10 hover:border-green-500/30 transform hover:-translate-y-1">
             <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/40">
@@ -1473,12 +1476,12 @@ async function loadProfileData(page = 1) {
                         ${
                           order.status !== "cancelled" && order.status !== "refunded"
                             ? `
-                              <button class="w-full py-2 px-4 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 text-xs font-bold uppercase tracking-wider transition-all reschedule-btn" 
+                              ${hasTickets ? `<button class="w-full py-2 px-4 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 text-xs font-bold uppercase tracking-wider transition-all reschedule-btn" 
                                   data-order-id="${order.id}" 
                                   data-bs-toggle="modal" 
                                   data-bs-target="#rescheduleModal">
                                   Reschedule
-                              </button>
+                              </button>` : ''}
                               <button class="w-full py-2 px-4 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider transition-all refund-btn" 
                                   data-order-id="${order.id}"
                                   data-bs-toggle="modal"
