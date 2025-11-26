@@ -1405,74 +1405,80 @@ async function loadProfileData(page = 1) {
     // 1. Generate HTML String
     const ordersHtml = ordersData.map((order) => {
         // Determine Badge Color
-        let badgeClass = "success";
-        if (order.status === "cancelled") badgeClass = "danger";
-        if (order.status === "refunded") badgeClass = "warning"; // Orange for refund
+        let badgeTailwind = "bg-green-600 text-white";
+        if (order.status === "cancelled") badgeTailwind = "bg-red-600 text-white";
+        if (order.status === "refunded") badgeTailwind = "bg-yellow-500 text-black";
 
         return `
-        <div class="card order-card mb-3">
-            <div class="card-header card-header d-flex justify-content-between align-items-center">
-                <span><strong>Order #${order.id.slice(0, 8)}</strong></span>
-                <span class="badge bg-${badgeClass}">${order.status.toUpperCase()}</span>
+        <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden mb-4 transition-all hover:bg-white/10">
+            <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/20">
+                <span class="text-white font-sans tracking-wide text-sm">Order <span class="font-bold text-green-400">#${order.id.slice(0, 8)}</span></span>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badgeTailwind}">${order.status}</span>
             </div>
-            <div class="card-body card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="d-flex justify-content-between mb-2 text-sm">
-                            <span><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString('en-GB')}</span>
-                            <span><strong>Total:</strong> RM ${order.total_amount.toFixed(2)}</span>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-grow">
+                        <div class="flex justify-between mb-4 text-sm text-gray-300 border-b border-white/10 pb-4">
+                            <span><span class="text-gray-500 uppercase text-xs font-bold tracking-wider mr-2">Date</span> ${new Date(order.created_at).toLocaleDateString('en-GB')}</span>
+                            <span><span class="text-gray-500 uppercase text-xs font-bold tracking-wider mr-2">Total</span> <span class="text-white font-bold">RM ${order.total_amount.toFixed(2)}</span></span>
                         </div>
-                        <h6 class="text-muted text-uppercase small fw-bold mb-2">Items</h6>
-                        <ul class="list-group list-group-flush mb-2">
+                        
+                        <div class="space-y-3">
                             ${order.items.map((item) => {
-                                // Only show QR code placeholder if it is a TICKET (has ticket_type_id)
-                                // and the order is NOT cancelled/refunded
+                                // QR Code Logic
                                 let qrHtml = "";
-                                if (item.ticket_type_id) { 
-                                    // Generate placeholder
-                                    if(order.status !== 'cancelled' && order.status !== 'refunded') {
-                                        qrHtml = `<div class="mt-2 flex flex-col items-center gap-1 w-full sm:w-auto">
-                                                    <small class="text-gray-400 text-[10px] uppercase tracking-wider font-bold">Scan for Entry</small>
-                                                    <div id="qrcode-${item.id}" class="p-1 bg-white rounded shadow-sm"></div>
-                                                  </div>`;
-                                    }
+                                if (item.ticket_type_id && order.status !== 'cancelled' && order.status !== 'refunded') { 
+                                    qrHtml = `<div class="mt-3 sm:mt-0 sm:ml-4 flex flex-col items-center gap-2 shrink-0">
+                                                <div id="qrcode-${item.id}" class="p-1 bg-white rounded shadow-sm"></div>
+                                                <small class="text-gray-500 text-[10px] uppercase tracking-wider font-bold">Scan Entry</small>
+                                              </div>`;
                                 }
                                 
-                                let itemText = "Unknown Item";
+                                let itemTitle = "Unknown Item";
+                                let itemMeta = "";
+                                
                                 if (item.ticket_types) {
-                                  itemText = `${item.quantity} x ${item.ticket_types.name} <span class="text-muted text-xs">(Visit: ${item.visit_date})</span>`;
+                                  itemTitle = item.ticket_types.name;
+                                  itemMeta = `<div class="text-xs text-gray-400 mt-1">Visit Date: <span class="text-gray-300">${item.visit_date}</span></div>`;
                                 } else if (item.merchandise) {
-                                  itemText = `${item.quantity} x ${item.merchandise.name}`;
+                                  itemTitle = item.merchandise.name;
+                                  itemMeta = `<div class="text-xs text-gray-400 mt-1">Merchandise</div>`;
                                 }
 
-                                return `<li class="list-group-item d-flex flex-column sm:flex-row justify-content-between align-items-center sm:align-items-start p-3 bg-transparent border-b border-white/10">
-                                            <div class="mb-2 sm:mb-0">
-                                                <div class="fw-bold text-white text-sm mb-0">${itemText}</div>
+                                return `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/20 transition-colors">
+                                            <div class="flex items-start gap-3">
+                                                <div class="bg-white/10 text-white font-bold px-3 py-2 rounded text-sm min-w-[40px] text-center">
+                                                    ${item.quantity}x
+                                                </div>
+                                                <div>
+                                                    <div class="text-white font-bold text-sm">${itemTitle}</div>
+                                                    ${itemMeta}
+                                                </div>
                                             </div>
                                             ${qrHtml}
-                                        </li>`;
+                                        </div>`;
                             }).join("")}
-                        </ul>
+                        </div>
                     </div>
                     
-                    <div class="col-md-4 d-flex flex-column justify-content-center align-items-end">
+                    <div class="md:w-48 shrink-0 flex flex-col justify-center gap-2 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
                         ${
                           order.status !== "cancelled" && order.status !== "refunded"
                             ? `
-                              <button class="btn btn-primary btn-sm mb-2 w-100 reschedule-btn" 
+                              <button class="w-full py-2 px-4 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 text-xs font-bold uppercase tracking-wider transition-all reschedule-btn" 
                                   data-order-id="${order.id}" 
                                   data-bs-toggle="modal" 
                                   data-bs-target="#rescheduleModal">
                                   Reschedule
                               </button>
-                              <button class="btn btn-danger btn-sm w-100 refund-btn" 
+                              <button class="w-full py-2 px-4 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider transition-all refund-btn" 
                                   data-order-id="${order.id}"
                                   data-bs-toggle="modal"
                                   data-bs-target="#refundModal">
-                                  Request Refund
+                                  Refund
                               </button>
                               `
-                            : `<button class="btn btn-secondary btn-sm w-100" disabled>Action Unavailable</button>`
+                            : `<div class="text-center py-2 text-xs text-gray-500 uppercase tracking-wider font-bold border border-white/5 rounded-lg bg-black/20">Action Unavailable</div>`
                         }
                     </div>
                 </div>
