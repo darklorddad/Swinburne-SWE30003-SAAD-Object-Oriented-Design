@@ -710,11 +710,11 @@ async function loadAdminParks() {
                       ? ""
                       : ' <span class="text-xs text-gray-500 ml-2">(Inactive)</span>';
                     return `
-                  <li class="flex justify-between items-center p-3 border-b border-white/10 last:border-0 text-gray-300 hover:bg-white/5 transition-colors">
+                  <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 border-b border-white/10 last:border-0 text-gray-300 hover:bg-white/5 transition-colors gap-2">
                       <span>${tt.name} - RM ${tt.price.toFixed(2)}${ttBadge}</span>
-                      <div class="flex gap-2">
+                      <div class="flex gap-2 shrink-0">
                           <button
-                              class="px-3 py-1 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-tt-btn"
+                              class="px-3 py-1 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-tt-btn whitespace-nowrap"
                               data-bs-toggle="modal"
                               data-bs-target="#ticketTypeModal"
                               data-park-id="${park.id}"
@@ -725,14 +725,14 @@ async function loadAdminParks() {
                               Edit
                           </button>
                           <button
-                              class="px-3 py-1 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-tt-btn"
+                              class="px-3 py-1 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-tt-btn whitespace-nowrap"
                               data-park-id="${park.id}"
                               data-tt-id="${tt.id}"
                           >
                               Deactivate
                           </button>
                           <button
-                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-tt-permanent-btn"
+                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-tt-permanent-btn whitespace-nowrap"
                               data-park-id="${park.id}"
                               data-tt-id="${tt.id}"
                           >
@@ -753,14 +753,14 @@ async function loadAdminParks() {
                       ? ""
                       : ' <span class="text-xs text-gray-500 ml-2">(Inactive)</span>';
                     return `
-                  <li class="flex justify-between items-center p-3 border-b border-white/10 last:border-0 text-gray-300 hover:bg-white/5 transition-colors">
+                  <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 border-b border-white/10 last:border-0 text-gray-300 hover:bg-white/5 transition-colors gap-2">
                       <div>
                           <span class="block">${m.name} - RM ${m.price.toFixed(2)}${mBadge}</span>
                           <small class="text-gray-500 text-xs">Stock: ${m.stock}</small>
                       </div>
-                      <div class="flex gap-2">
+                      <div class="flex gap-2 shrink-0">
                           <button
-                              class="px-3 py-1 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-merch-btn"
+                              class="px-3 py-1 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-merch-btn whitespace-nowrap"
                               data-bs-toggle="modal"
                               data-bs-target="#merchandiseModal"
                               data-park-id="${park.id}"
@@ -773,14 +773,14 @@ async function loadAdminParks() {
                               Edit
                           </button>
                           <button
-                              class="px-3 py-1 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-merch-btn"
+                              class="px-3 py-1 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-merch-btn whitespace-nowrap"
                               data-park-id="${park.id}"
                               data-merch-id="${m.id}"
                           >
                               Deactivate
                           </button>
                           <button
-                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-merch-permanent-btn"
+                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-merch-permanent-btn whitespace-nowrap"
                               data-park-id="${park.id}"
                               data-merch-id="${m.id}"
                           >
@@ -800,15 +800,15 @@ async function loadAdminParks() {
                  aria-labelledby="pills-${park.id}-tab">
               
               <div class="glass-panel p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-                  <div class="flex justify-between items-start mb-6 pb-6 border-b border-white/10">
-                      <div class="text-gray-300 text-sm">
+                  <div class="flex flex-col xl:flex-row justify-between items-start mb-6 pb-6 border-b border-white/10 gap-4">
+                      <div class="text-gray-300 text-sm w-full xl:w-auto">
                           <h4 class="text-2xl font-serif text-white font-bold mb-2">${park.name}${statusBadge}</h4>
                           <p class="mb-1"><strong class="text-white">Location:</strong> ${park.location || "N/A"}</p>
                           <p><strong class="text-white">Description:</strong> ${park.description || "N/A"}</p>
                       </div>
-                      <div class="flex gap-2">
+                      <div class="flex gap-2 flex-wrap shrink-0">
                           <button
-                              class="px-4 py-2 text-sm border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-park-btn"
+                              class="px-4 py-2 text-sm border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-park-btn whitespace-nowrap"
                               data-bs-toggle="modal"
                               data-bs-target="#editParkModal"
                               data-park-id="${park.id}"
@@ -818,10 +818,10 @@ async function loadAdminParks() {
                           >
                               Edit Park
                           </button>
-                          <button class="px-4 py-2 text-sm border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-park-btn" data-park-id="${park.id}">
+                          <button class="px-4 py-2 text-sm border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-park-btn whitespace-nowrap" data-park-id="${park.id}">
                             Deactivate
                           </button>
-                          <button class="px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-permanent-btn" data-park-id="${park.id}">
+                          <button class="px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-permanent-btn whitespace-nowrap" data-park-id="${park.id}">
                             Delete
                           </button>
                       </div>
