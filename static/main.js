@@ -1715,6 +1715,8 @@ async function handleOrderSubmit(event) {
   }
 
   // 2. Populate Modal
+  const parkName = document.querySelector("#park-detail-container h2").innerText;
+  document.getElementById("summary-park-name").innerText = parkName;
   document.getElementById("summary-items-list").innerHTML = summaryHtml;
   document.getElementById("summary-total").innerText = `RM ${grandTotal.toFixed(2)}`;
   
@@ -1753,7 +1755,7 @@ async function loadParkDetail() {
     // Render park details (Dark Text for Light Background)
     parkDetailContainer.innerHTML = `
             <h2 class="text-4xl md:text-5xl mb-6 font-serif font-bold text-green-900">${park.name}</h2>
-            <p class="text-lg text-gray-800 mb-4"><strong class="text-green-700">Location:</strong> ${park.location || "N/A"}</p>
+            <p class="text-lg text-gray-800 mb-4"><strong>Location:</strong> ${park.location || "N/A"}</p>
             <p class="text-gray-700 leading-relaxed text-lg">${park.description || "No description available."}</p>
         `;
 
@@ -1772,7 +1774,7 @@ async function loadParkDetail() {
                 .map(
                   (tt) => `
                     <div class="ticket-section p-6 rounded-xl border border-gray-200 hover:border-green-500 transition-colors duration-300 mb-4">
-                        <h5 class="text-xl font-bold text-green-800 mb-4">${tt.name} <span class="text-gray-600 text-base font-normal">(RM ${tt.price.toFixed(2)})</span></h5>
+                        <h5 class="text-xl font-bold text-green-800 mb-4">${tt.name} <span class="text-gray-600 font-normal">(RM ${tt.price.toFixed(2)})</span></h5>
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <label for="quantity-ticket-${tt.id}" class="form-label text-gray-700 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
@@ -1796,7 +1798,7 @@ async function loadParkDetail() {
                 .map(
                   (m) => `
                     <div class="merchandise-section p-6 rounded-xl border border-gray-200 hover:border-green-500 transition-colors duration-300 mb-4">
-                        <h5 class="text-xl font-bold text-green-800 mb-2">${m.name} <span class="text-gray-600 text-base font-normal">(RM ${m.price.toFixed(2)})</span></h5>
+                        <h5 class="text-xl font-bold text-green-800 mb-2">${m.name} <span class="text-gray-600 font-normal">(RM ${m.price.toFixed(2)})</span></h5>
                         <p class="mb-4 text-gray-600 text-sm">${m.description || ""}</p>
                         <div class="row g-4">
                             <div class="col-md-6">
