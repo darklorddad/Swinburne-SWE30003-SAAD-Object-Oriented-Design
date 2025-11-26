@@ -1881,11 +1881,13 @@ async function loadParkDetail() {
             : "";
 
         orderFormContainer.innerHTML = `
-                    <form id="order-form">
-                        ${ticketInputs}
-                        ${merchandiseInputs}
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 mt-6 shadow-lg shadow-green-500/30 uppercase tracking-widest text-sm">Place Order</button>
-                    </form>
+                    <div class="bg-white/5 rounded-2xl p-6 md:p-8 border border-white/10 backdrop-blur-sm">
+                        <form id="order-form">
+                            ${ticketInputs}
+                            ${merchandiseInputs}
+                            <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 mt-6 shadow-lg shadow-green-500/30 uppercase tracking-widest text-sm">Place Order</button>
+                        </form>
+                    </div>
                 `;
         document
           .getElementById("order-form")
@@ -1893,7 +1895,7 @@ async function loadParkDetail() {
       }
     } else {
       orderFormContainer.innerHTML =
-        '<div class="text-center p-8"><p class="text-gray-300 mb-4">Please log in to book tickets.</p><a href="/login" class="inline-block border border-green-500 text-green-400 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white hover:border-green-600 transition-colors no-underline">Log In</a></div>';
+        '<div class="bg-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm text-center"><p class="text-gray-300 mb-4">Please log in to book tickets.</p><a href="/login" class="inline-block border border-green-500 text-green-400 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white hover:border-green-600 transition-colors no-underline">Log In</a></div>';
     }
   } catch (error) {
     parkDetailContainer.innerHTML = `<div class="alert alert-danger alert">${error.message}</div>`;
