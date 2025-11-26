@@ -1606,7 +1606,7 @@ function renderParks(parks, skipClear = false) {
   parks.forEach((park, index) => {
     // Create the main card element
     const parkCard = document.createElement('div');
-    // The parent grid now has a fixed row height, so the card just needs to fill it.
+    // Card fills the grid row height (which adapts to content)
     parkCard.className = 'group relative glass-panel rounded-xl transform transition hover:-translate-y-2 duration-300 text-left flex flex-col h-full';
 
 
@@ -1640,7 +1640,6 @@ function renderParks(parks, skipClear = false) {
 }
 
 function handleParkSearch(event) {
-  const parksContainer = document.getElementById("parks-container");
   const searchTerm = event.target.value.toLowerCase();
 
   const filteredParks = allParks.filter(
@@ -1649,23 +1648,7 @@ function handleParkSearch(event) {
       (park.description && park.description.toLowerCase().includes(searchTerm))
   );
 
-  // Force the browser to calculate layout before we change anything.
-  const containerHeight = parksContainer.offsetHeight;
-  parksContainer.style.height = `${containerHeight}px`;
-
-  // Frame 1: Clear the container. This gives the browser a full frame to process the removal.
-  requestAnimationFrame(() => {
-    while (parksContainer.firstChild) {
-        parksContainer.removeChild(parksContainer.firstChild);
-    }
-
-    // Frame 2: Render the new content. This happens on the *next* frame.
-    requestAnimationFrame(() => {
-        // Release the fixed height before adding new content
-        parksContainer.style.height = '';
-        renderParks(filteredParks, true); // Pass a flag to skip clearing
-    });
-  });
+  renderParks(filteredParks);
 }
 
 let currentOrderPayload = null; // Store data temporarily
