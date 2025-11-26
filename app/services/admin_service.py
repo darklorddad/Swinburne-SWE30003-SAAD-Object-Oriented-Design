@@ -239,13 +239,14 @@ async def get_visitor_statistics(db: Client) -> VisitorStatistics:
 
     This report considers all non-cancelled orders as valid for statistics.
     """
-    # Fetch all non-cancelled orders with their items and related park info
+    # Fetch all paid orders with their items and related park info
+    # We exclude cancelled AND refunded orders from revenue stats
     response = (
         db.table("orders")
         .select(
             "status, order_items(quantity, price_at_purchase, ticket_types(park_id, parks(name)), merchandise(park_id, parks(name)))"
         )
-        .neq("status", "cancelled")
+        .eq("status", "paid")
         .execute()
     )
 
