@@ -75,13 +75,15 @@ async def update_existing_park(
 )
 async def delete_existing_park(
     park_id: UUID,
+    permanent: bool = False,
     db: Client = Depends(deps.get_db),
     token: str = Depends(deps.oauth2_scheme),
 ):
     """
     Delete a park. (Admin only)
+    If permanent=True, it is removed from the DB. Otherwise, it is set to inactive.
     """
-    success = await admin_service.delete_park(db, park_id, token)
+    success = await admin_service.delete_park(db, park_id, token, permanent)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Park not found"
@@ -161,16 +163,17 @@ async def update_ticket_type_for_park(
 async def delete_ticket_type_for_park(
     park_id: UUID,
     ticket_type_id: UUID,
+    permanent: bool = False,
     db: Client = Depends(deps.get_db),
     token: str = Depends(deps.oauth2_scheme),
 ):
     """
-    Soft-delete a ticket type for a specific park. (Admin only)
-
-    This archives the ticket type by setting it to inactive, rather than
-    deleting it, to preserve historical order data.
+    Delete a ticket type. (Admin only)
+    If permanent=True, it is removed from the DB. Otherwise, it is set to inactive.
     """
-    success = await admin_service.delete_ticket_type(db, park_id, ticket_type_id, token)
+    success = await admin_service.delete_ticket_type(
+        db, park_id, ticket_type_id, token, permanent
+    )
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -251,13 +254,17 @@ async def update_merchandise_for_park(
 async def delete_merchandise_for_park(
     park_id: UUID,
     merchandise_id: UUID,
+    permanent: bool = False,
     db: Client = Depends(deps.get_db),
     token: str = Depends(deps.oauth2_scheme),
 ):
     """
     Delete merchandise for a specific park. (Admin only)
+    If permanent=True, it is removed from the DB. Otherwise, it is set to inactive.
     """
-    success = await admin_service.delete_merchandise(db, park_id, merchandise_id, token)
+    success = await admin_service.delete_merchandise(
+        db, park_id, merchandise_id, token, permanent
+    )
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

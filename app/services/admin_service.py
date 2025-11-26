@@ -90,9 +90,13 @@ async def update_park(
     return None
 
 
-async def delete_park(db: Client, park_id: UUID, token: Optional[str] = None) -> bool:
+async def delete_park(
+    db: Client, park_id: UUID, token: Optional[str] = None, permanent: bool = False
+) -> bool:
     """
-    Soft-deletes a park and all its associated ticket types and merchandise.
+    Deletes a park.
+    If permanent is True, performs a hard delete (and attempts to delete image).
+    Otherwise, performs a soft delete (sets is_active=False).
     """
     if token:
         settings = get_settings()
@@ -101,27 +105,51 @@ async def delete_park(db: Client, park_id: UUID, token: Optional[str] = None) ->
     else:
         client = db
 
-    # This is not a true transaction, but for the assignment's scope,
-    # sequential deactivation is sufficient.
+    if permanent:
+        # 1. Attempt to get image URL to delete from storage
+        park_res = (
+            client.table("parks")
+            .select("image_url")
+            .eq("id", str(park_id))
+            .single()
+            .execute()
+        )
+        if park_res.data and park_res.data.get("image_url"):
+            image_url = park_res.data["image_url"]
+            # Extract filename from URL (assuming standard Supabase structure)
+            # URL format: .../park-images/public/filename.jpg
+            if "park-images" in image_url:
+                try:
+                    file_path = "public/" + image_url.split("/public/")[-1]
+                    client.storage.from_("park-images").remove([file_path])
+                except Exception:
+                    pass  # Fail silently on image delete, prioritize DB delete
 
-    # Deactivate associated merchandise
-    client.table("merchandise").update({"is_active": False}).eq(
-        "park_id", str(park_id)
-    ).execute()
+        # 2. Delete children first (if cascade isn't set up in DB)
+        client.table("merchandise").delete().eq("park_id", str(park_id)).execute()
+        client.table("ticket_types").delete().eq("park_id", str(park_id)).execute()
 
-    # Deactivate associated ticket types
-    client.table("ticket_types").update({"is_active": False}).eq(
-        "park_id", str(park_id)
-    ).execute()
+        # 3. Delete Park
+        response = client.table("parks").delete().eq("id", str(park_id)).execute()
+        return bool(response.data)
 
-    # Finally, deactivate the park itself
-    response = (
-        client.table("parks")
-        .update({"is_active": False})
-        .eq("id", str(park_id))
-        .execute()
-    )
-    return bool(response.data)
+    else:
+        # Soft Delete Logic
+        client.table("merchandise").update({"is_active": False}).eq(
+            "park_id", str(park_id)
+        ).execute()
+
+        client.table("ticket_types").update({"is_active": False}).eq(
+            "park_id", str(park_id)
+        ).execute()
+
+        response = (
+            client.table("parks")
+            .update({"is_active": False})
+            .eq("id", str(park_id))
+            .execute()
+        )
+        return bool(response.data)
 
 
 async def get_all_parks(db: Client) -> List[Park]:
@@ -187,11 +215,14 @@ async def update_ticket_type(
 
 
 async def delete_ticket_type(
-    db: Client, park_id: UUID, ticket_type_id: UUID, token: Optional[str] = None
+    db: Client,
+    park_id: UUID,
+    ticket_type_id: UUID,
+    token: Optional[str] = None,
+    permanent: bool = False,
 ) -> bool:
     """
-    Soft-deletes a ticket type by setting its is_active flag to false.
-    This ensures that historical order data remains intact.
+    Deletes a ticket type.
     """
     if token:
         settings = get_settings()
@@ -200,13 +231,22 @@ async def delete_ticket_type(
     else:
         client = db
 
-    response = (
-        client.table("ticket_types")
-        .update({"is_active": False})
-        .eq("id", str(ticket_type_id))
-        .eq("park_id", str(park_id))
-        .execute()
-    )
+    if permanent:
+        response = (
+            client.table("ticket_types")
+            .delete()
+            .eq("id", str(ticket_type_id))
+            .eq("park_id", str(park_id))
+            .execute()
+        )
+    else:
+        response = (
+            client.table("ticket_types")
+            .update({"is_active": False})
+            .eq("id", str(ticket_type_id))
+            .eq("park_id", str(park_id))
+            .execute()
+        )
     return bool(response.data)
 
 
@@ -289,11 +329,14 @@ async def update_merchandise(
 
 
 async def delete_merchandise(
-    db: Client, park_id: UUID, merchandise_id: UUID, token: Optional[str] = None
+    db: Client,
+    park_id: UUID,
+    merchandise_id: UUID,
+    token: Optional[str] = None,
+    permanent: bool = False,
 ) -> bool:
     """
-    Soft-deletes merchandise by setting its is_active flag to false.
-    This ensures that historical order data remains intact.
+    Deletes merchandise.
     """
     if token:
         settings = get_settings()
@@ -302,13 +345,22 @@ async def delete_merchandise(
     else:
         client = db
 
-    response = (
-        client.table("merchandise")
-        .update({"is_active": False})
-        .eq("id", str(merchandise_id))
-        .eq("park_id", str(park_id))
-        .execute()
-    )
+    if permanent:
+        response = (
+            client.table("merchandise")
+            .delete()
+            .eq("id", str(merchandise_id))
+            .eq("park_id", str(park_id))
+            .execute()
+        )
+    else:
+        response = (
+            client.table("merchandise")
+            .update({"is_active": False})
+            .eq("id", str(merchandise_id))
+            .eq("park_id", str(park_id))
+            .execute()
+        )
     return bool(response.data)
 
 

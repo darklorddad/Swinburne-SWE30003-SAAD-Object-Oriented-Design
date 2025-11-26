@@ -223,26 +223,49 @@ document.addEventListener("DOMContentLoaded", () => {
         await cancelOrder(orderId);
       }
     }
-    if (event.target.classList.contains("delete-park-btn")) {
+    // Park Actions
+    if (event.target.classList.contains("deactivate-park-btn")) {
       const parkId = event.target.dataset.parkId;
-      if (
-        confirm("Are you sure you want to delete this park? This is irreversible.")
-      ) {
-        await handleDeletePark(parkId);
+      if (confirm("Are you sure you want to deactivate this park? It will be hidden from visitors.")) {
+        await handleDeletePark(parkId, false);
       }
     }
-    if (event.target.classList.contains("delete-tt-btn")) {
+    if (event.target.classList.contains("delete-park-permanent-btn")) {
+      const parkId = event.target.dataset.parkId;
+      if (confirm("⚠️ DANGER: Are you sure you want to PERMANENTLY delete this park? This cannot be undone and will delete all associated tickets and merchandise.")) {
+        await handleDeletePark(parkId, true);
+      }
+    }
+
+    // Ticket Type Actions
+    if (event.target.classList.contains("deactivate-tt-btn")) {
       const parkId = event.target.dataset.parkId;
       const ttId = event.target.dataset.ttId;
-      if (confirm("Are you sure you want to delete this ticket type?")) {
-        await handleDeleteTicketType(parkId, ttId);
+      if (confirm("Deactivate this ticket type?")) {
+        await handleDeleteTicketType(parkId, ttId, false);
       }
     }
-    if (event.target.classList.contains("delete-merch-btn")) {
+    if (event.target.classList.contains("delete-tt-permanent-btn")) {
+      const parkId = event.target.dataset.parkId;
+      const ttId = event.target.dataset.ttId;
+      if (confirm("Permanently delete this ticket type?")) {
+        await handleDeleteTicketType(parkId, ttId, true);
+      }
+    }
+
+    // Merchandise Actions
+    if (event.target.classList.contains("deactivate-merch-btn")) {
       const parkId = event.target.dataset.parkId;
       const merchId = event.target.dataset.merchId;
-      if (confirm("Are you sure you want to delete this merchandise?")) {
-        await handleDeleteMerchandise(parkId, merchId);
+      if (confirm("Deactivate this merchandise?")) {
+        await handleDeleteMerchandise(parkId, merchId, false);
+      }
+    }
+    if (event.target.classList.contains("delete-merch-permanent-btn")) {
+      const parkId = event.target.dataset.parkId;
+      const merchId = event.target.dataset.merchId;
+      if (confirm("Permanently delete this merchandise?")) {
+        await handleDeleteMerchandise(parkId, merchId, true);
       }
     }
   });
@@ -702,7 +725,14 @@ async function loadAdminParks() {
                               Edit
                           </button>
                           <button
-                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-tt-btn"
+                              class="px-3 py-1 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-tt-btn"
+                              data-park-id="${park.id}"
+                              data-tt-id="${tt.id}"
+                          >
+                              Deactivate
+                          </button>
+                          <button
+                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-tt-permanent-btn"
                               data-park-id="${park.id}"
                               data-tt-id="${tt.id}"
                           >
@@ -743,7 +773,14 @@ async function loadAdminParks() {
                               Edit
                           </button>
                           <button
-                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-merch-btn"
+                              class="px-3 py-1 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-merch-btn"
+                              data-park-id="${park.id}"
+                              data-merch-id="${m.id}"
+                          >
+                              Deactivate
+                          </button>
+                          <button
+                              class="px-3 py-1 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-merch-permanent-btn"
                               data-park-id="${park.id}"
                               data-merch-id="${m.id}"
                           >
@@ -781,7 +818,12 @@ async function loadAdminParks() {
                           >
                               Edit Park
                           </button>
-                          <button class="px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-btn" data-park-id="${park.id}">Delete Park</button>
+                          <button class="px-4 py-2 text-sm border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-park-btn" data-park-id="${park.id}">
+                            Deactivate
+                          </button>
+                          <button class="px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-permanent-btn" data-park-id="${park.id}">
+                            Delete
+                          </button>
                       </div>
                   </div>
                   
@@ -830,15 +872,19 @@ async function loadAdminParks() {
   }
 }
 
-async function handleDeletePark(parkId) {
+async function handleDeletePark(parkId, permanent = false) {
   const token = getToken();
   if (!token) {
     showAlert("Authentication error. Please log in again.", "danger");
     return;
   }
 
+  const url = permanent 
+    ? `/api/admin/parks/${parkId}?permanent=true` 
+    : `/api/admin/parks/${parkId}`;
+
   try {
-    const response = await fetch(`/api/admin/parks/${parkId}`, {
+    const response = await fetch(url, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -848,7 +894,7 @@ async function handleDeletePark(parkId) {
       throw new Error(data.detail || "Failed to delete park.");
     }
 
-    showAlert("Park deleted successfully.", "success");
+    showAlert(permanent ? "Park permanently deleted." : "Park deactivated.", "success");
     loadAdminParks(); // Refresh the list
   } catch (error) {
     showAlert(error.message, "danger");
@@ -912,15 +958,19 @@ async function handleSaveTicketType() {
   }
 }
 
-async function handleDeleteTicketType(parkId, ttId) {
+async function handleDeleteTicketType(parkId, ttId, permanent = false) {
   const token = getToken();
   if (!token) {
     showAlert("Authentication error. Please log in again.", "danger");
     return;
   }
 
+  const url = permanent
+    ? `/api/admin/parks/${parkId}/ticket-types/${ttId}?permanent=true`
+    : `/api/admin/parks/${parkId}/ticket-types/${ttId}`;
+
   try {
-    const response = await fetch(`/api/admin/parks/${parkId}/ticket-types/${ttId}`, {
+    const response = await fetch(url, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -930,7 +980,7 @@ async function handleDeleteTicketType(parkId, ttId) {
       throw new Error(data.detail || "Failed to delete ticket type.");
     }
 
-    showAlert("Ticket type deleted successfully.", "success");
+    showAlert(permanent ? "Ticket type permanently deleted." : "Ticket type deactivated.", "success");
     loadAdminParks(); // Refresh the accordion
   } catch (error) {
     showAlert(error.message, "danger");
@@ -1045,28 +1095,29 @@ async function handleSaveMerchandise() {
   }
 }
 
-async function handleDeleteMerchandise(parkId, merchId) {
+async function handleDeleteMerchandise(parkId, merchId, permanent = false) {
   const token = getToken();
   if (!token) {
     showAlert("Authentication error. Please log in again.", "danger");
     return;
   }
 
+  const url = permanent
+    ? `/api/admin/parks/${parkId}/merchandise/${merchId}?permanent=true`
+    : `/api/admin/parks/${parkId}/merchandise/${merchId}`;
+
   try {
-    const response = await fetch(
-      `/api/admin/parks/${parkId}/merchandise/${merchId}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.detail || "Failed to delete merchandise.");
     }
 
-    showAlert("Merchandise deleted successfully.", "success");
+    showAlert(permanent ? "Merchandise permanently deleted." : "Merchandise deactivated.", "success");
     loadAdminParks(); // Refresh the accordion
   } catch (error) {
     showAlert(error.message, "danger");
