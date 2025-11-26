@@ -134,16 +134,32 @@ async def create_order(db: Client, order_in: OrderCreate, customer_id: UUID) -> 
         raise e
 
 
-async def get_orders_for_customer(db: Client, customer_id: UUID) -> List[Order]:
-    """Fetches all orders for a specific customer with full nested details."""
-    response = (
+async def get_orders_for_customer(
+    db: Client, customer_id: UUID, skip: int = 0, limit: int = 10
+) -> dict:
+    """Fetches orders for a specific customer with pagination."""
+    # Get total count
+    count_response = (
         db.table("orders")
-        .select("*, order_items(*, ticket_types(*), merchandise(*))") 
+        .select("id", count="exact")
         .eq("customer_id", str(customer_id))
-        .order("created_at", desc=True)
         .execute()
     )
-    return [Order(**{**o, "items": o.get("order_items", [])}) for o in response.data]
+    total = count_response.count
+
+    # Get paginated data
+    response = (
+        db.table("orders")
+        .select("*, order_items(*, ticket_types(*), merchandise(*))")
+        .eq("customer_id", str(customer_id))
+        .order("created_at", desc=True)
+        .range(skip, skip + limit - 1)
+        .execute()
+    )
+    orders = [
+        Order(**{**o, "items": o.get("order_items", [])}) for o in response.data
+    ]
+    return {"total": total, "items": orders}
 
 
 async def get_order_by_id(

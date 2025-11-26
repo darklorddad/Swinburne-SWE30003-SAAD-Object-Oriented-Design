@@ -4,7 +4,7 @@ API endpoints for customer orders.
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from supabase import Client
 
 from app.api import deps
@@ -40,15 +40,27 @@ async def create_new_order(
         )
 
 
-@router.get("/", response_model=List[Order])
+@router.get("/", response_model=dict)
 async def read_user_orders(
+    page: int = Query(1, ge=1),
+    size: int = Query(5, ge=1, le=50),
     db: Client = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user),
 ):
     """
-    Retrieve all orders for the current user.
+    Retrieve orders for the current user with pagination.
     """
-    return await order_service.get_orders_for_customer(db, customer_id=current_user.id)
+    skip = (page - 1) * size
+    result = await order_service.get_orders_for_customer(
+        db, customer_id=current_user.id, skip=skip, limit=size
+    )
+    return {
+        "items": result["items"],
+        "total": result["total"],
+        "page": page,
+        "size": size,
+        "pages": (result["total"] + size - 1) // size,
+    }
 
 
 @router.get("/{order_id}", response_model=Order)

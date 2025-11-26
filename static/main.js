@@ -1351,7 +1351,7 @@ function showBottomRightNotification(message, type = "success") {
   }, 5000);
 }
 
-async function loadProfileData() {
+async function loadProfileData(page = 1) {
   const token = getToken();
   if (!token) {
     window.location.href = "/login";
@@ -1373,19 +1373,25 @@ async function loadProfileData() {
     if(emailInput) emailInput.value = userData.email;
 
     // Fetch orders
-    const ordersResponse = await fetch(`/api/orders/?t=${new Date().getTime()}`, {
+    const ordersResponse = await fetch(`/api/orders/?page=${page}&size=5&t=${new Date().getTime()}`, {
       headers: { 
           Authorization: `Bearer ${token}`,
           'Cache-Control': 'no-cache'
       },
     });
     if (!ordersResponse.ok) throw new Error("Failed to fetch orders.");
-    const ordersData = await ordersResponse.json();
+    
+    const responseData = await ordersResponse.json();
+    const ordersData = responseData.items;
+    const totalPages = responseData.pages;
+    const currentPage = responseData.page;
+
     console.log("FULL ORDERS DATA:", JSON.stringify(ordersData, null, 2)); // Debugging log
 
     const ordersContainer = document.getElementById("orders-container");
     if (ordersData.length === 0) {
       ordersContainer.innerHTML = `<div class="card card mb-4"><div class="card-body"><p class="text-center text-muted">You have no orders.</p></div></div>`;
+      renderPagination(1, 0);
       return;
     }
 
@@ -1493,6 +1499,8 @@ async function loadProfileData() {
         }
     });
 
+    renderPagination(currentPage, totalPages);
+
   } catch (error) {
     console.error(error);
     showAlert(error.message, "danger");
@@ -1502,6 +1510,37 @@ async function loadProfileData() {
         setTimeout(() => (window.location.href = "/login"), 2000);
     }
   }
+}
+
+function renderPagination(currentPage, totalPages) {
+    const container = document.getElementById("pagination-controls");
+    if (!container) return;
+    
+    if (totalPages <= 1) {
+        container.innerHTML = "";
+        return;
+    }
+
+    let html = "";
+    
+    // Previous Button
+    html += `<button class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
+             ${currentPage === 1 ? 'disabled' : ''} 
+             onclick="loadProfileData(${currentPage - 1})">
+             <i class="fas fa-chevron-left"></i> Prev
+             </button>`;
+
+    // Page Info
+    html += `<span class="text-gray-300 font-sans text-sm">Page ${currentPage} of ${totalPages}</span>`;
+
+    // Next Button
+    html += `<button class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
+             ${currentPage === totalPages ? 'disabled' : ''} 
+             onclick="loadProfileData(${currentPage + 1})">
+             Next <i class="fas fa-chevron-right"></i>
+             </button>`;
+
+    container.innerHTML = html;
 }
 
 async function cancelOrder(orderId) {
