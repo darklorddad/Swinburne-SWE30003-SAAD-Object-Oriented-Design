@@ -1363,7 +1363,14 @@ async function loadProfileData(page = 1) {
     const userResponse = await fetch("/api/users/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!userResponse.ok) throw new Error("Failed to fetch user data.");
+    if (!userResponse.ok) {
+        if (userResponse.status === 401) {
+            removeToken();
+            window.location.href = "/login";
+            return;
+        }
+        throw new Error("Failed to fetch user data.");
+    }
     const userData = await userResponse.json();
     
     // Update Profile inputs safely

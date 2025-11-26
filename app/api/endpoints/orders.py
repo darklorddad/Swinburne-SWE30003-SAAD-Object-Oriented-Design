@@ -5,6 +5,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from pydantic import BaseModel
 from supabase import Client
 
 from app.api import deps
@@ -13,6 +14,14 @@ from app.models.user import User
 from app.services import order_service
 
 router = APIRouter()
+
+
+class PaginatedOrders(BaseModel):
+    items: List[Order]
+    total: int
+    page: int
+    size: int
+    pages: int
 
 
 @router.post(
@@ -40,7 +49,7 @@ async def create_new_order(
         )
 
 
-@router.get("/", response_model=dict)
+@router.get("/", response_model=PaginatedOrders)
 async def read_user_orders(
     page: int = Query(1, ge=1),
     size: int = Query(5, ge=1, le=50),
