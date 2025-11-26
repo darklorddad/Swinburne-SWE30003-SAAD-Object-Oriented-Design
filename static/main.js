@@ -1605,7 +1605,7 @@ function renderParks(parks, skipClear = false) {
     // Create the main card element
     const parkCard = document.createElement('div');
     // The parent grid now has a fixed row height, so the card just needs to fill it.
-    parkCard.className = 'group relative glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left h-full';
+    parkCard.className = 'group relative glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left h-full flex flex-col';
 
 
     // Get image and description
@@ -1614,16 +1614,16 @@ function renderParks(parks, skipClear = false) {
 
     // Use innerHTML for the static structure
     parkCard.innerHTML = `
-      <div class="h-48">
+      <div class="h-48 shrink-0 relative">
           <img src="${image}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
           <div class="absolute top-0 left-0 right-0 h-48 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
       </div>
-      <div class="p-6">
+      <div class="p-6 flex-grow flex flex-col">
           <h5 class="font-serif text-2xl text-white mb-3 group-hover:text-green-400 transition-colors">${park.name}</h5>
-          <p class="font-sans text-sm text-gray-300 mb-6 line-clamp-3 leading-relaxed">${description}</p>
+          <p class="font-sans text-sm text-gray-300 mb-8 line-clamp-3 leading-relaxed">${description}</p>
       </div>
-      <div class="absolute bottom-6 left-6 right-6 text-center">
-          <a href="/parks/${park.id}" class="inline-block bg-white/10 backdrop-blur-sm border border-white/50 px-6 py-3 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:!text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] no-underline rounded-full w-full">
+      <div class="p-6 pt-0 text-center mt-auto">
+          <a href="/parks/${park.id}" class="inline-block bg-white/10 backdrop-blur-sm border border-white/50 px-6 py-3 text-sm font-sans font-bold tracking-widest uppercase transition-all duration-300 text-white hover:bg-white hover:!text-black hover:border-white hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] no-underline w-full">
               Buy Tickets Now
           </a>
       </div>
