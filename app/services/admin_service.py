@@ -39,8 +39,8 @@ async def create_park(
         client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
         storage_client = client.storage
         if token:
-            # Ensure the storage client uses the user's auth token
-            storage_client.session.headers["Authorization"] = f"Bearer {token}"
+            # Update the headers dictionary which is passed to the FileApi via from_()
+            storage_client.headers["Authorization"] = f"Bearer {token}"
 
         storage_client.from_("park-images").upload(
             file_name,
