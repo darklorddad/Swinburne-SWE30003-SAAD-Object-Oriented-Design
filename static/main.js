@@ -1605,7 +1605,9 @@ function renderParks(parks, skipClear = false) {
     // Create the main card element
     const parkCard = document.createElement('div');
     // The parent grid now has a fixed row height, so the card just needs to fill it.
-    parkCard.className = 'group relative glass-panel rounded-xl overflow-hidden transform transition hover:-translate-y-2 duration-300 text-left h-auto min-h-full flex flex-col';
+    parkCard.className = 'group relative glass-panel rounded-xl transform transition hover:-translate-y-2 duration-300 text-left flex flex-col';
+    parkCard.style.height = 'auto';
+    parkCard.style.minHeight = '100%';
 
 
     // Get image and description
@@ -1614,7 +1616,7 @@ function renderParks(parks, skipClear = false) {
 
     // Use innerHTML for the static structure
     parkCard.innerHTML = `
-      <div class="h-48 shrink-0 relative">
+      <div class="h-48 shrink-0 relative rounded-t-xl overflow-hidden">
           <img src="${image}" class="w-full h-full object-cover" alt="${park.name}" loading="lazy">
           <div class="absolute top-0 left-0 right-0 h-48 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
       </div>
