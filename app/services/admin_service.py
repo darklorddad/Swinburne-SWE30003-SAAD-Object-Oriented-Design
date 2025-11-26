@@ -7,7 +7,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import UploadFile
-from supabase import Client, create_client
+from supabase import Client, create_client, ClientOptions
 
 from app.core.config import get_settings
 from app.models.park import Park, ParkUpdate
@@ -29,9 +29,12 @@ async def create_park(
     # Use a dedicated client with the user's token if provided, to satisfy RLS
     if token:
         settings = get_settings()
-        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        client = create_client(
+            settings.SUPABASE_URL,
+            settings.SUPABASE_KEY,
+            options=ClientOptions(headers={"Authorization": f"Bearer {token}"}),
+        )
         client.postgrest.auth(token)
-        client.storage.headers["Authorization"] = f"Bearer {token}"
     else:
         client = db
 
