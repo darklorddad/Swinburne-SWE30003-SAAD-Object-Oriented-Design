@@ -1587,6 +1587,8 @@ function getParkImage(park, index) {
 
 function renderParks(parks, skipClear = false) {
   const parksContainer = document.getElementById("parks-container");
+  // Ensure grid rows adapt to content height
+  if (parksContainer) parksContainer.style.gridAutoRows = 'auto';
 
   if (!skipClear) {
     while (parksContainer.firstChild) {
@@ -1605,9 +1607,7 @@ function renderParks(parks, skipClear = false) {
     // Create the main card element
     const parkCard = document.createElement('div');
     // The parent grid now has a fixed row height, so the card just needs to fill it.
-    parkCard.className = 'group relative glass-panel rounded-xl transform transition hover:-translate-y-2 duration-300 text-left flex flex-col';
-    parkCard.style.height = 'auto';
-    parkCard.style.minHeight = '100%';
+    parkCard.className = 'group relative glass-panel rounded-xl transform transition hover:-translate-y-2 duration-300 text-left flex flex-col h-full';
 
 
     // Get image and description
