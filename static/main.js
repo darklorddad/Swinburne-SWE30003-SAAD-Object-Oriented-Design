@@ -718,7 +718,7 @@ async function loadAdminParks() {
                       </div>
                       <div class="flex gap-2 w-full flex-wrap">
                           <button
-                              class="flex-1 px-3 py-2 text-xs border border-white/30 rounded-lg hover:bg-white hover:text-black transition-colors text-white edit-tt-btn whitespace-nowrap text-center"
+                              class="flex-1 px-3 py-2 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-tt-btn whitespace-nowrap text-center"
                               data-bs-toggle="modal"
                               data-bs-target="#ticketTypeModal"
                               data-park-id="${park.id}"
@@ -729,14 +729,14 @@ async function loadAdminParks() {
                               Edit
                           </button>
                           <button
-                              class="flex-1 px-3 py-2 text-xs border border-yellow-500/50 text-yellow-400 rounded-lg hover:bg-yellow-500 hover:text-black transition-colors deactivate-tt-btn whitespace-nowrap text-center"
+                              class="flex-1 px-3 py-2 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-tt-btn whitespace-nowrap text-center"
                               data-park-id="${park.id}"
                               data-tt-id="${tt.id}"
                           >
                               Deactivate
                           </button>
                           <button
-                              class="flex-1 px-3 py-2 text-xs border border-red-500/50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-colors delete-tt-permanent-btn whitespace-nowrap text-center"
+                              class="flex-1 px-3 py-2 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-tt-permanent-btn whitespace-nowrap text-center"
                               data-park-id="${park.id}"
                               data-tt-id="${tt.id}"
                           >
@@ -767,7 +767,7 @@ async function loadAdminParks() {
                       </div>
                       <div class="flex gap-2 w-full flex-wrap">
                           <button
-                              class="flex-1 px-3 py-2 text-xs border border-white/30 rounded-lg hover:bg-white hover:text-black transition-colors text-white edit-merch-btn whitespace-nowrap text-center"
+                              class="flex-1 px-3 py-2 text-xs border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors text-white edit-merch-btn whitespace-nowrap text-center"
                               data-bs-toggle="modal"
                               data-bs-target="#merchandiseModal"
                               data-park-id="${park.id}"
@@ -780,14 +780,14 @@ async function loadAdminParks() {
                               Edit
                           </button>
                           <button
-                              class="flex-1 px-3 py-2 text-xs border border-yellow-500/50 text-yellow-400 rounded-lg hover:bg-yellow-500 hover:text-black transition-colors deactivate-merch-btn whitespace-nowrap text-center"
+                              class="flex-1 px-3 py-2 text-xs border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-merch-btn whitespace-nowrap text-center"
                               data-park-id="${park.id}"
                               data-merch-id="${m.id}"
                           >
                               Deactivate
                           </button>
                           <button
-                              class="flex-1 px-3 py-2 text-xs border border-red-500/50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-colors delete-merch-permanent-btn whitespace-nowrap text-center"
+                              class="flex-1 px-3 py-2 text-xs border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-merch-permanent-btn whitespace-nowrap text-center"
                               data-park-id="${park.id}"
                               data-merch-id="${m.id}"
                           >
