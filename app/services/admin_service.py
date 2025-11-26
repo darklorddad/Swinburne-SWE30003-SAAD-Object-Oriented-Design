@@ -7,7 +7,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import UploadFile
-from supabase import Client, create_client
+from supabase import Client, create_client, ClientOptions
 
 from app.core.config import get_settings
 from app.models.park import Park, ParkUpdate
@@ -36,13 +36,16 @@ async def create_park(
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
         # Upload to Supabase Storage using the client library
-        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-        storage_client = client.storage
         if token:
-            # Update the headers dictionary which is passed to the FileApi via from_()
-            storage_client._headers["Authorization"] = f"Bearer {token}"
+            client = create_client(
+                settings.SUPABASE_URL,
+                settings.SUPABASE_KEY,
+                options=ClientOptions(headers={"Authorization": f"Bearer {token}"}),
+            )
+        else:
+            client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
-        storage_client.from_("park-images").upload(
+        client.storage.from_("park-images").upload(
             file_name,
             file_content,
             {"content-type": image.content_type or "application/octet-stream"},
