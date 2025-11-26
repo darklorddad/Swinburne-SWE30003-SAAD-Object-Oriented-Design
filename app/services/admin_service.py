@@ -40,7 +40,7 @@ async def create_park(
         storage_client = client.storage
         if token:
             # Update the headers dictionary which is passed to the FileApi via from_()
-            storage_client.headers["Authorization"] = f"Bearer {token}"
+            storage_client._headers["Authorization"] = f"Bearer {token}"
 
         storage_client.from_("park-images").upload(
             file_name,
