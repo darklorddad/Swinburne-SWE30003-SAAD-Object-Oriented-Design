@@ -34,6 +34,9 @@ async def create_park(
     image_url = None
     if image:
         file_content = await image.read()
+        if not file_content:
+            raise ValueError("Uploaded file is empty.")
+
         # Create a unique filename
         file_ext = image.filename.split(".")[-1] if "." in image.filename else "jpg"
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
@@ -61,16 +64,26 @@ async def create_park(
             client = create_client(
                 settings.SUPABASE_URL,
                 settings.SUPABASE_KEY,
-                options=ClientOptions(headers={"Authorization": f"Bearer {token}"}),
+                options=ClientOptions(
+                    headers={
+                        "Authorization": f"Bearer {token}",
+                        "apikey": settings.SUPABASE_KEY,
+                    }
+                ),
             )
         else:
             client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
 
-        client.storage.from_("park-images").upload(
-            file_name,
-            file_content,
-            {"content-type": image.content_type or "application/octet-stream"},
-        )
+        try:
+            client.storage.from_("park-images").upload(
+                file_name,
+                file_content,
+                {"content-type": image.content_type or "application/octet-stream"},
+            )
+        except Exception as e:
+            if "new row violates row-level security policy" in str(e) and not service_key:
+                print("CRITICAL: Supabase Storage RLS violation. You MUST add SUPABASE_SERVICE_ROLE_KEY to your .env file.")
+            raise e
 
         # Get public URL
         image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/park-images/{file_name}"
