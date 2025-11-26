@@ -90,26 +90,33 @@ async def update_park(
     return None
 
 
-async def delete_park(db: Client, park_id: UUID) -> bool:
+async def delete_park(db: Client, park_id: UUID, token: Optional[str] = None) -> bool:
     """
     Soft-deletes a park and all its associated ticket types and merchandise.
     """
+    if token:
+        settings = get_settings()
+        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        client.postgrest.auth(token)
+    else:
+        client = db
+
     # This is not a true transaction, but for the assignment's scope,
     # sequential deactivation is sufficient.
 
     # Deactivate associated merchandise
-    db.table("merchandise").update({"is_active": False}).eq(
+    client.table("merchandise").update({"is_active": False}).eq(
         "park_id", str(park_id)
     ).execute()
 
     # Deactivate associated ticket types
-    db.table("ticket_types").update({"is_active": False}).eq(
+    client.table("ticket_types").update({"is_active": False}).eq(
         "park_id", str(park_id)
     ).execute()
 
     # Finally, deactivate the park itself
     response = (
-        db.table("parks")
+        client.table("parks")
         .update({"is_active": False})
         .eq("id", str(park_id))
         .execute()
@@ -179,13 +186,22 @@ async def update_ticket_type(
     return None
 
 
-async def delete_ticket_type(db: Client, park_id: UUID, ticket_type_id: UUID) -> bool:
+async def delete_ticket_type(
+    db: Client, park_id: UUID, ticket_type_id: UUID, token: Optional[str] = None
+) -> bool:
     """
     Soft-deletes a ticket type by setting its is_active flag to false.
     This ensures that historical order data remains intact.
     """
+    if token:
+        settings = get_settings()
+        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        client.postgrest.auth(token)
+    else:
+        client = db
+
     response = (
-        db.table("ticket_types")
+        client.table("ticket_types")
         .update({"is_active": False})
         .eq("id", str(ticket_type_id))
         .eq("park_id", str(park_id))
@@ -272,13 +288,22 @@ async def update_merchandise(
     return None
 
 
-async def delete_merchandise(db: Client, park_id: UUID, merchandise_id: UUID) -> bool:
+async def delete_merchandise(
+    db: Client, park_id: UUID, merchandise_id: UUID, token: Optional[str] = None
+) -> bool:
     """
     Soft-deletes merchandise by setting its is_active flag to false.
     This ensures that historical order data remains intact.
     """
+    if token:
+        settings = get_settings()
+        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        client.postgrest.auth(token)
+    else:
+        client = db
+
     response = (
-        db.table("merchandise")
+        client.table("merchandise")
         .update({"is_active": False})
         .eq("id", str(merchandise_id))
         .eq("park_id", str(park_id))
