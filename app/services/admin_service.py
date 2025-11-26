@@ -6,8 +6,9 @@ from collections import defaultdict
 from typing import List, Optional
 from uuid import UUID
 
+import httpx
 from fastapi import UploadFile
-from supabase import Client, create_client, ClientOptions
+from supabase import Client, create_client
 
 from app.core.config import get_settings
 from app.models.park import Park, ParkUpdate
@@ -26,17 +27,7 @@ async def create_park(
     token: Optional[str] = None,
 ) -> Park:
     """Creates a new park in the database, handling image upload."""
-    # Use a dedicated client with the user's token if provided, to satisfy RLS
-    if token:
-        settings = get_settings()
-        client = create_client(
-            settings.SUPABASE_URL,
-            settings.SUPABASE_KEY,
-            options=ClientOptions(headers={"Authorization": f"Bearer {token}"}),
-        )
-        client.postgrest.auth(token)
-    else:
-        client = db
+    settings = get_settings()
 
     image_url = None
     if image:
@@ -45,13 +36,29 @@ async def create_park(
         file_ext = image.filename.split(".")[-1] if "." in image.filename else "jpg"
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
-        # Upload to Supabase Storage
-        client.storage.from_("park-images").upload(
-            file_name, file_content, {"content-type": image.content_type}
-        )
+        # Upload to Supabase Storage via HTTPX to ensure Auth headers are correct
+        upload_url = f"{settings.SUPABASE_URL}/storage/v1/object/park-images/{file_name}"
+
+        headers = {
+            "apikey": settings.SUPABASE_KEY,
+            "Content-Type": image.content_type or "application/octet-stream",
+        }
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        async with httpx.AsyncClient() as client:
+            r = await client.post(upload_url, content=file_content, headers=headers)
+            r.raise_for_status()
 
         # Get public URL
-        image_url = client.storage.from_("park-images").get_public_url(file_name)
+        image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/park-images/{file_name}"
+
+    # Use a dedicated client for the DB insert to satisfy RLS without modifying global db
+    if token:
+        db_client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        db_client.postgrest.auth(token)
+    else:
+        db_client = db
 
     park_data = {
         "name": name,
@@ -60,7 +67,7 @@ async def create_park(
         "image_url": image_url,
     }
 
-    response = client.table("parks").insert(park_data).execute()
+    response = db_client.table("parks").insert(park_data).execute()
     created_park_data = response.data[0]
     return Park(**created_park_data)
 
