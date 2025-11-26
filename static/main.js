@@ -1410,7 +1410,7 @@ async function loadProfileData(page = 1) {
         if (order.status === "refunded") badgeTailwind = "bg-yellow-500 text-black";
 
         return `
-        <div class="bg-black/20 border border-white/10 rounded-xl overflow-hidden mb-4 transition-all hover:bg-black/30">
+        <div class="bg-black/20 border border-white/10 rounded-xl overflow-hidden mb-4 transition-all duration-300 hover:bg-black/40 hover:shadow-lg hover:shadow-green-900/10 hover:border-green-500/30 transform hover:-translate-y-1">
             <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-black/40">
                 <span class="text-white font-sans tracking-wide text-sm">Order <span class="font-bold text-green-400">#${order.id.slice(0, 8)}</span></span>
                 <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badgeTailwind}">${order.status}</span>
@@ -1445,7 +1445,7 @@ async function loadProfileData(page = 1) {
                                   itemMeta = `<div class="text-xs text-gray-400 mt-1">Merchandise</div>`;
                                 }
 
-                                return `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/20 transition-colors">
+                                return `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/30 transition-all duration-200">
                                             <div class="flex items-start gap-3">
                                                 <div class="bg-white/10 text-white font-bold px-3 py-2 rounded text-sm min-w-[40px] text-center">
                                                     ${item.quantity}x
