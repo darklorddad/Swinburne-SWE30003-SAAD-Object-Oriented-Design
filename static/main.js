@@ -716,7 +716,7 @@ async function loadAdminParks() {
                           <span class="font-bold text-white block">${tt.name}</span>
                           <span class="text-sm text-gray-400">RM ${tt.price.toFixed(2)}${ttBadge}</span>
                       </div>
-                      <div class="flex gap-2 w-full flex-wrap">
+                      <div class="flex gap-1 w-full flex-wrap">
                           <button
                               class="flex-1 px-3 py-2 text-sm border border-white/30 rounded-full hover:bg-white/20 hover:text-white transition-colors text-white edit-tt-btn whitespace-nowrap text-center"
                               data-bs-toggle="modal"
@@ -765,7 +765,7 @@ async function loadAdminParks() {
                               <span class="text-xs bg-white/10 px-2 py-0.5 rounded">Stock: ${m.stock}</span>
                           </div>
                       </div>
-                      <div class="flex gap-2 w-full flex-wrap">
+                      <div class="flex gap-1 w-full flex-wrap">
                           <button
                               class="flex-1 px-3 py-2 text-sm border border-white/30 rounded-full hover:bg-white/20 hover:text-white transition-colors text-white edit-merch-btn whitespace-nowrap text-center"
                               data-bs-toggle="modal"
@@ -815,7 +815,7 @@ async function loadAdminParks() {
                       </div>
                       <div class="flex gap-2 flex-wrap shrink-0">
                           <button
-                              class="px-4 py-2 text-sm border border-white/30 rounded-full hover:bg-white/20 hover:text-white transition-colors text-white edit-park-btn whitespace-nowrap"
+                              class="w-32 text-center px-4 py-2 text-sm border border-white/30 rounded-full hover:bg-white/20 hover:text-white transition-colors text-white edit-park-btn whitespace-nowrap"
                               data-bs-toggle="modal"
                               data-bs-target="#editParkModal"
                               data-park-id="${park.id}"
@@ -825,10 +825,10 @@ async function loadAdminParks() {
                           >
                               Edit Park
                           </button>
-                          <button class="px-4 py-2 text-sm border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-park-btn whitespace-nowrap" data-park-id="${park.id}">
+                          <button class="w-32 text-center px-4 py-2 text-sm border border-yellow-500/50 text-yellow-400 rounded-full hover:bg-yellow-500 hover:text-black transition-colors deactivate-park-btn whitespace-nowrap" data-park-id="${park.id}">
                             Deactivate
                           </button>
-                          <button class="px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-permanent-btn whitespace-nowrap" data-park-id="${park.id}">
+                          <button class="w-32 text-center px-4 py-2 text-sm border border-red-500/50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors delete-park-permanent-btn whitespace-nowrap" data-park-id="${park.id}">
                             Delete
                           </button>
                       </div>
