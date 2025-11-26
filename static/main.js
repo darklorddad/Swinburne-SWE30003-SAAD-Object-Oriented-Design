@@ -1771,7 +1771,7 @@ async function loadParkDetail() {
               ticketTypes
                 .map(
                   (tt) => `
-                    <div class="ticket-section mb-6 pb-6 border-b border-gray-200">
+                    <div class="ticket-section p-6 rounded-xl border border-gray-200 hover:border-green-500 transition-colors duration-300 mb-4">
                         <h5 class="text-xl font-bold text-green-800 mb-4">${tt.name} <span class="text-gray-600 text-base font-normal">(RM ${tt.price.toFixed(2)})</span></h5>
                         <div class="row g-4">
                             <div class="col-md-6">
@@ -1795,7 +1795,7 @@ async function loadParkDetail() {
               merchandise
                 .map(
                   (m) => `
-                    <div class="merchandise-section mb-6 pb-6 border-b border-gray-200">
+                    <div class="merchandise-section p-6 rounded-xl border border-gray-200 hover:border-green-500 transition-colors duration-300 mb-4">
                         <h5 class="text-xl font-bold text-green-800 mb-2">${m.name} <span class="text-gray-600 text-base font-normal">(RM ${m.price.toFixed(2)})</span></h5>
                         <p class="mb-4 text-gray-600 text-sm">${m.description || ""}</p>
                         <div class="row g-4">
