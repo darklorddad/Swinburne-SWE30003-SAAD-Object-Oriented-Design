@@ -525,42 +525,21 @@ async function handleCreatePark(event) {
   const fileInput = document.getElementById("park-image");
   const file = fileInput.files[0];
 
-  let imageUrl = null;
-
+  const formData = new FormData();
+  formData.append("name", parkName);
+  if (parkLocation) formData.append("location", parkLocation);
+  if (parkDescription) formData.append("description", parkDescription);
   if (file) {
-    try {
-      const { data, error } = await supabaseClient.storage
-        .from("park-images")
-        .upload(`public/${Date.now()}_${file.name}`, file);
-
-      if (error) {
-        throw error;
-      }
-
-      // Construct the public URL
-      const { publicUrl } = supabaseClient.storage.from('park-images').getPublicUrl(data.path);
-      imageUrl = publicUrl;
-    } catch (error) {
-      showAlert(`Failed to upload image: ${error.message}`, "danger");
-      return;
-    }
+    formData.append("image", file);
   }
-
-  const parkData = {
-    name: parkName,
-    location: parkLocation,
-    description: parkDescription,
-    image_url: imageUrl,
-  };
 
   try {
     const response = await fetch("/api/admin/parks/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(parkData),
+      body: formData,
     });
 
     const data = await response.json();

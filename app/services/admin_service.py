@@ -1,22 +1,52 @@
 """
 Service layer for administrator-specific logic.
 """
+import time
 from collections import defaultdict
 from typing import List, Optional
 from uuid import UUID
 
+from fastapi import UploadFile
 from supabase import Client
 
-from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.park import Park, ParkUpdate
 from app.models.merchandise import Merchandise, MerchandiseCreate, MerchandiseUpdate
 from app.models.report import ParkStatistic, VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
 from app.services.park_service import get_park_by_id
 
 
-async def create_park(db: Client, park: ParkCreate) -> Park:
-    """Creates a new park in the database."""
-    response = db.table("parks").insert(park.dict()).execute()
+async def create_park(
+    db: Client,
+    name: str,
+    location: Optional[str],
+    description: Optional[str],
+    image: Optional[UploadFile],
+) -> Park:
+    """Creates a new park in the database, handling image upload."""
+    image_url = None
+    if image:
+        file_content = await image.read()
+        # Create a unique filename
+        file_ext = image.filename.split(".")[-1] if "." in image.filename else "jpg"
+        file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
+
+        # Upload to Supabase Storage
+        db.storage.from_("park-images").upload(
+            file_name, file_content, {"content-type": image.content_type}
+        )
+
+        # Get public URL
+        image_url = db.storage.from_("park-images").get_public_url(file_name)
+
+    park_data = {
+        "name": name,
+        "location": location,
+        "description": description,
+        "image_url": image_url,
+    }
+
+    response = db.table("parks").insert(park_data).execute()
     created_park_data = response.data[0]
     return Park(**created_park_data)
 

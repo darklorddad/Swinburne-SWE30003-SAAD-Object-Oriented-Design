@@ -4,11 +4,11 @@ API endpoints for administrator-specific tasks.
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Form
 from supabase import Client
 
 from app.api import deps
-from app.models.park import Park, ParkCreate, ParkUpdate
+from app.models.park import Park, ParkUpdate
 from app.models.merchandise import Merchandise, MerchandiseCreate, MerchandiseUpdate
 from app.models.report import VisitorStatistics
 from app.models.ticket import TicketType, TicketTypeCreate, TicketTypeUpdate
@@ -23,11 +23,17 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(deps.get_current_active_admin)],
 )
-async def create_new_park(park_in: ParkCreate, db: Client = Depends(deps.get_db)):
+async def create_new_park(
+    name: str = Form(...),
+    location: str = Form(None),
+    description: str = Form(None),
+    image: UploadFile = File(None),
+    db: Client = Depends(deps.get_db),
+):
     """
     Create a new national park. (Admin only)
     """
-    return await admin_service.create_park(db, park_in)
+    return await admin_service.create_park(db, name, location, description, image)
 
 
 @router.get(
