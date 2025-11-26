@@ -1,4 +1,5 @@
 let allParks = []; // To store all parks for client-side searching
+let currentProfilePage = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
   updateNav();
@@ -1352,6 +1353,7 @@ function showBottomRightNotification(message, type = "success") {
 }
 
 async function loadProfileData(page = 1) {
+  currentProfilePage = page;
   const token = getToken();
   if (!token) {
     window.location.href = "/login";
@@ -1935,7 +1937,7 @@ async function handleRescheduleSubmit() {
       if (modal) modal.hide();
     }
 
-    loadProfileData(); // Refresh list to show new date
+    loadProfileData(currentProfilePage); // Refresh list to show new date
   } catch (error) {
     showBottomRightNotification(error.message, "danger");
   }
@@ -1981,7 +1983,7 @@ async function handleRefundSubmit() {
     const modal = bootstrap.Modal.getInstance(modalEl);
     modal.hide();
 
-    loadProfileData(); // Refresh list to show "refunded" status
+    loadProfileData(currentProfilePage); // Refresh list to show "refunded" status
   } catch (error) {
     showBottomRightNotification(error.message, "danger");
   }

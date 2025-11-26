@@ -247,10 +247,11 @@ async def reschedule_order(
     
     if ticket_item_ids:
         # Update the identified ticket items
-        db.table("order_items")\
-            .update({"visit_date": str(new_date)})\
-            .in_("id", ticket_item_ids)\
-            .execute()
+        for item_id in ticket_item_ids:
+            db.table("order_items")\
+                .update({"visit_date": str(new_date)})\
+                .eq("id", item_id)\
+                .execute()
     
     # 4. Return the updated order object
     return await get_order_by_id(db, order_id, customer_id)
