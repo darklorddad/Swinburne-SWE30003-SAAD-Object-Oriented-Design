@@ -716,7 +716,7 @@ async function loadAdminParks() {
                           <span class="font-bold text-white block">${tt.name}</span>
                           <span class="text-sm text-gray-400">RM ${tt.price.toFixed(2)}${ttBadge}</span>
                       </div>
-                      <div class="flex gap-x-0.5 gap-y-2 w-full flex-wrap">
+                      <div class="flex gap-x-px gap-y-2 w-full flex-wrap">
                           <button
                               class="flex-1 px-3 py-2 text-sm border border-white/30 rounded-full hover:bg-white/20 hover:text-white transition-colors text-white edit-tt-btn whitespace-nowrap text-center"
                               data-bs-toggle="modal"
@@ -765,7 +765,7 @@ async function loadAdminParks() {
                               <span class="text-xs bg-white/10 px-2 py-0.5 rounded">Stock: ${m.stock}</span>
                           </div>
                       </div>
-                      <div class="flex gap-x-0.5 gap-y-2 w-full flex-wrap">
+                      <div class="flex gap-x-px gap-y-2 w-full flex-wrap">
                           <button
                               class="flex-1 px-3 py-2 text-sm border border-white/30 rounded-full hover:bg-white/20 hover:text-white transition-colors text-white edit-merch-btn whitespace-nowrap text-center"
                               data-bs-toggle="modal"
