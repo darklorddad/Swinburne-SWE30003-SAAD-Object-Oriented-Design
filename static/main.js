@@ -1869,9 +1869,11 @@ async function loadParkDetail() {
                         <p class="mb-4 text-gray-300 text-sm">${m.description || ""}</p>
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="quantity-merch-${m.id}" class="form-label text-gray-300 uppercase tracking-wider text-xs font-bold mb-2">Quantity</label>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label for="quantity-merch-${m.id}" class="form-label text-gray-300 uppercase tracking-wider text-xs font-bold m-0">Quantity</label>
+                                    <span class="text-gray-400 text-xs">Stock: ${m.stock}</span>
+                                </div>
                                 <input type="number" id="quantity-merch-${m.id}" class="form-control glass-input bg-white/10 border-white/20 text-white merchandise-quantity" min="0" value="0" data-merchandise-id="${m.id}" max="${m.stock}">
-                                <small class="text-gray-400 block mt-1">Stock: ${m.stock}</small>
                             </div>
                         </div>
                     </div>
