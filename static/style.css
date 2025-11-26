@@ -2262,6 +2262,25 @@ body.has-full-bg {
     margin: 0;
 }
 
+/* Nav Pills for Admin Dashboard */
+.nav-pills .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(45, 80, 22, 0.4);
+}
+
 /* Custom Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 8px;
