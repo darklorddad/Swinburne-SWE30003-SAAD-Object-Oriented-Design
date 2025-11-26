@@ -38,10 +38,22 @@ async def create_park(
 
         # Upload to Supabase Storage using the client library
         # Try to use Service Role Key to bypass RLS for admin uploads
-        service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or getattr(
+            settings, "SUPABASE_SERVICE_ROLE_KEY", None
+        )
 
         if service_key:
-            client = create_client(settings.SUPABASE_URL, service_key)
+            # Explicitly set headers to ensure Storage API uses the service key
+            client = create_client(
+                settings.SUPABASE_URL,
+                service_key,
+                options=ClientOptions(
+                    headers={
+                        "Authorization": f"Bearer {service_key}",
+                        "apikey": service_key,
+                    }
+                ),
+            )
         elif token:
             client = create_client(
                 settings.SUPABASE_URL,
