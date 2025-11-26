@@ -933,6 +933,15 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
 }
 
 /* Modal Styling */
+body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+}
+
+body.modal-open .navbar {
+    padding-right: 0 !important;
+}
+
 .modal-content {
     border: none;
     border-radius: 25px;
