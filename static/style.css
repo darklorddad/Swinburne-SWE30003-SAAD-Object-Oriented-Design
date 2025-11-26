@@ -934,7 +934,8 @@ body:not(:has(.hero)):not(.has-full-bg) .navbar {
 
 /* Modal Styling */
 body.modal-open {
-    overflow: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     padding-right: 0 !important;
 }
 
