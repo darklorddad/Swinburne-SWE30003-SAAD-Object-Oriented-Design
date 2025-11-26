@@ -529,7 +529,7 @@ async function handleCreatePark(event) {
 
   if (file) {
     try {
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseClient.storage
         .from("park-images")
         .upload(`public/${Date.now()}_${file.name}`, file);
 
@@ -538,7 +538,7 @@ async function handleCreatePark(event) {
       }
 
       // Construct the public URL
-      const { publicUrl } = supabase.storage.from('park-images').getPublicUrl(data.path);
+      const { publicUrl } = supabaseClient.storage.from('park-images').getPublicUrl(data.path);
       imageUrl = publicUrl;
     } catch (error) {
       showAlert(`Failed to upload image: ${error.message}`, "danger");
