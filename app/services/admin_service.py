@@ -7,8 +7,9 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import UploadFile
-from supabase import Client
+from supabase import Client, create_client
 
+from app.core.config import get_settings
 from app.models.park import Park, ParkUpdate
 from app.models.merchandise import Merchandise, MerchandiseCreate, MerchandiseUpdate
 from app.models.report import ParkStatistic, VisitorStatistics
@@ -25,6 +26,15 @@ async def create_park(
     token: Optional[str] = None,
 ) -> Park:
     """Creates a new park in the database, handling image upload."""
+    # Use a dedicated client with the user's token if provided, to satisfy RLS
+    if token:
+        settings = get_settings()
+        client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        client.postgrest.auth(token)
+        client.storage.headers["Authorization"] = f"Bearer {token}"
+    else:
+        client = db
+
     image_url = None
     if image:
         file_content = await image.read()
@@ -33,16 +43,12 @@ async def create_park(
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
         # Upload to Supabase Storage
-        bucket = db.storage.from_("park-images")
-        if token:
-            bucket.headers["Authorization"] = f"Bearer {token}"
-
-        bucket.upload(
+        client.storage.from_("park-images").upload(
             file_name, file_content, {"content-type": image.content_type}
         )
 
         # Get public URL
-        image_url = db.storage.from_("park-images").get_public_url(file_name)
+        image_url = client.storage.from_("park-images").get_public_url(file_name)
 
     park_data = {
         "name": name,
@@ -51,7 +57,7 @@ async def create_park(
         "image_url": image_url,
     }
 
-    response = db.table("parks").insert(park_data).execute()
+    response = client.table("parks").insert(park_data).execute()
     created_park_data = response.data[0]
     return Park(**created_park_data)
 
