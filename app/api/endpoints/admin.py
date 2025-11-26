@@ -29,11 +29,12 @@ async def create_new_park(
     description: str = Form(None),
     image: UploadFile = File(None),
     db: Client = Depends(deps.get_db),
+    token: str = Depends(deps.oauth2_scheme),
 ):
     """
     Create a new national park. (Admin only)
     """
-    return await admin_service.create_park(db, name, location, description, image)
+    return await admin_service.create_park(db, name, location, description, image, token)
 
 
 @router.get(

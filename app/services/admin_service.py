@@ -22,6 +22,7 @@ async def create_park(
     location: Optional[str],
     description: Optional[str],
     image: Optional[UploadFile],
+    token: Optional[str] = None,
 ) -> Park:
     """Creates a new park in the database, handling image upload."""
     image_url = None
@@ -32,7 +33,11 @@ async def create_park(
         file_name = f"public/{int(time.time())}_{name.replace(' ', '_')}.{file_ext}"
 
         # Upload to Supabase Storage
-        db.storage.from_("park-images").upload(
+        bucket = db.storage.from_("park-images")
+        if token:
+            bucket.headers["Authorization"] = f"Bearer {token}"
+
+        bucket.upload(
             file_name, file_content, {"content-type": image.content_type}
         )
 
