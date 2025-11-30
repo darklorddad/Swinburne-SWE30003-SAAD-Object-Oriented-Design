@@ -6,8 +6,6 @@ This system allows users to explore park details, book tickets, and purchase mer
 
 ---
 
-## Features
-
 ### Public Interface
 - **Explore Parks**: Browse National Parks like Bako, Mulu, and Niah.
 - **Detailed Views**: Access park information, ticket types, and merchandise.
