@@ -1,6 +1,6 @@
 # National Parks Booking System
 
-This project is a web application for the National Parks Marketing Company, developed by Swin Consulting. It allows customers to browse national parks, purchase tickets and merchandise and manage their orders. It also provides an admin dashboard for managing parks, products and viewing statistics.
+This project is a web application for the National Parks Marketing Company. It allows customers to browse national parks, purchase tickets and merchandise and manage their orders. It also provides an admin dashboard for managing parks, products and viewing statistics.
 
 ---
 
