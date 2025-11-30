@@ -2,8 +2,16 @@
 dld*
 *.sql
 supabase/
-Documents/
 .claude/
+Assignment-2-Object-oriented-Design-(Part-1)-Group-10/
+Assignment-3-contribution-document.doc
+Assignment-3-contribution-document.pdf
+Assignment-3-Object-oriented-Design-Part-II/
+Submission/
+Assignment-1-SRS-Group-10.md
+Assignment-3-Object-oriented-Design-Part-II-outline.docx
+
+---
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,10 @@
+Here is the marking rubric from the document in Markdown format.
+
+| Area | Elements | Allocated mark |
+| :--- | :--- | :--- |
+| **Detailed design, with explanation and justification of changes and non-changes to Assignment 2 Design** | Presentation of Detailed Design and Justification of Changes and Non-Changes (points allocation scheme: [Low: 2; Medium: 4; Good: 6; Very Good: 8; Excellent: 10]:<ul><li>Overall (at class level) -> max 10</li><li>Responsibilities & Collaborators -> max 10</li><li>dynamic aspects (bootstrap, interaction scenarios) -> max 10</li></ul> | 30 |
+| **Discussion of Assignment 2 Design** | Quality of Assignment 2 Design<ul><li>Good aspects -> max 5</li><li>Missing from original design -> max 5</li><li>Flawed aspects of original design -> max 5</li><li>Level of interpretation required -> max 5</li></ul> | 20 |
+| **Lessons learnt** | Missing: 0; Low : 2; Medium: 4; Good: 6; Very Good: 8; Excellent: 10 | 10 |
+| **Implementation** | Source code quality, including the use of suitable coding standards:<ul><li>low -> 5;</li><li>medium -> 10,</li><li>good 15;</li><li>very good -> 17;</li><li>excellent -> 20</li></ul> | 20 |
+| **Compilation and execution:** | Aspects:<ul><li>Explicit evidence of compilation -> 5</li><li>Illustration of home screen -> 1</li><li>Illustration of successful data input -> 9</li><li>Validate inputs and process inputs-> 5</li><li>Illustration of sample outputs -> 5</li><li>Exit and test screens -> 5</li><li>NOTE: 4 or more scenarios may be needed for illustration!</li></ul> | 30 |
+| **Meeting the requirements of the assignment specification** | <ul><li>Cover sheet signed (penalty up to 5 points)</li><li>Worksheet (contribution document) completed and signed (otherwise, penalty up to 10 points)</li><li>Assignment 2 is attached (otherwise, no reference basis for discussion; penalty up to 60 points)</li><li>Others</li></ul> | -XX |
