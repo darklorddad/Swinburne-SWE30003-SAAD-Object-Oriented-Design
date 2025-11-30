@@ -1,24 +1,25 @@
-# National Parks Online System (Sarawak)
+# 🌿 National Parks Online System (Sarawak)
 
-This is a web-based application for managing and visiting National Parks in Sarawak. It allows users to view park details, book tickets, and purchase merchandise. Administrators can manage parks, ticket types, merchandise, and view statistics.
+> A modern web-based application for managing and visiting National Parks in Sarawak.
+
+This system allows users to explore park details, book tickets, and purchase merchandise seamlessly. It also provides a comprehensive dashboard for administrators to manage park operations and view analytics.
 
 ---
 
-### Features
+## ✨ Features
 
-- **Public Interface**:
-  - View list of National Parks (Bako, Mulu, Niah, etc.)
-  - View park details, ticket types, and merchandise.
-  - Responsive design with animations.
+### 🌍 Public Interface
+- **Explore Parks**: Browse National Parks like Bako, Mulu, and Niah.
+- **Detailed Views**: Access park information, ticket types, and merchandise.
+- **Modern UI**: Responsive design with smooth animations.
 
-- **User Features**:
-  - User registration and login.
-  - Profile management.
-  - Book tickets and purchase merchandise.
-  - View order history.
-  - Reschedule bookings or request refunds.
+### 👤 User Features
+- **Account Management**: Secure registration, login, and profile updates.
+- **Booking System**: Easy ticket booking and merchandise purchasing.
+- **Order History**: Track past orders and current bookings.
+- **Flexibility**: Reschedule bookings or request refunds with ease.
 
-- **Admin Dashboard**:
-  - Manage Parks (Create, Update, Delete/Deactivate).
-  - Manage Ticket Types and Merchandise.
-  - View visitor statistics and revenue reports.
+### 🛡️ Admin Dashboard
+- **Park Management**: Create, update, and deactivate park listings.
+- **Inventory Control**: Manage ticket types and merchandise stock.
+- **Analytics**: Visualize visitor statistics and revenue reports.
